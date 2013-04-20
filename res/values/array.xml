@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="menu_list">
+        <item>Call Blocklist</item>
+        <item>SMS/MMS Blocklist</item>
+        <item>SMS/MMS Spam Blocker</item>
+        <item>Settings</item>
+        <item>About</item>
+    </string-array>
+    
+    <integer-array name="menu_icon_list">
+        <item>@drawable/ic_launcher</item>
+        <item>@drawable/ic_launcher</item>
+        <item>@drawable/ic_launcher</item>
+        <item>@drawable/ic_launcher</item>
+        <item>@drawable/ic_launcher</item>
+    </integer-array>
+    <string-array name="layout_resources_list">
+        <item>@layout/fragment_call_blocklist</item>
+        <item>@layout/fragment_sms_mms_blocklist</item>
+        <item>@layout/fragment_call_blocklist</item>
+        <item>@layout/fragment_call_blocklist</item>
+        <item>@layout/fragment_call_blocklist</item>
+    </string-array>
+
+</resources>
