@@ -1,38 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<view xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="horizontal" >
+    android:layout_height="wrap_content"
+    class="com.jphsoftware.nope.CallBlockListItemView"
+    android:orientation="vertical" >
 
     <LinearLayout
-        android:layout_width="fill_parent"
+        android:id="@+id/primary_action_view"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical" >
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="@dimen/block_log_outer_margin"
+        android:layout_marginRight="@dimen/block_log_outer_margin"
+        android:background="?android:attr/selectableItemBackground"
+        android:focusable="true"
+        android:gravity="center_vertical" >
 
-        <TextView
-            android:id="@+id/phoneNum"
-            android:textIsSelectable="false"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textStyle="bold" />
+        <QuickContactBadge
+            android:id="@+id/quick_contact_photo"
+            android:layout_width="@dimen/block_log_list_contact_photo_size"
+            android:layout_height="@dimen/block_log_list_contact_photo_size"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:focusable="true"
+            android:nextFocusRight="@id/primary_action_view" />
 
-        <TextView
-            android:id="@+id/lastCalled"
-            android:textIsSelectable="false"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textStyle="italic" />
+            android:layout_marginLeft="@dimen/block_log_inner_margin"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:orientation="vertical"
+            android:paddingBottom="@dimen/block_log_inner_margin"
+            android:paddingTop="@dimen/block_log_inner_margin" >
+
+            <TextView
+                android:id="@+id/name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="@dimen/block_log_icon_margin"
+                android:singleLine="true"
+                android:textSize="18sp" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" >
+
+                <TextView
+                    android:id="@+id/phoneNum"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="@dimen/block_log_icon_margin"
+                    android:ellipsize="marquee"
+                    android:singleLine="true"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/lastCalled"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginRight="@dimen/block_log_icon_margin"
+                    android:singleLine="true"
+                    android:textSize="14sp" />
+            </LinearLayout>
+        </LinearLayout>
     </LinearLayout>
-    
-    <ImageView
-        android:id="@+id/call_block_item_icon"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_gravity="center_vertical"
-        android:contentDescription="@string/item_icon_desc"
-        android:padding="10dp"
-        android:src="@drawable/ic_edit_item" />
 
-</LinearLayout>
+</view>

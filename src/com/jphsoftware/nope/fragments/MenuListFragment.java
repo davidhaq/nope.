@@ -2,6 +2,7 @@ package com.jphsoftware.nope.fragments;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,7 +11,6 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.app.SherlockListFragment;
 import com.jphsoftware.nope.MainActivity;
 import com.jphsoftware.nope.R;
@@ -75,7 +75,7 @@ public class MenuListFragment extends SherlockListFragment {
 
 	@Override
 	public void onListItemClick(ListView lv, View v, int position, long id) {
-		SherlockFragment newContent = null;
+		Fragment newContent = null;
 		switch (position) {
 		case 0:
 			newContent = new CallBlockFragment();
@@ -105,7 +105,7 @@ public class MenuListFragment extends SherlockListFragment {
 	}
 
 	// the meat of switching the above fragment
-	private void switchFragment(SherlockFragment fragment) {
+	private void switchFragment(Fragment newContent) {
 		if (getActivity() == null) {
 			return;
 		}
@@ -114,7 +114,7 @@ public class MenuListFragment extends SherlockListFragment {
 			System.err.println("Grabbing activity");
 			MainActivity activity = (MainActivity) getActivity();
 			System.err.println("switching content");
-			activity.switchContent(fragment);
+			activity.switchContent(newContent);
 		}
 	}
 }
