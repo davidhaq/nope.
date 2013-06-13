@@ -95,13 +95,12 @@ public class CallBlockFragment extends SherlockListFragment {
 		sharedPrefs = getActivity().getSharedPreferences(
 				Constants.CALLBLOCK_DATA, Context.MODE_PRIVATE);
 		listView.setAdapter(callBlockAdapter);
-		new UiThread().execute();
+//		new UiThread().execute();
 	}
 
 	@Override
 	public void onResume() {
 		super.onResume();
-		new UiThread().execute();
 	}
 
 	@Override
