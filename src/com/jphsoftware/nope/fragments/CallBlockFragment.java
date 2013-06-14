@@ -12,21 +12,25 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.database.Cursor;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.BaseColumns;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.PhoneLookup;
 import android.text.InputType;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.QuickContactBadge;
@@ -50,6 +54,7 @@ public class CallBlockFragment extends SherlockListFragment {
 	private GsonBuilder gsonb;
 	private Gson gson;
 	private SharedPreferences sharedPrefs;
+	private static int s180DipInPixel = -1;
 
 	public CallBlockFragment() {
 
@@ -121,22 +126,22 @@ public class CallBlockFragment extends SherlockListFragment {
 		gsonb = new GsonBuilder();
 		gson = gsonb.create();
 		String value = prefs.getString(callData, null);
-		System.err.println("Value: " + value);
+//		System.err.println("Value: " + value);
 		if (value != null) {
-			System.err.println("String Value not null!");
+//			System.err.println("String Value not null!");
 
 			@SuppressWarnings("unused")
 			String nullOrNot;
-			System.err.println(nullOrNot = (gson != null) ? "gson is not null"
-					: "gson is null");
+//			System.err.println(nullOrNot = (gson != null) ? "gson is not null"
+//					: "gson is null");
 			String[] list = gson.fromJson(value, String[].class);
 			ArrayList<String> arrayList = new ArrayList<String>(
 					Arrays.asList(list));
-			System.err.println("Array contents" + arrayList.toString());
+//			System.err.println("Array contents" + arrayList.toString());
 			return arrayList;
 		} else {
-			System.err
-					.println("String value is null, so creating a blank arraylist");
+//			System.err
+//					.println("String value is null, so creating a blank arraylist");
 			ArrayList<String> arrayList = new ArrayList<String>();
 			return arrayList;
 		}
@@ -275,7 +280,7 @@ public class CallBlockFragment extends SherlockListFragment {
 			@Override
 			public void onShow(DialogInterface dialog) {
 
-				Button b = alert.getButton(AlertDialog.BUTTON_POSITIVE);
+				Button b = alert.getButton(DialogInterface.BUTTON_POSITIVE);
 				b.setOnClickListener(new View.OnClickListener() {
 
 					// Overriding the positive button on click to prevent the
@@ -381,7 +386,7 @@ public class CallBlockFragment extends SherlockListFragment {
 					PhoneLookup.CONTENT_FILTER_URI,
 					Uri.encode(phoneNums[position]));
 			String[] mPhoneNumberProjection = { PhoneLookup.DISPLAY_NAME,
-					PhoneLookup._ID, PhoneLookup.LAST_TIME_CONTACTED };
+					BaseColumns._ID, PhoneLookup.LAST_TIME_CONTACTED };
 			Cursor cur = getActivity().getContentResolver().query(lookupUri,
 					mPhoneNumberProjection, null, null, null);
 
@@ -391,7 +396,7 @@ public class CallBlockFragment extends SherlockListFragment {
 						.getString(cur
 								.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME));
 				contactId = cur.getString(cur
-						.getColumnIndex(ContactsContract.PhoneLookup._ID));
+						.getColumnIndex(BaseColumns._ID));
 				contactUri = Uri.withAppendedPath(
 						ContactsContract.Contacts.CONTENT_URI,
 						String.valueOf(contactId));
@@ -399,11 +404,13 @@ public class CallBlockFragment extends SherlockListFragment {
 						.getColumnIndex(PhoneLookup.LAST_TIME_CONTACTED));
 				holder.quickContactView.assignContactFromPhone(
 						phoneNums[position], true);
+				loadThumbnail(holder.quickContactView, contactUri);
 				InputStream input = ContactsContract.Contacts
 						.openContactPhotoInputStream(getActivity()
 								.getContentResolver(), contactUri);
 				holder.quickContactView.setImageBitmap(BitmapFactory
 						.decodeStream(input));
+				
 				holder.name.setText(name);
 				holder.phoneNum.setText(phoneNums[position]);
 				holder.lastCall.setText(lastContacted);
@@ -411,6 +418,7 @@ public class CallBlockFragment extends SherlockListFragment {
 			} else {
 				holder.quickContactView.assignContactFromPhone(
 						phoneNums[position], true);
+				loadThumbnail(holder.quickContactView, null);
 				holder.name.setText(phoneNums[position]);
 				holder.phoneNum.setText("-");
 				holder.lastCall.setVisibility(View.INVISIBLE);
@@ -453,6 +461,36 @@ public class CallBlockFragment extends SherlockListFragment {
 		}
 
 	}
+	public static int getDefaultAvatarResId(Context context, int extent) {
+        // TODO: Is it worth finding a nicer way to do hires/lores here? In practice, the
+        // default avatar doesn't look too different when stretched
+        if (s180DipInPixel == -1) {
+            Resources r = context.getResources();
+            s180DipInPixel = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 180,
+                    r.getDisplayMetrics());
+        }
+
+        final boolean hires = (extent != -1) && (extent > s180DipInPixel);
+        return getDefaultAvatarResId(hires);
+    }
+
+    public static int getDefaultAvatarResId(boolean hires) {
+        if (hires) return R.drawable.ic_contact_picture_180_holo_light;
+        return R.drawable.ic_contact_picture_holo_light;
+    }
+	public void loadThumbnail(ImageView view, Uri contactUri ) {
+        if (contactUri == null) {
+            // No photo is needed
+        	view.setImageResource(getDefaultAvatarResId(view.getContext(), -1));
+        } else {
+        	
+        	InputStream input = ContactsContract.Contacts
+					.openContactPhotoInputStream(getActivity()
+							.getContentResolver(), contactUri);
+			view.setImageBitmap(BitmapFactory
+					.decodeStream(input));
+        }
+    }
 
 	private class UiThread extends AsyncTask<Void, Void, Void> {
 		CallBlocklistAdapter adapter = callBlockAdapter;

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="app_background_light">#fffafafa</color>
+    <color name="play_translucent_separator_line">#23000000</color>
+    <color name="side_drawer_item_pressed_color">#99f4842d</color>
+    <color name="transparent">#00000000</color>
+
+</resources>

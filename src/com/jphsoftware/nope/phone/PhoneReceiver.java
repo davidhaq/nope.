@@ -1,13 +1,8 @@
 package com.jphsoftware.nope.phone;
 
-import java.lang.reflect.Method;
-
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.telephony.TelephonyManager;
-
-import com.android.internal.telephony.ITelephony;
 
 public class PhoneReceiver extends BroadcastReceiver {
 

@@ -142,7 +142,7 @@ public class SMSBlockFragment extends SherlockFragment {
 			// TODO Auto-generated method stub
 			if (convertView == null) {
 				convertView = getActivity().getLayoutInflater().inflate(
-						R.layout.slide_menu_row, null);
+						R.layout.side_menu_list_item, null);
 			}
 			return null;
 		}
