@@ -1,12 +1,15 @@
 package com.jphsoftware.nope;
 
 import android.content.res.Configuration;
+import android.content.res.Resources;
+import android.graphics.Point;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.view.Display;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -33,55 +36,45 @@ public class MainActivity extends SherlockFragmentActivity {
 	private CharSequence mTitle;
 	private Integer mMenuPosition;
 	private ActionBar actionBar;
+	private int i;
+
+	private boolean firstLoad = true;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		if (savedInstanceState == null || savedInstanceState.isEmpty()) {
-			mMenuPosition = 0;
-			mContent = new CallBlockFragment();
-			System.err.println("Derp, new activity.");
-		} else {
-			mMenuPosition = savedInstanceState.getInt("position");
-			System.err.println(mMenuPosition);
-			if (mMenuPosition != null) {
-				if (mMenuPosition == 0) {
-					mContent = new CallBlockFragment();
-				} else if (mMenuPosition == 1) {
-					mContent = new SMSBlockFragment();
-				} else if (mMenuPosition == 2) {
-					mContent = new AntiSMSSpamFragment();
-				} else if (mMenuPosition == 3) {
-					mContent = new SettingsFragment();
-				} else if (mMenuPosition == 4) {
-					mContent = new AboutFragment();
-				}
-			}
-
-		}
-
 		// Request window feature before content is displayed
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 
-		// set the Above View
+		// set the main container view
 		setContentView(R.layout.main);
+
+		// grab and set some things in the actionBarSherlock
 		actionBar = getSupportActionBar();
 		actionBar.setDisplayHomeAsUpEnabled(true);
-		// If there isn't a fragment, make one, and commit it.
-		menuListArray = getResources().getStringArray(R.array.menu_list);
-		getSupportFragmentManager().beginTransaction()
-				.replace(R.id.content_frame, mContent).commit();
-		mTitle = menuListArray[mMenuPosition];
 
+		// Make sure we get the array of menu item strings.
+		menuListArray = getResources().getStringArray(R.array.menu_list);
+
+		// Define the drawer list view
 		mDrawerList = (ListView) findViewById(R.id.menu_frame);
 		mDrawerList.setAdapter(new ArrayAdapter<String>(this,
 				R.layout.side_menu_list_item, menuListArray));
-		mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
+		mDrawerList.setOnItemClickListener(new DrawerItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view,
+					int position, long arg3) {
+				view.setSelected(true);
+				super.onItemClick(parent, view, position, arg3);
+			}
+		});
 
 		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 		mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow,
 				GravityCompat.START);
+
+		// mDrawerLayout.getLayoutParams().width = calculateSideDrawerWidth();
 
 		mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
 				R.drawable.ic_drawer, R.string.drawer_open,
@@ -108,16 +101,48 @@ public class MainActivity extends SherlockFragmentActivity {
 		};
 
 		mDrawerLayout.setDrawerListener(mDrawerToggle);
+
 		if (savedInstanceState == null) {
-			selectItem(0);
+
+			System.err.println("New activity, so default to callblockfragment");
+			mMenuPosition = 0;
+			selectItem(mMenuPosition, firstLoad);
+			setTitle(menuListArray[mMenuPosition]);
+		} else {
+			mMenuPosition = savedInstanceState.getInt("position");
+			if (mMenuPosition != null) {
+				System.err.println("MenuPosition: ");
+				selectItem(mMenuPosition, firstLoad);
+			} else {
+				selectItem(0, true);
+			}
 		}
+
+	}
+
+	protected int calculateSideDrawerWidth() {
+		Resources localResources = getResources();
+		Display display = getWindowManager().getDefaultDisplay();
+		Point size = new Point();
+		display.getSize(size);
+		this.i = size.x;
+		int j = localResources
+				.getDimensionPixelSize(R.dimen.side_panel_max_width);
+		int k = localResources.getConfiguration().orientation;
+		int m;
+
+		if (k == 1) {
+			m = Math.min(this.i * 4 / 5, j);
+		} else {
+			m = Math.min(this.i / 2, j);
+		}
+		return m;
 
 	}
 
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
-		getSupportFragmentManager().beginTransaction().remove(mContent)
-				.commit();
+
 		outState.putInt("position", mMenuPosition);
 		System.err.println("Putting in position: " + mMenuPosition);
 		super.onSaveInstanceState(outState);
@@ -143,8 +168,8 @@ public class MainActivity extends SherlockFragmentActivity {
 	public boolean onPrepareOptionsMenu(Menu menu) {
 		// If the nav drawer is open, hide action items related to the content
 		// view
-		
-		System.err.println("onPrepareOptionsMenu called");
+
+		// System.err.println("onPrepareOptionsMenu called");
 		boolean drawerOpen = mDrawerLayout.isDrawerVisible(mDrawerList);
 		if (menu.hasVisibleItems()) {
 			if (mMenuPosition == 0 || mMenuPosition == 1) {
@@ -156,35 +181,6 @@ public class MainActivity extends SherlockFragmentActivity {
 		return super.onPrepareOptionsMenu(menu);
 	}
 
-	@Override
-	public void onRestoreInstanceState(Bundle savedInstanceState) {
-		super.onRestoreInstanceState(savedInstanceState);
-		mMenuPosition = savedInstanceState.getInt("position");
-		System.err.println("Restored state position: " + mMenuPosition);
-		switch (mMenuPosition) {
-		case 0:
-			mContent = new CallBlockFragment();
-			break;
-		case 1:
-			mContent = new SMSBlockFragment();
-			break;
-		case 2:
-			mContent = new AntiSMSSpamFragment();
-			break;
-		case 3:
-			mContent = new SettingsFragment();
-			break;
-		case 4:
-			mContent = new AboutFragment();
-			break;
-		default:
-			mContent = new CallBlockFragment();
-			break;
-		}
-		setTitle(menuListArray[mMenuPosition]);
-
-	}
-
 	private class DrawerItemClickListener implements
 			ListView.OnItemClickListener {
 		@Override
@@ -194,63 +190,71 @@ public class MainActivity extends SherlockFragmentActivity {
 		}
 	}
 
+	private void selectItem(int position, boolean first) {
+
+		if (first) {
+			selectItem(position);
+			this.firstLoad = !first;
+			System.err.println(firstLoad);
+		} else {
+			if (mMenuPosition == position) {
+
+				// Highlight the selected item, update the title, and close the
+				// drawer
+				mDrawerList.setItemChecked(position, true);
+				setTitle(menuListArray[position]);
+				mDrawerLayout.closeDrawer(mDrawerList);
+
+			} else {
+				selectItem(position);
+			}
+		}
+	}
+
 	// Swaps fragments that are shown in the main view
 	private void selectItem(int position) {
-		Fragment fragment = mContent;
-		if (fragment != null) {
 
-			if (mMenuPosition == position) {
-				// Highlight the selected item, update the title, and close the
-				// drawer
-				mDrawerList.setItemChecked(position, true);
-				setTitle(menuListArray[position]);
-				mDrawerLayout.closeDrawer(mDrawerList);
-			} else {
-
-				// Create a new fragment and specify the fragment to show based
-				// on
-				// position
-				switch (position) {
-				case 0:
-					fragment = new CallBlockFragment();
-					mMenuPosition = 0;
-					System.err.println("Call Block");
-					break;
-				case 1:
-					fragment = new SMSBlockFragment();
-					mMenuPosition = 1;
-					System.err.println("SMS Blocklist");
-					break;
-				case 2:
-					fragment = new AntiSMSSpamFragment();
-					mMenuPosition = 2;
-					System.err.println("Anti Text Spam");
-					break;
-				case 3:
-					fragment = new SettingsFragment();
-					mMenuPosition = 3;
-					System.err.println("Settings");
-					break;
-				case 4:
-					fragment = new AboutFragment();
-					mMenuPosition = 4;
-					System.err.println("About");
-					break;
-				}
-
-				// Insert the fragment by replacing any existing fragment
-				FragmentManager fragmentManager = getSupportFragmentManager();
-				fragmentManager.beginTransaction()
-						.replace(R.id.content_frame, fragment).commit();
-
-				// Highlight the selected item, update the title, and close the
-				// drawer
-				mDrawerList.setItemChecked(position, true);
-				setTitle(menuListArray[position]);
-				mDrawerLayout.closeDrawer(mDrawerList);
-			}
-
+		// Create a new fragment and specify
+		// the fragment to show based on position
+		switch (position) {
+		case 0:
+			mContent = new CallBlockFragment();
+			mMenuPosition = 0;
+			System.err.println("Call Block");
+			break;
+		case 1:
+			mContent = new SMSBlockFragment();
+			mMenuPosition = 1;
+			System.err.println("SMS Blocklist");
+			break;
+		case 2:
+			mContent = new AntiSMSSpamFragment();
+			mMenuPosition = 2;
+			System.err.println("Anti Text Spam");
+			break;
+		case 3:
+			mContent = new SettingsFragment();
+			mMenuPosition = 3;
+			System.err.println("Settings");
+			break;
+		case 4:
+			mContent = new AboutFragment();
+			mMenuPosition = 4;
+			System.err.println("About");
+			break;
 		}
+
+		// Insert the fragment by replacing any existing fragment
+		FragmentManager fragmentManager = getSupportFragmentManager();
+		fragmentManager.beginTransaction()
+				.replace(R.id.content_frame, mContent).commit();
+
+		// Highlight the selected item, update the title, and close the
+		// drawer
+		mDrawerList.setItemChecked(position, true);
+		setTitle(menuListArray[position]);
+		mDrawerLayout.closeDrawer(mDrawerList);
+
 	}
 
 	@Override
