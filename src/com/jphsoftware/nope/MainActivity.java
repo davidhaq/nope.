@@ -1,15 +1,12 @@
 package com.jphsoftware.nope;
 
 import android.content.res.Configuration;
-import android.content.res.Resources;
-import android.graphics.Point;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.view.Display;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -36,7 +33,6 @@ public class MainActivity extends SherlockFragmentActivity {
 	private CharSequence mTitle;
 	private Integer mMenuPosition;
 	private ActionBar actionBar;
-	private int i;
 
 	private boolean firstLoad = true;
 
@@ -69,6 +65,7 @@ public class MainActivity extends SherlockFragmentActivity {
 				super.onItemClick(parent, view, position, arg3);
 			}
 		});
+		mDrawerList.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 
 		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 		mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow,
@@ -117,26 +114,6 @@ public class MainActivity extends SherlockFragmentActivity {
 				selectItem(0, true);
 			}
 		}
-
-	}
-
-	protected int calculateSideDrawerWidth() {
-		Resources localResources = getResources();
-		Display display = getWindowManager().getDefaultDisplay();
-		Point size = new Point();
-		display.getSize(size);
-		this.i = size.x;
-		int j = localResources
-				.getDimensionPixelSize(R.dimen.side_panel_max_width);
-		int k = localResources.getConfiguration().orientation;
-		int m;
-
-		if (k == 1) {
-			m = Math.min(this.i * 4 / 5, j);
-		} else {
-			m = Math.min(this.i / 2, j);
-		}
-		return m;
 
 	}
 

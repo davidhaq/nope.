@@ -1,21 +1,8 @@
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!--
-        Base application theme, dependent on API level. This theme is replaced
-        by AppBaseTheme from res/values-vXX/styles.xml on newer devices.
-    -->
-    <style name="AppBaseTheme" parent="android:Theme.Light">
-        <!--
-            Theme customizations available in newer API levels can go in
-            res/values-vXX/styles.xml, while customizations related to
-            backward-compatibility can go here.
-        -->
-    </style>
-
     <!-- Application theme. -->
     <style name="AppTheme" parent="AppBaseTheme">
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
-        <item name="android:fontFamily">sans-serif-light</item>
     </style>
 
     <style name="SideMenuText" parent="android:style/TextAppearance.Medium">
@@ -24,6 +11,20 @@
         <item name="android:ellipsize">marquee</item>
         <item name="android:singleLine">true</item>
         <item name="android:fontFamily">sans-serif-light</item>
+    </style>
+    
+    <style name="block_item_name_text" parent="android:style/TextAppearance.Medium">
+        <item name="android:textColor">#ff505050</item>
+        <item name="android:ellipsize">marquee</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:fontFamily">sans-serif</item>
+    </style>
+    <style name="block_item_last_contacted_text" parent="android:style/TextAppearance.Medium">
+        <item name="android:textColor">#b0b0b0</item>
+        <item name="android:ellipsize">marquee</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:fontFamily">sans-serif-condensed</item>
     </style>
 
 </resources>

@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <view xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     class="com.jphsoftware.nope.CallBlockListItemView"
-    android:orientation="vertical" >
+    android:orientation="vertical"
+    tools:ignore="PxUsage,HardcodedText" >
 
     <LinearLayout
         android:id="@+id/primary_action_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
-        android:layout_marginLeft="@dimen/block_log_outer_margin"
-        android:layout_marginRight="@dimen/block_log_outer_margin"
         android:background="?android:attr/selectableItemBackground"
         android:focusable="true"
         android:gravity="center_vertical" >
@@ -20,8 +20,6 @@
             android:id="@+id/quick_contact_photo"
             android:layout_width="@dimen/block_log_list_contact_photo_size"
             android:layout_height="@dimen/block_log_list_contact_photo_size"
-            android:layout_alignParentLeft="true"
-            android:layout_centerVertical="true"
             android:focusable="true"
             android:nextFocusRight="@id/primary_action_view" />
 
@@ -41,7 +39,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginRight="@dimen/block_log_icon_margin"
                 android:singleLine="true"
-                android:textSize="18sp" />
+                android:textSize="18sp"
+                android:theme="@style/block_item_name_text" />
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -64,8 +63,31 @@
                     android:layout_gravity="center_vertical"
                     android:layout_marginRight="@dimen/block_log_icon_margin"
                     android:singleLine="true"
-                    android:textSize="14sp" />
+                    android:theme="@style/block_item_last_contacted_text" />
             </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:orientation="horizontal" >
+
+            <View
+                android:id="@+id/vertical_divider"
+                android:layout_width="1px"
+                android:layout_height="@dimen/block_log_contact_action_size"
+                android:layout_gravity="center_vertical"
+                android:background="@drawable/vertical_divider_light" />
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:background="?android:attr/selectableItemBackground"
+                android:clickable="true"
+                android:contentDescription="block options"
+                android:padding="8dp"
+                android:scaleType="center"
+                android:src="@drawable/navigation_next_item" />
         </LinearLayout>
     </LinearLayout>
 
