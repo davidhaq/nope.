@@ -65,7 +65,6 @@ public class MainActivity extends SherlockFragmentActivity {
 				super.onItemClick(parent, view, position, arg3);
 			}
 		});
-		mDrawerList.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 
 		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 		mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow,
@@ -178,7 +177,6 @@ public class MainActivity extends SherlockFragmentActivity {
 
 				// Highlight the selected item, update the title, and close the
 				// drawer
-				mDrawerList.setItemChecked(position, true);
 				setTitle(menuListArray[position]);
 				mDrawerLayout.closeDrawer(mDrawerList);
 
@@ -228,7 +226,15 @@ public class MainActivity extends SherlockFragmentActivity {
 
 		// Highlight the selected item, update the title, and close the
 		// drawer
-		mDrawerList.setItemChecked(position, true);
+
+		// Debugging
+		System.err.println("Child count: " + mDrawerLayout.getChildCount());
+		System.err.println("View: " + mDrawerLayout.getChildAt(1).toString());
+		ListView temp = (ListView) mDrawerLayout.getChildAt(1);
+		System.err.println("item count of listview: "
+				+ temp.getAdapter().getCount());
+		// debugging
+
 		setTitle(menuListArray[position]);
 		mDrawerLayout.closeDrawer(mDrawerList);
 
@@ -252,6 +258,7 @@ public class MainActivity extends SherlockFragmentActivity {
 		super.onConfigurationChanged(newConfig);
 		// Pass any configuration change to the drawer toggles
 		mDrawerToggle.onConfigurationChanged(newConfig);
+
 	}
 
 }
