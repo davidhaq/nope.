@@ -19,7 +19,6 @@
         android:layout_gravity="start"
         android:background="@color/default_color_side_menu_item"
         android:divider="@color/play_translucent_separator_line"
-        android:dividerHeight="1.0px"
-        android:listSelector="@drawable/home_drawer_list_selector" />
+        android:dividerHeight="1.0px" />
 
 </android.support.v4.widget.DrawerLayout>

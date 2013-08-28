@@ -3,6 +3,7 @@
     <!-- Application theme. -->
     <style name="AppTheme" parent="AppBaseTheme">
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
+<<<<<<< HEAD
     </style>
 
     <style name="SideMenuText" parent="android:style/TextAppearance.Medium">
@@ -11,6 +12,8 @@
         <item name="android:ellipsize">marquee</item>
         <item name="android:singleLine">true</item>
         <item name="android:fontFamily">sans-serif-light</item>
+=======
+>>>>>>> origin/dev-unstable
     </style>
     
     <style name="block_item_name_text" parent="android:style/TextAppearance.Medium">

@@ -1,16 +1,26 @@
 package com.jphsoftware.nope;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.content.res.Configuration;
+<<<<<<< HEAD
+=======
+import android.content.res.Resources;
+>>>>>>> origin/dev-unstable
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
@@ -25,7 +35,6 @@ import com.jphsoftware.nope.fragments.SettingsFragment;
 
 public class MainActivity extends SherlockFragmentActivity {
 
-	private Fragment mContent;
 	private DrawerLayout mDrawerLayout;
 	private ListView mDrawerList;
 	private ActionBarDrawerToggle mDrawerToggle;
@@ -34,7 +43,15 @@ public class MainActivity extends SherlockFragmentActivity {
 	private Integer mMenuPosition;
 	private ActionBar actionBar;
 
-	private boolean firstLoad = true;
+	private static final String OPENED_KEY = "OPENED_KEY";
+	private SharedPreferences prefs = null;
+	private Boolean opened = null;
+
+	Fragment cbFrag = new CallBlockFragment();
+	Fragment smFrag = new SMSBlockFragment();
+	Fragment asFrag = new AntiSMSSpamFragment();
+	Fragment sFrag = new SettingsFragment();
+	Fragment abFrag = new AboutFragment();
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -55,72 +72,76 @@ public class MainActivity extends SherlockFragmentActivity {
 
 		// Define the drawer list view
 		mDrawerList = (ListView) findViewById(R.id.menu_frame);
-		mDrawerList.setAdapter(new ArrayAdapter<String>(this,
+		mDrawerList.setAdapter(new HomeMenuAdapter(this,
 				R.layout.side_menu_list_item, menuListArray));
-		mDrawerList.setOnItemClickListener(new DrawerItemClickListener() {
-			@Override
-			public void onItemClick(AdapterView<?> parent, View view,
-					int position, long arg3) {
-				view.setSelected(true);
-				super.onItemClick(parent, view, position, arg3);
-			}
-		});
+		mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
 
 		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 		mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow,
 				GravityCompat.START);
 
-		// mDrawerLayout.getLayoutParams().width = calculateSideDrawerWidth();
-
+		mDrawerList.getLayoutParams().width = calculateSideDrawerWidth();
 		mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
 				R.drawable.ic_drawer, R.string.drawer_open,
 				R.string.drawer_close) {
 			public void onDrawerClosed(View view) {
-				getActionBar().setTitle(mTitle);
-				invalidateOptionsMenu(); // creates call to
-											// onPrepareOptionsMenu()
+				getSupportActionBar().setTitle(mTitle);
+				supportInvalidateOptionsMenu();
+				if (opened != null && opened == false) {
+					opened = true;
+					if (prefs != null) {
+						Editor editor = prefs.edit();
+						editor.putBoolean(OPENED_KEY, true);
+						editor.apply();
+					}
+				}
 			}
 
 			public void onDrawerOpened(View drawerView) {
-				getActionBar().setTitle(mTitle);
-				invalidateOptionsMenu(); // creates call to
-											// onPrepareOptionsMenu()
+				getSupportActionBar().setTitle(mTitle);
+				supportInvalidateOptionsMenu(); // creates call to
+				// onPrepareOptionsMenu()
 			}
 
 			@Override
 			public void onDrawerSlide(View drawerView, float offset) {
 				super.onDrawerSlide(drawerView, offset);
 				// getActionBar().setTitle(mTitle);
-				invalidateOptionsMenu(); // creates call to
-											// onPrepareOptionsMenu()
+				supportInvalidateOptionsMenu(); // creates call to
+				// onPrepareOptionsMenu()
 			}
 		};
 
 		mDrawerLayout.setDrawerListener(mDrawerToggle);
-
 		if (savedInstanceState == null) {
-
-			System.err.println("New activity, so default to callblockfragment");
 			mMenuPosition = 0;
-			selectItem(mMenuPosition, firstLoad);
-			setTitle(menuListArray[mMenuPosition]);
-		} else {
-			mMenuPosition = savedInstanceState.getInt("position");
-			if (mMenuPosition != null) {
-				System.err.println("MenuPosition: ");
-				selectItem(mMenuPosition, firstLoad);
-			} else {
-				selectItem(0, true);
-			}
-		}
+			selectItem(0, true);
 
+<<<<<<< HEAD
+=======
+		} else {
+
+			mMenuPosition = savedInstanceState.getInt("position");
+			selectItem(mMenuPosition, false);
+		}
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				prefs = getPreferences(MODE_PRIVATE);
+				opened = prefs.getBoolean(OPENED_KEY, false);
+				if (opened == false) {
+					mDrawerLayout.openDrawer(mDrawerList);
+				}
+			}
+		}).start();
+
+>>>>>>> origin/dev-unstable
 	}
 
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
 
 		outState.putInt("position", mMenuPosition);
-		System.err.println("Putting in position: " + mMenuPosition);
 		super.onSaveInstanceState(outState);
 
 	}
@@ -162,16 +183,66 @@ public class MainActivity extends SherlockFragmentActivity {
 		@Override
 		public void onItemClick(AdapterView<?> parent, View view, int position,
 				long id) {
-			selectItem(position);
+			view.setSelected(true);
+			selectItem(position, false);
 		}
 	}
 
-	private void selectItem(int position, boolean first) {
+	// Swaps fragments that are shown in the main view
+	private void selectItem(int position, boolean firstload) {
 
-		if (first) {
-			selectItem(position);
-			this.firstLoad = !first;
-			System.err.println(firstLoad);
+		if (firstload = true) {
+			FragmentManager fragmentManager = getSupportFragmentManager();
+			FragmentTransaction ft = fragmentManager.beginTransaction();
+
+			// Create a new fragment and specify
+			// the fragment to show based on position
+			switch (position) {
+			case 0:
+				ft.replace(R.id.content_frame, cbFrag);
+				mMenuPosition = 0;
+				((HomeMenuAdapter) mDrawerList.getAdapter())
+						.onItemSelected(mMenuPosition);
+				System.err.println("Call Block");
+				break;
+			case 1:
+				ft.replace(R.id.content_frame, smFrag);
+				mMenuPosition = 1;
+				((HomeMenuAdapter) mDrawerList.getAdapter())
+						.onItemSelected(mMenuPosition);
+				System.err.println("SMS Blocklist");
+				break;
+			case 2:
+				ft.replace(R.id.content_frame, asFrag);
+				mMenuPosition = 2;
+				((HomeMenuAdapter) mDrawerList.getAdapter())
+						.onItemSelected(mMenuPosition);
+				System.err.println("Anti Text Spam");
+				break;
+			case 3:
+				ft.replace(R.id.content_frame, sFrag);
+				mMenuPosition = 3;
+				((HomeMenuAdapter) mDrawerList.getAdapter())
+						.onItemSelected(mMenuPosition);
+				System.err.println("Settings");
+				break;
+			case 4:
+				ft.replace(R.id.content_frame, abFrag);
+				mMenuPosition = 4;
+				((HomeMenuAdapter) mDrawerList.getAdapter())
+						.onItemSelected(mMenuPosition);
+				System.err.println("About");
+				break;
+			}
+
+			// Highlight the selected item, update the title, and close the
+			// drawer
+			// mDrawerList.setItemChecked(position, true);
+			setTitle(menuListArray[position]);
+			mDrawerLayout.closeDrawer(mDrawerList);
+
+			// Insert the fragment by replacing any existing fragment
+			ft.commit();
 		} else {
 			if (mMenuPosition == position) {
 
@@ -181,49 +252,57 @@ public class MainActivity extends SherlockFragmentActivity {
 				mDrawerLayout.closeDrawer(mDrawerList);
 
 			} else {
-				selectItem(position);
-			}
-		}
-	}
 
-	// Swaps fragments that are shown in the main view
-	private void selectItem(int position) {
+				FragmentManager fragmentManager = getSupportFragmentManager();
+				FragmentTransaction ft = fragmentManager.beginTransaction();
 
-		// Create a new fragment and specify
-		// the fragment to show based on position
-		switch (position) {
-		case 0:
-			mContent = new CallBlockFragment();
-			mMenuPosition = 0;
-			System.err.println("Call Block");
-			break;
-		case 1:
-			mContent = new SMSBlockFragment();
-			mMenuPosition = 1;
-			System.err.println("SMS Blocklist");
-			break;
-		case 2:
-			mContent = new AntiSMSSpamFragment();
-			mMenuPosition = 2;
-			System.err.println("Anti Text Spam");
-			break;
-		case 3:
-			mContent = new SettingsFragment();
-			mMenuPosition = 3;
-			System.err.println("Settings");
-			break;
-		case 4:
-			mContent = new AboutFragment();
-			mMenuPosition = 4;
-			System.err.println("About");
-			break;
-		}
+				// Create a new fragment and specify
+				// the fragment to show based on position
+				switch (position) {
+				case 0:
+					ft.replace(R.id.content_frame, cbFrag);
+					mMenuPosition = 0;
+					((HomeMenuAdapter) mDrawerList.getAdapter())
+							.onItemSelected(mMenuPosition);
+					System.err.println("Call Block");
+					break;
+				case 1:
+					ft.replace(R.id.content_frame, smFrag);
+					mMenuPosition = 1;
+					((HomeMenuAdapter) mDrawerList.getAdapter())
+							.onItemSelected(mMenuPosition);
+					System.err.println("SMS Blocklist");
+					break;
+				case 2:
+					ft.replace(R.id.content_frame, asFrag);
+					mMenuPosition = 2;
+					((HomeMenuAdapter) mDrawerList.getAdapter())
+							.onItemSelected(mMenuPosition);
+					System.err.println("Anti Text Spam");
+					break;
+				case 3:
+					ft.replace(R.id.content_frame, sFrag);
+					mMenuPosition = 3;
+					((HomeMenuAdapter) mDrawerList.getAdapter())
+							.onItemSelected(mMenuPosition);
+					System.err.println("Settings");
+					break;
+				case 4:
+					ft.replace(R.id.content_frame, abFrag);
+					mMenuPosition = 4;
+					((HomeMenuAdapter) mDrawerList.getAdapter())
+							.onItemSelected(mMenuPosition);
+					System.err.println("About");
+					break;
+				}
 
-		// Insert the fragment by replacing any existing fragment
-		FragmentManager fragmentManager = getSupportFragmentManager();
-		fragmentManager.beginTransaction()
-				.replace(R.id.content_frame, mContent).commit();
+				// Highlight the selected item, update the title, and close the
+				// drawer
+				// mDrawerList.setItemChecked(position, true);
+				setTitle(menuListArray[position]);
+				mDrawerLayout.closeDrawer(mDrawerList);
 
+<<<<<<< HEAD
 		// Highlight the selected item, update the title, and close the
 		// drawer
 
@@ -237,13 +316,19 @@ public class MainActivity extends SherlockFragmentActivity {
 
 		setTitle(menuListArray[position]);
 		mDrawerLayout.closeDrawer(mDrawerList);
+=======
+				// Insert the fragment by replacing any existing fragment
+				ft.commit();
+			}
+		}
+>>>>>>> origin/dev-unstable
 
 	}
 
 	@Override
 	public void setTitle(CharSequence title) {
 		mTitle = title;
-		getActionBar().setTitle(mTitle);
+		getSupportActionBar().setTitle(mTitle);
 	}
 
 	@Override
@@ -259,6 +344,65 @@ public class MainActivity extends SherlockFragmentActivity {
 		// Pass any configuration change to the drawer toggles
 		mDrawerToggle.onConfigurationChanged(newConfig);
 
+	}
+
+	@SuppressWarnings("deprecation")
+	protected int calculateSideDrawerWidth() {
+
+		Resources localResources = getResources();
+		Display display = getWindowManager().getDefaultDisplay();
+
+		int i = display.getWidth();
+		System.err.println("width:" + i);
+		int j = localResources
+				.getDimensionPixelSize(R.dimen.side_panel_max_width);
+		int k = localResources.getConfiguration().orientation;
+		int m;
+
+		if (k == 1) {
+			m = Math.min(i * 4 / 5, j);
+		} else {
+			m = Math.min(i / 2, j);
+		}
+		return m;
+
+	}
+
+	private class HomeMenuAdapter extends ArrayAdapter<String> {
+		private final int mNormalColor;
+		private final int mSelectedColor;
+		private int mSelectedIndex;
+
+		public HomeMenuAdapter(Context paramContext, int paramInt,
+				String[] paramArrayOfString) {
+			super(paramContext, paramInt, paramArrayOfString);
+			Resources localResources = paramContext.getResources();
+			this.mSelectedColor = localResources
+					.getColor(R.color.side_drawer_item_current_screen_color);
+			this.mNormalColor = localResources.getColor(R.color.transparent);
+		}
+
+		public View getView(int paramInt, View paramView,
+				ViewGroup paramViewGroup) {
+			TextView localTextView = (TextView) super.getView(paramInt,
+					paramView, paramViewGroup);
+			this.mSelectedIndex = mMenuPosition;
+			if (paramInt == this.mSelectedIndex) {
+				localTextView.setBackgroundColor(this.mSelectedColor);
+				return localTextView;
+			} else {
+				localTextView.setBackgroundColor(this.mNormalColor);
+				return localTextView;
+			}
+		}
+
+		public boolean onItemSelected(int paramInt) {
+			if (this.mSelectedIndex != paramInt) {
+				this.mSelectedIndex = paramInt;
+				notifyDataSetChanged();
+			}
+			return true;
+		}
 	}
 
 }
