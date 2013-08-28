@@ -3,6 +3,8 @@
 
     <color name="default_color_side_menu_item">#fffafafa</color>
     <color name="pressed_color_side_menu_item">#CCCCCC</color>
+    <color name="side_drawer_item_current_screen_color">#25000000</color>
+    <color name="side_drawer_item_pressed_color">#99f4842d</color>
     <color name="play_translucent_separator_line">#23000000</color>
     <color name="transparent">#00000000</color>
 

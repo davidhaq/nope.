@@ -15,15 +15,6 @@
     <!-- Application theme. -->
     <style name="AppTheme" parent="AppBaseTheme">
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
-        <item name="android:fontFamily">sans-serif-light</item>
-    </style>
-
-    <style name="SideMenuText" parent="android:style/TextAppearance.Medium">
-        <item name="android:textSize">21.0sp</item>
-        <item name="android:textColor">#ff505050</item>
-        <item name="android:ellipsize">marquee</item>
-        <item name="android:singleLine">true</item>
-        <item name="android:fontFamily">sans-serif-light</item>
     </style>
 
 </resources>

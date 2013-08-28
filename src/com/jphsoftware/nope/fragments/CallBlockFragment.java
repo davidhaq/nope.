@@ -100,7 +100,7 @@ public class CallBlockFragment extends SherlockListFragment {
 		sharedPrefs = getActivity().getSharedPreferences(
 				Constants.CALLBLOCK_DATA, Context.MODE_PRIVATE);
 		listView.setAdapter(callBlockAdapter);
-//		new UiThread().execute();
+		// new UiThread().execute();
 	}
 
 	@Override
@@ -126,22 +126,23 @@ public class CallBlockFragment extends SherlockListFragment {
 		gsonb = new GsonBuilder();
 		gson = gsonb.create();
 		String value = prefs.getString(callData, null);
-//		System.err.println("Value: " + value);
+		// System.err.println("Value: " + value);
 		if (value != null) {
-//			System.err.println("String Value not null!");
+			// System.err.println("String Value not null!");
 
 			@SuppressWarnings("unused")
 			String nullOrNot;
-//			System.err.println(nullOrNot = (gson != null) ? "gson is not null"
-//					: "gson is null");
+			// System.err.println(nullOrNot = (gson != null) ?
+			// "gson is not null"
+			// : "gson is null");
 			String[] list = gson.fromJson(value, String[].class);
 			ArrayList<String> arrayList = new ArrayList<String>(
 					Arrays.asList(list));
-//			System.err.println("Array contents" + arrayList.toString());
+			// System.err.println("Array contents" + arrayList.toString());
 			return arrayList;
 		} else {
-//			System.err
-//					.println("String value is null, so creating a blank arraylist");
+			// System.err
+			// .println("String value is null, so creating a blank arraylist");
 			ArrayList<String> arrayList = new ArrayList<String>();
 			return arrayList;
 		}
@@ -395,8 +396,7 @@ public class CallBlockFragment extends SherlockListFragment {
 				name = cur
 						.getString(cur
 								.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME));
-				contactId = cur.getString(cur
-						.getColumnIndex(BaseColumns._ID));
+				contactId = cur.getString(cur.getColumnIndex(BaseColumns._ID));
 				contactUri = Uri.withAppendedPath(
 						ContactsContract.Contacts.CONTENT_URI,
 						String.valueOf(contactId));
@@ -410,7 +410,7 @@ public class CallBlockFragment extends SherlockListFragment {
 								.getContentResolver(), contactUri);
 				holder.quickContactView.setImageBitmap(BitmapFactory
 						.decodeStream(input));
-				
+
 				holder.name.setText(name);
 				holder.phoneNum.setText(phoneNums[position]);
 				holder.lastCall.setText(lastContacted);
@@ -461,36 +461,37 @@ public class CallBlockFragment extends SherlockListFragment {
 		}
 
 	}
+
 	public static int getDefaultAvatarResId(Context context, int extent) {
-        // TODO: Is it worth finding a nicer way to do hires/lores here? In practice, the
-        // default avatar doesn't look too different when stretched
-        if (s180DipInPixel == -1) {
-            Resources r = context.getResources();
-            s180DipInPixel = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 180,
-                    r.getDisplayMetrics());
-        }
 
-        final boolean hires = (extent != -1) && (extent > s180DipInPixel);
-        return getDefaultAvatarResId(hires);
-    }
+		if (s180DipInPixel == -1) {
+			Resources r = context.getResources();
+			s180DipInPixel = (int) TypedValue.applyDimension(
+					TypedValue.COMPLEX_UNIT_DIP, 180, r.getDisplayMetrics());
+		}
 
-    public static int getDefaultAvatarResId(boolean hires) {
-        if (hires) return R.drawable.ic_contact_picture_180_holo_light;
-        return R.drawable.ic_contact_picture_holo_light;
-    }
-	public void loadThumbnail(ImageView view, Uri contactUri ) {
-        if (contactUri == null) {
-            // No photo is needed
-        	view.setImageResource(getDefaultAvatarResId(view.getContext(), -1));
-        } else {
-        	
-        	InputStream input = ContactsContract.Contacts
+		final boolean hires = (extent != -1) && (extent > s180DipInPixel);
+		return getDefaultAvatarResId(hires);
+	}
+
+	public static int getDefaultAvatarResId(boolean hires) {
+		if (hires)
+			return R.drawable.ic_contact_picture_180_holo_light;
+		return R.drawable.ic_contact_picture_holo_light;
+	}
+
+	public void loadThumbnail(ImageView view, Uri contactUri) {
+		if (contactUri == null) {
+			// No photo is needed
+			view.setImageResource(getDefaultAvatarResId(view.getContext(), -1));
+		} else {
+
+			InputStream input = ContactsContract.Contacts
 					.openContactPhotoInputStream(getActivity()
 							.getContentResolver(), contactUri);
-			view.setImageBitmap(BitmapFactory
-					.decodeStream(input));
-        }
-    }
+			view.setImageBitmap(BitmapFactory.decodeStream(input));
+		}
+	}
 
 	private class UiThread extends AsyncTask<Void, Void, Void> {
 		CallBlocklistAdapter adapter = callBlockAdapter;
