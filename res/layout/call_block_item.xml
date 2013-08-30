@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     class="com.jphsoftware.nope.CallBlockListItemView"
+    android:descendantFocusability="blocksDescendants"
     android:orientation="vertical" >
 
     <LinearLayout
@@ -12,7 +13,6 @@
         android:layout_centerVertical="true"
         android:layout_marginLeft="@dimen/block_log_outer_margin"
         android:layout_marginRight="@dimen/block_log_outer_margin"
-        android:background="?android:attr/selectableItemBackground"
         android:focusable="true"
         android:gravity="center_vertical" >
 

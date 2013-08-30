@@ -27,9 +27,9 @@ import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.Window;
 import com.jphsoftware.nope.fragments.AboutFragment;
 import com.jphsoftware.nope.fragments.AntiSMSSpamFragment;
-import com.jphsoftware.nope.fragments.CallBlockFragment;
 import com.jphsoftware.nope.fragments.SMSBlockFragment;
 import com.jphsoftware.nope.fragments.SettingsFragment;
+import com.jphsoftware.nope.fragments.callblock.CallBlockFragment;
 
 public class MainActivity extends SherlockFragmentActivity {
 

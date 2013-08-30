@@ -7,5 +7,7 @@
     <color name="side_drawer_item_pressed_color">#99f4842d</color>
     <color name="play_translucent_separator_line">#23000000</color>
     <color name="transparent">#00000000</color>
+    <color name="holo_blue_light">#ff33b5e5</color>
+    <color name="holo_blue_bright">#ff00ddff</color>
 
 </resources>

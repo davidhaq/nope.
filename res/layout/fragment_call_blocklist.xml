@@ -5,12 +5,13 @@
     android:orientation="vertical" >
 
     <ListView
-        android:id="@android:id/list"
+        android:id="@id/android:list"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:background="#ffffff"
         android:drawSelectorOnTop="false"
+        android:choiceMode="multipleChoice"
         android:tag="call_block_list" />
 
     <TextView

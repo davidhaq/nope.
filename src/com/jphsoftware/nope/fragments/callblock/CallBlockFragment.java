@@ -1,8 +1,8 @@
-package com.jphsoftware.nope.fragments;
+package com.jphsoftware.nope.fragments.callblock;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -12,33 +12,25 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import android.content.res.Resources;
 import android.content.res.TypedArray;
-import android.database.Cursor;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.provider.BaseColumns;
-import android.provider.ContactsContract;
-import android.provider.ContactsContract.PhoneLookup;
 import android.text.InputType;
-import android.util.TypedValue;
+import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.QuickContactBadge;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockListFragment;
+import com.actionbarsherlock.view.ActionMode;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
@@ -51,10 +43,12 @@ public class CallBlockFragment extends SherlockListFragment {
 
 	private ListView listView;
 	private CallBlocklistAdapter callBlockAdapter;
+	List<CallBlockItem> callBlocks;
+
 	private GsonBuilder gsonb;
 	private Gson gson;
 	private SharedPreferences sharedPrefs;
-	private static int s180DipInPixel = -1;
+	private ActionMode mMode;
 
 	public CallBlockFragment() {
 
@@ -64,15 +58,11 @@ public class CallBlockFragment extends SherlockListFragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		callBlockAdapter = new CallBlocklistAdapter(getActivity(),
-				getCallBlockDataArrayList(Constants.BLOCKED_NUMBERS).toArray(
-						new String[getCallBlockDataArrayList(
-								Constants.BLOCKED_NUMBERS).size()]),
-				getCallBlockDataArrayList(Constants.BLOCKED_NUMBERS_LAST_CALL)
-						.toArray(
-								new String[getCallBlockDataArrayList(
-										Constants.BLOCKED_NUMBERS_LAST_CALL)
-										.size()]));
+		if (callBlocks == null) {
+			setCallBlockList();
+		}
+		callBlockAdapter = new CallBlocklistAdapter(getSherlockActivity(),
+				R.layout.call_block_item, callBlocks);
 		gsonb = new GsonBuilder();
 		gson = gsonb.create();
 
@@ -81,25 +71,32 @@ public class CallBlockFragment extends SherlockListFragment {
 
 	}
 
+	private void setCallBlockList() {
+		callBlocks = new ArrayList<CallBlockItem>();
+		String[] numbers = getCallBlockDataArrayList(Constants.BLOCKED_NUMBERS)
+				.toArray(
+						new String[getCallBlockDataArrayList(
+								Constants.BLOCKED_NUMBERS).size()]);
+
+		for (int i = 0; i < numbers.length; i++) {
+			CallBlockItem block = new CallBlockItem(numbers[i]);
+			callBlocks.add(block);
+		}
+	}
+
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 
-		callBlockAdapter = new CallBlocklistAdapter(getActivity(),
-				getCallBlockDataArrayList(Constants.BLOCKED_NUMBERS).toArray(
-						new String[getCallBlockDataArrayList(
-								Constants.BLOCKED_NUMBERS).size()]),
-				getCallBlockDataArrayList(Constants.BLOCKED_NUMBERS_LAST_CALL)
-						.toArray(
-								new String[getCallBlockDataArrayList(
-										Constants.BLOCKED_NUMBERS_LAST_CALL)
-										.size()]));
+		callBlockAdapter = new CallBlocklistAdapter(getSherlockActivity(),
+				R.layout.call_block_item, callBlocks);
 		gsonb = new GsonBuilder();
 		gson = gsonb.create();
 
 		sharedPrefs = getActivity().getSharedPreferences(
 				Constants.CALLBLOCK_DATA, Context.MODE_PRIVATE);
 		listView.setAdapter(callBlockAdapter);
+
 		// new UiThread().execute();
 	}
 
@@ -184,15 +181,9 @@ public class CallBlockFragment extends SherlockListFragment {
 	}
 
 	public void updateList() {
-		callBlockAdapter = new CallBlocklistAdapter(getActivity(),
-				getCallBlockDataArrayList(Constants.BLOCKED_NUMBERS).toArray(
-						new String[getCallBlockDataArrayList(
-								Constants.BLOCKED_NUMBERS).size()]),
-				getCallBlockDataArrayList(Constants.BLOCKED_NUMBERS_LAST_CALL)
-						.toArray(
-								new String[getCallBlockDataArrayList(
-										Constants.BLOCKED_NUMBERS_LAST_CALL)
-										.size()]));
+		setCallBlockList();
+		callBlockAdapter = new CallBlocklistAdapter(getSherlockActivity(),
+				R.layout.call_block_item, callBlocks);
 		callBlockAdapter.notifyDataSetChanged();
 	}
 
@@ -202,14 +193,7 @@ public class CallBlockFragment extends SherlockListFragment {
 		View view = inflater.inflate(R.layout.fragment_call_blocklist,
 				container, false);
 		callBlockAdapter = new CallBlocklistAdapter(getSherlockActivity(),
-				getCallBlockDataArrayList(Constants.BLOCKED_NUMBERS).toArray(
-						new String[getCallBlockDataArrayList(
-								Constants.BLOCKED_NUMBERS).size()]),
-				getCallBlockDataArrayList(Constants.BLOCKED_NUMBERS_LAST_CALL)
-						.toArray(
-								new String[getCallBlockDataArrayList(
-										Constants.BLOCKED_NUMBERS_LAST_CALL)
-										.size()]));
+				R.layout.call_block_item, callBlocks);
 		TypedArray layouts = getResources().obtainTypedArray(
 				R.array.layout_resources_list);
 		layouts.getResourceId(0, 0);
@@ -221,12 +205,46 @@ public class CallBlockFragment extends SherlockListFragment {
 		actionBar.setTitle(menuListArray[0]);
 		actionBar.setDisplayShowCustomEnabled(true);
 		actionBar.show();
+
+		System.err.println("onCreateView called");
 		listView = (ListView) view.findViewById(android.R.id.list);
-		// listView = (ListView) inflater.inflate(mLayoutRes, null);
+
+		listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+
+		listView.setOnItemLongClickListener(new OnItemLongClickListener() {
+
+			public boolean onItemLongClick(AdapterView<?> parent, View view,
+					int position, long id) {
+
+				System.err.println("onCreateView called");
+				onListItemSelect(position);
+				return true;
+			}
+		});
+
+		// listView = (ListView) inflater.inflate(R.id.call_block_list,
+		// container);
 		// listView.setAdapter(callBlockAdapter);
 		layouts.recycle();
 		return view;
 
+	}
+
+	@Override
+	public void onListItemClick(ListView l, View v, int position, long id) {
+		// TODO Auto-generated method stub
+		super.onListItemClick(l, v, position, id);
+		if (mMode == null) {
+			/*
+			 * no items selected, so perform item click actions like moving to
+			 * next activity
+			 */
+			System.err.println("No Items selected");
+
+		} else {// add or remove selection for current list item
+			onListItemSelect(position);
+			v.setSelected(true);
+		}
 	}
 
 	@Override
@@ -343,156 +361,6 @@ public class CallBlockFragment extends SherlockListFragment {
 
 	}
 
-	public class CallBlocklistAdapter extends BaseAdapter implements
-			ListAdapter {
-
-		String[] phoneNums, lastCalled;
-		private LayoutInflater inflater = (LayoutInflater) getActivity()
-				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
-		public CallBlocklistAdapter(Context context, String[] phoneNums,
-				String[] lastCalled) {
-			super();
-			this.phoneNums = phoneNums;
-			this.lastCalled = lastCalled;
-			inflater = LayoutInflater.from(context);
-		}
-
-		@Override
-		public View getView(int position, View convertView, ViewGroup parent) {
-
-			String name = null;
-			String lastContacted = null;
-			String contactId = null;
-			Uri contactUri = null;
-			CallBlockItem holder;
-			if (convertView == null) {
-				convertView = inflater.inflate(R.layout.call_block_item, null);
-				holder = new CallBlockItem();
-				holder.primaryActionView = convertView
-						.findViewById(R.id.primary_action_view);
-				holder.quickContactView = (QuickContactBadge) convertView
-						.findViewById(R.id.quick_contact_photo);
-				holder.name = (TextView) convertView.findViewById(R.id.name);
-				holder.phoneNum = (TextView) convertView
-						.findViewById(R.id.phoneNum);
-				holder.lastCall = (TextView) convertView
-						.findViewById(R.id.lastCalled);
-				convertView.setTag(holder);
-			} else {
-				holder = (CallBlockItem) convertView.getTag();
-			}
-
-			Uri lookupUri = Uri.withAppendedPath(
-					PhoneLookup.CONTENT_FILTER_URI,
-					Uri.encode(phoneNums[position]));
-			String[] mPhoneNumberProjection = { PhoneLookup.DISPLAY_NAME,
-					BaseColumns._ID, PhoneLookup.LAST_TIME_CONTACTED };
-			Cursor cur = getActivity().getContentResolver().query(lookupUri,
-					mPhoneNumberProjection, null, null, null);
-
-			if (cur.moveToFirst()) {
-
-				name = cur
-						.getString(cur
-								.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME));
-				contactId = cur.getString(cur.getColumnIndex(BaseColumns._ID));
-				contactUri = Uri.withAppendedPath(
-						ContactsContract.Contacts.CONTENT_URI,
-						String.valueOf(contactId));
-				lastContacted = cur.getString(cur
-						.getColumnIndex(PhoneLookup.LAST_TIME_CONTACTED));
-				holder.quickContactView.assignContactFromPhone(
-						phoneNums[position], true);
-				loadThumbnail(holder.quickContactView, contactUri);
-				InputStream input = ContactsContract.Contacts
-						.openContactPhotoInputStream(getActivity()
-								.getContentResolver(), contactUri);
-				holder.quickContactView.setImageBitmap(BitmapFactory
-						.decodeStream(input));
-
-				holder.name.setText(name);
-				holder.phoneNum.setText(phoneNums[position]);
-				holder.lastCall.setText(lastContacted);
-				cur.close();
-			} else {
-				holder.quickContactView.assignContactFromPhone(
-						phoneNums[position], true);
-				loadThumbnail(holder.quickContactView, null);
-				holder.name.setText(phoneNums[position]);
-				holder.phoneNum.setText("-");
-				holder.lastCall.setVisibility(View.INVISIBLE);
-				cur.close();
-			}
-
-			holder.primaryActionView.setVisibility(View.VISIBLE);
-			// holder.phoneNum.setText(phoneNums[position]);
-			// holder.lastCall.setText("Last Called:" + lastCalled[position]);
-			// holder.lastCall.setText("Last Called:");
-
-			return convertView;
-		}
-
-		private class CallBlockItem {
-			/** The quick contact badge for the contact. */
-			QuickContactBadge quickContactView;
-			/** The primary action view of the entry. */
-			View primaryActionView;
-			TextView phoneNum;
-			TextView name;
-			TextView lastCall;
-		}
-
-		@Override
-		public int getCount() {
-			return phoneNums.length;
-		}
-
-		@Override
-		public Object getItem(int position) {
-			// TODO Auto-generated method stub
-			return phoneNums[position];
-		}
-
-		@Override
-		public long getItemId(int position) {
-			// TODO Auto-generated method stub
-			return 0;
-		}
-
-	}
-
-	public static int getDefaultAvatarResId(Context context, int extent) {
-
-		if (s180DipInPixel == -1) {
-			Resources r = context.getResources();
-			s180DipInPixel = (int) TypedValue.applyDimension(
-					TypedValue.COMPLEX_UNIT_DIP, 180, r.getDisplayMetrics());
-		}
-
-		final boolean hires = (extent != -1) && (extent > s180DipInPixel);
-		return getDefaultAvatarResId(hires);
-	}
-
-	public static int getDefaultAvatarResId(boolean hires) {
-		if (hires)
-			return R.drawable.ic_contact_picture_180_holo_light;
-		return R.drawable.ic_contact_picture_holo_light;
-	}
-
-	public void loadThumbnail(ImageView view, Uri contactUri) {
-		if (contactUri == null) {
-			// No photo is needed
-			view.setImageResource(getDefaultAvatarResId(view.getContext(), -1));
-		} else {
-
-			InputStream input = ContactsContract.Contacts
-					.openContactPhotoInputStream(getActivity()
-							.getContentResolver(), contactUri);
-			view.setImageBitmap(BitmapFactory.decodeStream(input));
-		}
-	}
-
 	private class UiThread extends AsyncTask<Void, Void, Void> {
 		CallBlocklistAdapter adapter = callBlockAdapter;
 
@@ -514,4 +382,69 @@ public class CallBlockFragment extends SherlockListFragment {
 		}
 
 	}
+
+	private void onListItemSelect(int position) {
+		
+		callBlockAdapter.toggleSelection(position);
+		boolean hasCheckedItems = callBlockAdapter.getSelectedCount() > 0;
+
+		if (hasCheckedItems && mMode == null)
+			// there are some selected items, start the actionMode
+			mMode = getSherlockActivity().startActionMode(new ModeCallback());
+		else if (!hasCheckedItems && mMode != null)
+			// there no selected items, finish the actionMode
+			mMode.finish();
+
+		if (mMode != null)
+			mMode.setTitle(String.valueOf(callBlockAdapter.getSelectedCount())
+					+ " selected");
+	}
+
+	protected final class ModeCallback implements ActionMode.Callback {
+
+		@Override
+		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+			// Create the menu from the xml file
+			MenuInflater inflater = getSherlockActivity()
+					.getSupportMenuInflater();
+			inflater.inflate(R.menu.context_menu, menu);
+			return true;
+		}
+
+		@Override
+		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+			// Here, you can checked selected items to adapt available actions
+			return false;
+		}
+
+		@Override
+		public void onDestroyActionMode(ActionMode mode) {
+			// Destroying action mode, let's unselect all items
+			callBlockAdapter.removeSelection();
+			mMode = null;
+		}
+
+		@Override
+		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+			switch (item.getItemId()) {
+			case R.id.action_delete_item:
+				// retrieve selected items and delete them out
+				SparseBooleanArray selected = listView
+						.getCheckedItemPositions();
+				for (int i = (selected.size() - 1); i >= 0; i--) {
+					if (selected.valueAt(i)) {
+						CallBlockItem selectedItem = (CallBlockItem) callBlockAdapter
+								.getItem(selected.keyAt(i));
+						callBlockAdapter.remove(selectedItem);
+					}
+				}
+				mode.finish(); // Action picked, so close the CAB
+				return true;
+			default:
+				return false;
+			}
+
+		}
+	}
+
 }
