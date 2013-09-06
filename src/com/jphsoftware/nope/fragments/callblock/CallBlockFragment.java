@@ -1,7 +1,5 @@
 package com.jphsoftware.nope.fragments.callblock;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -9,10 +7,7 @@ import java.util.regex.Pattern;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.DialogInterface;
-import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.content.res.TypedArray;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -35,9 +30,6 @@ import com.actionbarsherlock.view.ActionMode;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.jphsoftware.nope.Constants;
 import com.jphsoftware.nope.R;
 import com.jphsoftware.nope.database.BlockItem;
 
@@ -47,9 +39,6 @@ public class CallBlockFragment extends SherlockListFragment {
 	private BlocklistAdapter callBlockAdapter;
 	List<BlockItem> callBlocks;
 
-	private GsonBuilder gsonb;
-	private Gson gson;
-	private SharedPreferences sharedPrefs;
 	private ActionMode mMode;
 
 	public CallBlockFragment() {
@@ -60,46 +49,6 @@ public class CallBlockFragment extends SherlockListFragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		if (callBlocks == null) {
-			setCallBlockList();
-		}
-		callBlockAdapter = new BlocklistAdapter(getSherlockActivity(),
-				R.layout.call_block_item, callBlocks);
-		gsonb = new GsonBuilder();
-		gson = gsonb.create();
-
-		sharedPrefs = getActivity().getSharedPreferences(
-				Constants.CALLBLOCK_DATA, Context.MODE_PRIVATE);
-
-	}
-
-	private void setCallBlockList() {
-		callBlocks = new ArrayList<BlockItem>();
-		String[] numbers = getCallBlockDataArrayList(Constants.BLOCKED_NUMBERS)
-				.toArray(
-						new String[getCallBlockDataArrayList(
-								Constants.BLOCKED_NUMBERS).size()]);
-
-		for (int i = 0; i < numbers.length; i++) {
-			BlockItem block = new BlockItem(numbers[i]);
-			callBlocks.add(block);
-		}
-	}
-
-	@Override
-	public void onActivityCreated(Bundle savedInstanceState) {
-		super.onActivityCreated(savedInstanceState);
-
-		callBlockAdapter = new BlocklistAdapter(getSherlockActivity(),
-				R.layout.call_block_item, callBlocks);
-		gsonb = new GsonBuilder();
-		gson = gsonb.create();
-
-		sharedPrefs = getActivity().getSharedPreferences(
-				Constants.CALLBLOCK_DATA, Context.MODE_PRIVATE);
-		listView.setAdapter(callBlockAdapter);
-
-		// new UiThread().execute();
 	}
 
 	@Override
@@ -119,71 +68,9 @@ public class CallBlockFragment extends SherlockListFragment {
 		setHasOptionsMenu(false);
 	}
 
-	public ArrayList<String> getCallBlockDataArrayList(String callData) {
-		SharedPreferences prefs = getActivity().getSharedPreferences(
-				Constants.CALLBLOCK_DATA, Context.MODE_PRIVATE);
-		gsonb = new GsonBuilder();
-		gson = gsonb.create();
-		String value = prefs.getString(callData, null);
-		// System.err.println("Value: " + value);
-		if (value != null) {
-			// System.err.println("String Value not null!");
-
-			@SuppressWarnings("unused")
-			String nullOrNot;
-			// System.err.println(nullOrNot = (gson != null) ?
-			// "gson is not null"
-			// : "gson is null");
-			String[] list = gson.fromJson(value, String[].class);
-			ArrayList<String> arrayList = new ArrayList<String>(
-					Arrays.asList(list));
-			// System.err.println("Array contents" + arrayList.toString());
-			return arrayList;
-		} else {
-			// System.err
-			// .println("String value is null, so creating a blank arraylist");
-			ArrayList<String> arrayList = new ArrayList<String>();
-			return arrayList;
-		}
-
-	}
-
-	public ArrayList<String> addPhoneNumbertoArraylist(String phoneNumber) {
-		ArrayList<String> returnArray = getCallBlockDataArrayList(Constants.BLOCKED_NUMBERS);
-		if (!getCallBlockDataArrayList(Constants.BLOCKED_NUMBERS).contains(
-				phoneNumber)) {
-			returnArray.add(phoneNumber);
-			System.err.println("Added phone number to arraylist");
-			return returnArray;
-		} else {
-			System.err.println("ArrayList already has that number!");
-			return returnArray;
-		}
-
-	}
-
-	private ArrayList<String> removePhoneNumberFromArrayList(String phoneNum) {
-		ArrayList<String> returnArray = getCallBlockDataArrayList(Constants.BLOCKED_NUMBERS);
-		if (getCallBlockDataArrayList(Constants.BLOCKED_NUMBERS).contains(
-				phoneNum)) {
-			returnArray.remove(phoneNum);
-			return returnArray;
-		} else {
-			System.err.println("ArrayList doesn't have that number!");
-			return returnArray;
-		}
-	}
-
-	public void writeArrayToPrefs(String[] array, String prefs) {
-		String value = gson.toJson(array);
-		System.err.println(value);
-		Editor e = sharedPrefs.edit();
-		e.putString(prefs, value);
-		e.commit();
-	}
 
 	public void updateList() {
-		setCallBlockList();
+		//When we build the new Cursor adapter, notify data set changed right here.
 		callBlockAdapter = new BlocklistAdapter(getSherlockActivity(),
 				R.layout.call_block_item, callBlocks);
 		callBlockAdapter.notifyDataSetChanged();
@@ -318,7 +205,7 @@ public class CallBlockFragment extends SherlockListFragment {
 							Toast.makeText(getSherlockActivity(),
 									"Phone number matches!:" + phoneNum,
 									Toast.LENGTH_LONG).show();
-							addToBlockList(phoneNum);
+							//Fill in for call block item addition
 							new UiThread().execute();
 							alert.dismiss();
 						} else {
@@ -339,23 +226,6 @@ public class CallBlockFragment extends SherlockListFragment {
 
 	}
 
-	protected void addToBlockList(String phoneNum) {
-
-		writeArrayToPrefs(
-				addPhoneNumbertoArraylist(phoneNum).toArray(
-						new String[getCallBlockDataArrayList(
-								Constants.BLOCKED_NUMBERS).size()]),
-				Constants.BLOCKED_NUMBERS);
-
-	}
-
-	protected void removeFromBlockList(String phoneNum) {
-		writeArrayToPrefs(
-				removePhoneNumberFromArrayList(phoneNum).toArray(
-						new String[getCallBlockDataArrayList(
-								Constants.BLOCKED_NUMBERS).size()]),
-				Constants.BLOCKED_NUMBERS);
-	}
 
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
@@ -465,7 +335,7 @@ public class CallBlockFragment extends SherlockListFragment {
 				SparseBooleanArray checkedItemPositions = getListView()
 						.getCheckedItemPositions();
 				int itemCount = getListView().getCount();
-				System.err.println("Item count: "+itemCount);
+				System.err.println("Item count: " + itemCount);
 
 				for (int i = itemCount - 1; i >= 0; i--) {
 					if (checkedItemPositions.get(i)) {
