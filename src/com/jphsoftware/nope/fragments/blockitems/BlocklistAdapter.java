@@ -1,9 +1,7 @@
 package com.jphsoftware.nope.fragments.blockitems;
 
 import java.io.InputStream;
-import java.util.List;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
 import android.database.Cursor;
@@ -14,84 +12,59 @@ import android.provider.BaseColumns;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.PhoneLookup;
 import android.support.v4.widget.CursorAdapter;
-import android.util.SparseBooleanArray;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.QuickContactBadge;
 import android.widget.TextView;
 
 import com.jphsoftware.nope.R;
 import com.jphsoftware.nope.database.BlockItem;
-import com.jphsoftware.nope.database.BlockItemDatabaseHelper;
+import com.jphsoftware.nope.database.DbUtil;
 
 public class BlocklistAdapter extends CursorAdapter {
 
 	private LayoutInflater inflator;
 	private static final String TAG = BlocklistAdapter.class.getSimpleName();
-
+	private Context context;
 	private static int s180DipInPixel = -1;
 
 	public BlocklistAdapter(Context context, Cursor cursor, int flags) {
 		super(context, cursor, flags);
+		this.context = context;
 		inflator = LayoutInflater.from(context);
 	}
 
 	@Override
 	public void bindView(View view, Context context, Cursor cursor) {
-		// TODO Auto-generated method stub
 
-	}
-
-	@Override
-	public View newView(Context context, Cursor cursor, ViewGroup viewGroup) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	private class ViewHolder {
-
-		/** The quick contact badge for the contact. */
-		QuickContactBadge quickContactView;
-		/** The primary action view of the entry. */
-		View primaryActionView;
-		TextView phoneNum;
-		TextView name;
-		TextView lastContact;
-
-	}
-
-	@Override
-	public View getView(int position, View convertView, ViewGroup parent) {
-		inflater = (LayoutInflater) context
-				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		String name = null;
 		String lastContacted = null;
 		String contactId = null;
 		Uri contactUri = null;
+
+		BlockItem item = DbUtil.generateObjectFromCursor(cursor);
+
 		ViewHolder holder;
-		if (convertView == null) {
-			convertView = inflater.inflate(R.layout.call_block_item, null);
+		if (view == null) {
+			view = inflator.inflate(R.layout.call_block_item, null);
 			holder = new ViewHolder();
-			holder.primaryActionView = convertView
+			holder.primaryActionView = view
 					.findViewById(R.id.primary_action_view);
-			holder.quickContactView = (QuickContactBadge) convertView
+			holder.quickContactView = (QuickContactBadge) view
 					.findViewById(R.id.quick_contact_photo);
-			holder.name = (TextView) convertView.findViewById(R.id.name);
-			holder.phoneNum = (TextView) convertView
-					.findViewById(R.id.phoneNum);
-			holder.lastContact = (TextView) convertView
-					.findViewById(R.id.lastCalled);
-			convertView.setTag(holder);
+			holder.name = (TextView) view.findViewById(R.id.name);
+			holder.phoneNum = (TextView) view.findViewById(R.id.phoneNum);
+			holder.lastContact = (TextView) view.findViewById(R.id.lastCalled);
+			view.setTag(holder);
 		} else {
-			holder = (ViewHolder) convertView.getTag();
+			holder = (ViewHolder) view.getTag();
 		}
 
 		Uri lookupUri = Uri.withAppendedPath(PhoneLookup.CONTENT_FILTER_URI,
-				Uri.encode(callBlocks.get(position).getNumber()));
+				Uri.encode(item.getNumber()));
 		String[] mPhoneNumberProjection = { PhoneLookup.DISPLAY_NAME,
 				BaseColumns._ID, PhoneLookup.LAST_TIME_CONTACTED };
 		Cursor cur = context.getContentResolver().query(lookupUri,
@@ -107,8 +80,8 @@ public class BlocklistAdapter extends CursorAdapter {
 					String.valueOf(contactId));
 			lastContacted = cur.getString(cur
 					.getColumnIndex(PhoneLookup.LAST_TIME_CONTACTED));
-			holder.quickContactView.assignContactFromPhone(
-					callBlocks.get(position).getNumber(), true);
+			holder.quickContactView.assignContactFromPhone(item.getNumber(),
+					true);
 			loadThumbnail(holder.quickContactView, contactUri);
 			InputStream input = ContactsContract.Contacts
 					.openContactPhotoInputStream(context.getContentResolver(),
@@ -117,24 +90,39 @@ public class BlocklistAdapter extends CursorAdapter {
 					.decodeStream(input));
 
 			holder.name.setText(name);
-			holder.phoneNum.setText(callBlocks.get(position).getNumber());
+			holder.phoneNum.setText(item.getNumber());
 			holder.lastContact.setText(lastContacted);
 			cur.close();
 		} else {
-			holder.quickContactView.assignContactFromPhone(
-					callBlocks.get(position).getNumber(), true);
+			holder.quickContactView.assignContactFromPhone(item.getNumber(),
+					true);
 			loadThumbnail(holder.quickContactView, null);
-			holder.name.setText(callBlocks.get(position).getNumber());
+			holder.name.setText(item.getNumber());
 			holder.phoneNum.setText("-");
 			holder.lastContact.setVisibility(View.INVISIBLE);
 			cur.close();
 		}
 
 		holder.primaryActionView.setVisibility(View.VISIBLE);
-		convertView
-				.setBackgroundColor(mSelectedItemsIds.get(position) ? 0x9934B5E4
-						: Color.TRANSPARENT);
-		return convertView;
+
+	}
+
+	@Override
+	public View newView(Context context, Cursor cursor, ViewGroup viewGroup) {
+		inflator.inflate(R.layout.call_block_item, null);
+		return null;
+	}
+
+	private class ViewHolder {
+
+		// The quick contact badge for the contact.
+		QuickContactBadge quickContactView;
+		// The primary action view of the entry.
+		View primaryActionView;
+		TextView phoneNum;
+		TextView name;
+		TextView lastContact;
+
 	}
 
 	public static int getDefaultAvatarResId(Context context, int extent) {

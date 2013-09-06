@@ -1,16 +1,19 @@
 package com.jphsoftware.nope.fragments.blockitems;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.TypedArray;
-import android.os.AsyncTask;
+import android.database.Cursor;
 import android.os.Bundle;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
+import android.support.v4.widget.CursorAdapter;
 import android.text.InputType;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
@@ -31,14 +34,18 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.jphsoftware.nope.R;
-import com.jphsoftware.nope.database.BlockItem;
+import com.jphsoftware.nope.database.BlockItemDataSource;
+import com.jphsoftware.nope.database.SimpleCursorLoader;
 
-public class CallBlockFragment extends SherlockListFragment {
+public class CallBlockFragment extends SherlockListFragment implements
+		LoaderManager.LoaderCallbacks<Cursor> {
+
+	// Class debugging tag
+	private static final String TAG = CallBlockFragment.class.getSimpleName();
 
 	private ListView listView;
-	private BlocklistAdapter callBlockAdapter;
-	List<BlockItem> callBlocks;
-
+	private BlockItemDataSource db;
+	private BlocklistAdapter adapter;
 	private ActionMode mMode;
 
 	public CallBlockFragment() {
@@ -49,6 +56,48 @@ public class CallBlockFragment extends SherlockListFragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+		listView = (ListView) getSherlockActivity().findViewById(
+				android.R.id.list);
+		db = new BlockItemDataSource(getSherlockActivity());
+		Cursor c = db.query(BlockItemDataSource.CALLBLOCK_TABLE_NAME);
+		adapter = new BlocklistAdapter(getSherlockActivity(), c,
+				CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
+
+		listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+
+		listView.setOnItemLongClickListener(new OnItemLongClickListener() {
+
+			public boolean onItemLongClick(AdapterView<?> parent, View view,
+					int position, long id) {
+
+				Cursor cursor = adapter.getCursor();
+				cursor.moveToPosition(position);
+				onListItemSelect(position);
+				return true;
+			}
+		});
+
+		getLoaderManager().initLoader(0, null, this);
+
+	}
+
+	public Loader<Cursor> onCreateLoader(int loaderId, Bundle args) {
+		return new BlockItemCursorLoader(getActivity());
+	}
+
+	public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+		adapter.swapCursor(cursor);
+
+		// the list should now be shown
+		if (isResumed()) {
+			setListShown(true);
+		} else {
+			setListShownNoAnimation(true);
+		}
+	}
+
+	public void onLoaderReset(Loader<Cursor> loader) {
+		adapter.swapCursor(null);
 	}
 
 	@Override
@@ -68,21 +117,11 @@ public class CallBlockFragment extends SherlockListFragment {
 		setHasOptionsMenu(false);
 	}
 
-
-	public void updateList() {
-		//When we build the new Cursor adapter, notify data set changed right here.
-		callBlockAdapter = new BlocklistAdapter(getSherlockActivity(),
-				R.layout.call_block_item, callBlocks);
-		callBlockAdapter.notifyDataSetChanged();
-	}
-
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.fragment_call_blocklist,
 				container, false);
-		callBlockAdapter = new BlocklistAdapter(getSherlockActivity(),
-				R.layout.call_block_item, callBlocks);
 		TypedArray layouts = getResources().obtainTypedArray(
 				R.array.layout_resources_list);
 		layouts.getResourceId(0, 0);
@@ -94,26 +133,6 @@ public class CallBlockFragment extends SherlockListFragment {
 		actionBar.setTitle(menuListArray[0]);
 		actionBar.setDisplayShowCustomEnabled(true);
 		actionBar.show();
-
-		System.err.println("onCreateView called");
-		listView = (ListView) view.findViewById(android.R.id.list);
-
-		listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-
-		listView.setOnItemLongClickListener(new OnItemLongClickListener() {
-
-			public boolean onItemLongClick(AdapterView<?> parent, View view,
-					int position, long id) {
-
-				System.err.println("onCreateView called");
-				onListItemSelect(position);
-				return true;
-			}
-		});
-
-		// listView = (ListView) inflater.inflate(R.id.call_block_list,
-		// container);
-		// listView.setAdapter(callBlockAdapter);
 		layouts.recycle();
 		return view;
 
@@ -178,7 +197,7 @@ public class CallBlockFragment extends SherlockListFragment {
 			@Override
 			public void onDismiss(DialogInterface dialog) {
 				System.err.println("Dismissing dialog");
-				new UiThread().execute();
+				adapter.notifyDataSetChanged();
 
 			}
 		});
@@ -205,8 +224,8 @@ public class CallBlockFragment extends SherlockListFragment {
 							Toast.makeText(getSherlockActivity(),
 									"Phone number matches!:" + phoneNum,
 									Toast.LENGTH_LONG).show();
-							//Fill in for call block item addition
-							new UiThread().execute();
+							// Fill in for call block item addition
+							adapter.notifyDataSetChanged();
 							alert.dismiss();
 						} else {
 							Toast.makeText(
@@ -226,50 +245,35 @@ public class CallBlockFragment extends SherlockListFragment {
 
 	}
 
-
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
 
 	}
 
-	private class UiThread extends AsyncTask<Void, Void, Void> {
-		BlocklistAdapter adapter = callBlockAdapter;
-
-		@Override
-		protected void onPreExecute() {
-			getActivity().setProgressBarIndeterminateVisibility(true);
-		}
-
-		@Override
-		protected Void doInBackground(Void... params) {
-			updateList();
-			return null;
-		}
-
-		@Override
-		protected void onPostExecute(Void results) {
-			listView.setAdapter(adapter);
-			getActivity().setProgressBarIndeterminateVisibility(false);
-		}
-
-	}
-
 	private void onListItemSelect(int position) {
 
-		callBlockAdapter.toggleSelection(position);
-		boolean hasCheckedItems = callBlockAdapter.getSelectedCount() > 0;
+		SparseBooleanArray checked = listView.getCheckedItemPositions();
+		boolean hasCheckedElement = false;
+		for (int i = 0; i < checked.size() && !hasCheckedElement; i++) {
+			hasCheckedElement = checked.valueAt(i);
+		}
 
-		if (hasCheckedItems && mMode == null)
-			// there are some selected items, start the actionMode
-			mMode = getSherlockActivity().startActionMode(new ModeCallback());
-		else if (!hasCheckedItems && mMode != null)
-			// there no selected items, finish the actionMode
-			mMode.finish();
-
-		if (mMode != null)
-			mMode.setTitle(String.valueOf(callBlockAdapter.getSelectedCount())
-					+ " selected");
+		if (hasCheckedElement) {
+			if (mMode == null) {
+				mMode = (getSherlockActivity())
+						.startActionMode(new ModeCallback());
+				mMode.setTitle(String.valueOf(checked.size()) + " selected");
+				mMode.invalidate();
+			} else {
+				mMode.setTitle(String.valueOf(checked.size()) + " selected");
+				mMode.invalidate();
+			}
+		} else {
+			if (mMode != null) {
+				mMode.finish();
+			}
+		}
 	}
 
 	protected final class ModeCallback implements ActionMode.Callback {
@@ -285,7 +289,6 @@ public class CallBlockFragment extends SherlockListFragment {
 			// Create the menu from the xml file
 			MenuInflater inflater = getSherlockActivity()
 					.getSupportMenuInflater();
-			mSelectedItemIds = new HashSet<Integer>();
 			inflater.inflate(R.menu.item_multi_select_menu, menu);
 
 			if (mMultiSelectActionBarView == null) {
@@ -324,7 +327,6 @@ public class CallBlockFragment extends SherlockListFragment {
 		@Override
 		public void onDestroyActionMode(ActionMode mode) {
 			// Destroying action mode, let's unselect all items
-			callBlockAdapter.removeSelection();
 			mMode = null;
 		}
 
@@ -341,11 +343,11 @@ public class CallBlockFragment extends SherlockListFragment {
 
 				for (int i = itemCount - 1; i >= 0; i--) {
 					if (checkedItemPositions.get(i)) {
-						callBlockAdapter.remove(callBlocks.get(i));
+						db.remove(BlockItemDataSource.CALLBLOCK_TABLE_NAME, i);
 					}
 				}
 				checkedItemPositions.clear();
-				callBlockAdapter.notifyDataSetChanged();
+				adapter.notifyDataSetChanged();
 
 				mode.finish(); // Action picked, so close the CAB
 				return true;
@@ -354,6 +356,25 @@ public class CallBlockFragment extends SherlockListFragment {
 			}
 
 		}
+	}
+
+	public static final class BlockItemCursorLoader extends SimpleCursorLoader {
+
+		Context mContext;
+
+		public BlockItemCursorLoader(Context context) {
+			super(context);
+
+			mContext = context;
+		}
+
+		@Override
+		public Cursor loadInBackground() {
+			BlockItemDataSource datasource = new BlockItemDataSource(mContext);
+
+			return datasource.query(BlockItemDataSource.CALLBLOCK_TABLE_NAME);
+		}
+
 	}
 
 }
