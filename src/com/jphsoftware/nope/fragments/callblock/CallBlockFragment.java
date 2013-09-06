@@ -275,7 +275,9 @@ public class CallBlockFragment extends SherlockListFragment {
 	protected final class ModeCallback implements ActionMode.Callback {
 
 		private View mMultiSelectActionBarView;
+		@SuppressWarnings("unused")
 		private TextView mSelectedConvCount;
+		@SuppressWarnings("unused")
 		private HashSet<Integer> mSelectedItemIds;
 
 		@Override
