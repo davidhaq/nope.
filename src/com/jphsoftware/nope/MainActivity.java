@@ -29,7 +29,7 @@ import com.jphsoftware.nope.fragments.AboutFragment;
 import com.jphsoftware.nope.fragments.AntiSMSSpamFragment;
 import com.jphsoftware.nope.fragments.SMSBlockFragment;
 import com.jphsoftware.nope.fragments.SettingsFragment;
-import com.jphsoftware.nope.fragments.callblock.CallBlockFragment;
+import com.jphsoftware.nope.fragments.blockitems.CallBlockFragment;
 
 public class MainActivity extends SherlockFragmentActivity {
 

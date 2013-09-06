@@ -1,20 +1,21 @@
 package com.jphsoftware.nope.database;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
-public class BlockItem implements Serializable{
+public class BlockItem implements Serializable {
 
 	private String number;
-	private String lastContact;
+	private ArrayList<String> contactLog;
 
 	public BlockItem() {
 		super();
 	}
 
-	public BlockItem(String phoneNumber, String lastContact) {
+	public BlockItem(String phoneNumber, ArrayList<String> contactLog) {
 		super();
 		this.number = phoneNumber;
-		this.lastContact = lastContact;
+		this.contactLog = contactLog;
 	}
 
 	public BlockItem(String phoneNumber) {
@@ -30,11 +31,16 @@ public class BlockItem implements Serializable{
 		this.number = number;
 	}
 
-	public String getLastCall() {
-		return lastContact;
+	public ArrayList<String> getContactLog() {
+		return contactLog;
 	}
 
-	public void setLastCall(String lastCall) {
-		this.lastContact = lastCall;
+	public void setContactLog(ArrayList<String> contactLog) {
+		this.contactLog = contactLog;
+	}
+
+	public String getLastContact() {
+
+		return getContactLog().get(0);
 	}
 }
