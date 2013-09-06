@@ -2,6 +2,7 @@ package com.jphsoftware.nope.fragments.callblock;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -21,11 +22,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.ActionBar;
@@ -36,14 +37,15 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.jphsoftware.nope.BlockItem;
 import com.jphsoftware.nope.Constants;
 import com.jphsoftware.nope.R;
 
 public class CallBlockFragment extends SherlockListFragment {
 
 	private ListView listView;
-	private CallBlocklistAdapter callBlockAdapter;
-	List<CallBlockItem> callBlocks;
+	private BlocklistAdapter callBlockAdapter;
+	List<BlockItem> callBlocks;
 
 	private GsonBuilder gsonb;
 	private Gson gson;
@@ -61,7 +63,7 @@ public class CallBlockFragment extends SherlockListFragment {
 		if (callBlocks == null) {
 			setCallBlockList();
 		}
-		callBlockAdapter = new CallBlocklistAdapter(getSherlockActivity(),
+		callBlockAdapter = new BlocklistAdapter(getSherlockActivity(),
 				R.layout.call_block_item, callBlocks);
 		gsonb = new GsonBuilder();
 		gson = gsonb.create();
@@ -72,14 +74,14 @@ public class CallBlockFragment extends SherlockListFragment {
 	}
 
 	private void setCallBlockList() {
-		callBlocks = new ArrayList<CallBlockItem>();
+		callBlocks = new ArrayList<BlockItem>();
 		String[] numbers = getCallBlockDataArrayList(Constants.BLOCKED_NUMBERS)
 				.toArray(
 						new String[getCallBlockDataArrayList(
 								Constants.BLOCKED_NUMBERS).size()]);
 
 		for (int i = 0; i < numbers.length; i++) {
-			CallBlockItem block = new CallBlockItem(numbers[i]);
+			BlockItem block = new BlockItem(numbers[i]);
 			callBlocks.add(block);
 		}
 	}
@@ -88,7 +90,7 @@ public class CallBlockFragment extends SherlockListFragment {
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 
-		callBlockAdapter = new CallBlocklistAdapter(getSherlockActivity(),
+		callBlockAdapter = new BlocklistAdapter(getSherlockActivity(),
 				R.layout.call_block_item, callBlocks);
 		gsonb = new GsonBuilder();
 		gson = gsonb.create();
@@ -182,7 +184,7 @@ public class CallBlockFragment extends SherlockListFragment {
 
 	public void updateList() {
 		setCallBlockList();
-		callBlockAdapter = new CallBlocklistAdapter(getSherlockActivity(),
+		callBlockAdapter = new BlocklistAdapter(getSherlockActivity(),
 				R.layout.call_block_item, callBlocks);
 		callBlockAdapter.notifyDataSetChanged();
 	}
@@ -192,7 +194,7 @@ public class CallBlockFragment extends SherlockListFragment {
 			Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.fragment_call_blocklist,
 				container, false);
-		callBlockAdapter = new CallBlocklistAdapter(getSherlockActivity(),
+		callBlockAdapter = new BlocklistAdapter(getSherlockActivity(),
 				R.layout.call_block_item, callBlocks);
 		TypedArray layouts = getResources().obtainTypedArray(
 				R.array.layout_resources_list);
@@ -362,7 +364,7 @@ public class CallBlockFragment extends SherlockListFragment {
 	}
 
 	private class UiThread extends AsyncTask<Void, Void, Void> {
-		CallBlocklistAdapter adapter = callBlockAdapter;
+		BlocklistAdapter adapter = callBlockAdapter;
 
 		@Override
 		protected void onPreExecute() {
@@ -384,7 +386,7 @@ public class CallBlockFragment extends SherlockListFragment {
 	}
 
 	private void onListItemSelect(int position) {
-		
+
 		callBlockAdapter.toggleSelection(position);
 		boolean hasCheckedItems = callBlockAdapter.getSelectedCount() > 0;
 
@@ -402,19 +404,49 @@ public class CallBlockFragment extends SherlockListFragment {
 
 	protected final class ModeCallback implements ActionMode.Callback {
 
+		private View mMultiSelectActionBarView;
+		private TextView mSelectedConvCount;
+		private HashSet<Integer> mSelectedItemIds;
+
 		@Override
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 			// Create the menu from the xml file
 			MenuInflater inflater = getSherlockActivity()
 					.getSupportMenuInflater();
-			inflater.inflate(R.menu.context_menu, menu);
+			mSelectedItemIds = new HashSet<Integer>();
+			inflater.inflate(R.menu.item_multi_select_menu, menu);
+
+			if (mMultiSelectActionBarView == null) {
+				mMultiSelectActionBarView = LayoutInflater
+						.from(getSherlockActivity())
+						.inflate(
+								R.layout.conversation_list_multi_select_actionbar,
+								null);
+
+				mSelectedConvCount = (TextView) mMultiSelectActionBarView
+						.findViewById(R.id.selected_conv_count);
+			}
+			mode.setCustomView(mMultiSelectActionBarView);
+			((TextView) mMultiSelectActionBarView.findViewById(R.id.title))
+					.setText(R.string.select_items);
 			return true;
 		}
 
 		@Override
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
 			// Here, you can checked selected items to adapt available actions
-			return false;
+			if (mMultiSelectActionBarView == null) {
+				ViewGroup v = (ViewGroup) LayoutInflater
+						.from(getSherlockActivity())
+						.inflate(
+								R.layout.conversation_list_multi_select_actionbar,
+								null);
+				mode.setCustomView(v);
+
+				mSelectedConvCount = (TextView) v
+						.findViewById(R.id.selected_conv_count);
+			}
+			return true;
 		}
 
 		@Override
@@ -427,17 +459,22 @@ public class CallBlockFragment extends SherlockListFragment {
 		@Override
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 			switch (item.getItemId()) {
-			case R.id.action_delete_item:
-				// retrieve selected items and delete them out
-				SparseBooleanArray selected = listView
+			case R.id.delete:
+
+				/** Getting the checked items from the listview */
+				SparseBooleanArray checkedItemPositions = getListView()
 						.getCheckedItemPositions();
-				for (int i = (selected.size() - 1); i >= 0; i--) {
-					if (selected.valueAt(i)) {
-						CallBlockItem selectedItem = (CallBlockItem) callBlockAdapter
-								.getItem(selected.keyAt(i));
-						callBlockAdapter.remove(selectedItem);
+				int itemCount = getListView().getCount();
+				System.err.println("Item count: "+itemCount);
+
+				for (int i = itemCount - 1; i >= 0; i--) {
+					if (checkedItemPositions.get(i)) {
+						callBlockAdapter.remove(callBlocks.get(i));
 					}
 				}
+				checkedItemPositions.clear();
+				callBlockAdapter.notifyDataSetChanged();
+
 				mode.finish(); // Action picked, so close the CAB
 				return true;
 			default:

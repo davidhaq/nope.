@@ -23,19 +23,20 @@ import android.widget.ImageView;
 import android.widget.QuickContactBadge;
 import android.widget.TextView;
 
+import com.jphsoftware.nope.BlockItem;
 import com.jphsoftware.nope.R;
 
-public class CallBlocklistAdapter extends ArrayAdapter<CallBlockItem> {
+public class BlocklistAdapter extends ArrayAdapter<BlockItem> {
 
 	String[] phoneNums, lastCalled;
 	Activity context;
-	List<CallBlockItem> callBlocks;
+	List<BlockItem> callBlocks;
 	private SparseBooleanArray mSelectedItemsIds;
 	private LayoutInflater inflater;
 	private static int s180DipInPixel = -1;
 
-	public CallBlocklistAdapter(Activity context, int resId,
-			List<CallBlockItem> blocks) {
+	public BlocklistAdapter(Activity context, int resId,
+			List<BlockItem> blocks) {
 		super(context, resId, blocks);
 		mSelectedItemsIds = new SparseBooleanArray();
 		this.context = context;
@@ -43,11 +44,6 @@ public class CallBlocklistAdapter extends ArrayAdapter<CallBlockItem> {
 		inflater = LayoutInflater.from(context);
 	}
 
-	public void remove(CallBlockItem object) {
-		// super.remove(object);
-		this.remove(object);
-		notifyDataSetChanged();
-	}
 
 	private class ViewHolder {
 
@@ -163,6 +159,10 @@ public class CallBlocklistAdapter extends ArrayAdapter<CallBlockItem> {
 
 	public int getSelectedCount() {
 		return mSelectedItemsIds.size();
+	}
+
+	public SparseBooleanArray getSelectedIds() {
+		return mSelectedItemsIds;
 	}
 
 	public static int getDefaultAvatarResId(Context context, int extent) {

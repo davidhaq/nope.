@@ -2,6 +2,8 @@
 <resources>
 
     <string name="app_name">Nope!</string>
+    <string name="select_items">Choose items</string>
+    <string name="delete">Delete</string>
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
     <string name="call_blocklist_string">Call Nope! List</string>
