@@ -13,6 +13,7 @@ import android.net.Uri;
 import android.provider.BaseColumns;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.PhoneLookup;
+import android.support.v4.widget.CursorAdapter;
 import android.util.SparseBooleanArray;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -25,25 +26,31 @@ import android.widget.TextView;
 
 import com.jphsoftware.nope.R;
 import com.jphsoftware.nope.database.BlockItem;
+import com.jphsoftware.nope.database.BlockItemDatabaseHelper;
 
-public class BlocklistAdapter extends ArrayAdapter<BlockItem> {
+public class BlocklistAdapter extends CursorAdapter {
 
-	String[] phoneNums, lastCalled;
-	Activity context;
-	List<BlockItem> callBlocks;
-	private SparseBooleanArray mSelectedItemsIds;
-	private LayoutInflater inflater;
+	private LayoutInflater inflator;
+	private static final String TAG = BlocklistAdapter.class.getSimpleName();
+
 	private static int s180DipInPixel = -1;
 
-	public BlocklistAdapter(Activity context, int resId,
-			List<BlockItem> blocks) {
-		super(context, resId, blocks);
-		mSelectedItemsIds = new SparseBooleanArray();
-		this.context = context;
-		this.callBlocks = blocks;
-		inflater = LayoutInflater.from(context);
+	public BlocklistAdapter(Context context, Cursor cursor, int flags) {
+		super(context, cursor, flags);
+		inflator = LayoutInflater.from(context);
 	}
 
+	@Override
+	public void bindView(View view, Context context, Cursor cursor) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public View newView(Context context, Cursor cursor, ViewGroup viewGroup) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 	private class ViewHolder {
 
@@ -53,7 +60,7 @@ public class BlocklistAdapter extends ArrayAdapter<BlockItem> {
 		View primaryActionView;
 		TextView phoneNum;
 		TextView name;
-		TextView lastCall;
+		TextView lastContact;
 
 	}
 
@@ -76,7 +83,7 @@ public class BlocklistAdapter extends ArrayAdapter<BlockItem> {
 			holder.name = (TextView) convertView.findViewById(R.id.name);
 			holder.phoneNum = (TextView) convertView
 					.findViewById(R.id.phoneNum);
-			holder.lastCall = (TextView) convertView
+			holder.lastContact = (TextView) convertView
 					.findViewById(R.id.lastCalled);
 			convertView.setTag(holder);
 		} else {
@@ -111,7 +118,7 @@ public class BlocklistAdapter extends ArrayAdapter<BlockItem> {
 
 			holder.name.setText(name);
 			holder.phoneNum.setText(callBlocks.get(position).getNumber());
-			holder.lastCall.setText(lastContacted);
+			holder.lastContact.setText(lastContacted);
 			cur.close();
 		} else {
 			holder.quickContactView.assignContactFromPhone(
@@ -119,50 +126,15 @@ public class BlocklistAdapter extends ArrayAdapter<BlockItem> {
 			loadThumbnail(holder.quickContactView, null);
 			holder.name.setText(callBlocks.get(position).getNumber());
 			holder.phoneNum.setText("-");
-			holder.lastCall.setVisibility(View.INVISIBLE);
+			holder.lastContact.setVisibility(View.INVISIBLE);
 			cur.close();
 		}
 
 		holder.primaryActionView.setVisibility(View.VISIBLE);
-		// holder.phoneNum.setText(phoneNums[position]);
-		// holder.lastCall.setText("Last Called:" + lastCalled[position]);
-		// holder.lastCall.setText("Last Called:");
 		convertView
 				.setBackgroundColor(mSelectedItemsIds.get(position) ? 0x9934B5E4
 						: Color.TRANSPARENT);
 		return convertView;
-	}
-
-	@Override
-	public long getItemId(int position) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	public void toggleSelection(int position) {
-		selectView(position, !mSelectedItemsIds.get(position));
-	}
-
-	public void removeSelection() {
-		mSelectedItemsIds = new SparseBooleanArray();
-		notifyDataSetChanged();
-	}
-
-	public void selectView(int position, boolean value) {
-		if (value)
-			mSelectedItemsIds.put(position, value);
-		else
-			mSelectedItemsIds.delete(position);
-
-		notifyDataSetChanged();
-	}
-
-	public int getSelectedCount() {
-		return mSelectedItemsIds.size();
-	}
-
-	public SparseBooleanArray getSelectedIds() {
-		return mSelectedItemsIds;
 	}
 
 	public static int getDefaultAvatarResId(Context context, int extent) {
