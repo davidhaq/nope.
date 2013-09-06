@@ -8,11 +8,11 @@ public class BlockItemTable {
 	private static final String TAG = BlockItemTable.class.getSimpleName();
 
 	// Names and atrributes of tables that will hold block items
-	private static final String CALLBLOCK_TABLE_NAME = " call block database ";
-	private static final String SMSBLOCK_TABLE_NAME = " call block database ";
-	private static final String _ID = "_id";
-	private static final String _BYTECODE = "_bytecode";
-	private static final String _LASTCONTACT = "_lastcontact";
+	public static final String CALLBLOCK_TABLE_NAME = " call block database ";
+	public static final String SMSBLOCK_TABLE_NAME = " call block database ";
+	public static final String _ID = "_id";
+	public static final String _BYTECODE = "_bytecode";
+	public static final String _LASTCONTACT = "_lastcontact";
 
 	private static final String CALLTABLE_CREATE = " CREATE TABLE IF NOT EXISTS "
 			+ CALLBLOCK_TABLE_NAME

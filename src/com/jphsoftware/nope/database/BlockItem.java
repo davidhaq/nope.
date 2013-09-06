@@ -1,6 +1,8 @@
 package com.jphsoftware.nope.database;
 
-public class BlockItem {
+import java.io.Serializable;
+
+public class BlockItem implements Serializable{
 
 	private String number;
 	private String lastContact;
