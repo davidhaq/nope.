@@ -37,9 +37,9 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.jphsoftware.nope.BlockItem;
 import com.jphsoftware.nope.Constants;
 import com.jphsoftware.nope.R;
+import com.jphsoftware.nope.database.BlockItem;
 
 public class CallBlockFragment extends SherlockListFragment {
 

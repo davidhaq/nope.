@@ -23,8 +23,8 @@ import android.widget.ImageView;
 import android.widget.QuickContactBadge;
 import android.widget.TextView;
 
-import com.jphsoftware.nope.BlockItem;
 import com.jphsoftware.nope.R;
+import com.jphsoftware.nope.database.BlockItem;
 
 public class BlocklistAdapter extends ArrayAdapter<BlockItem> {
 
