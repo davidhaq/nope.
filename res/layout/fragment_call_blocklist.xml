@@ -20,7 +20,7 @@
         android:layout_height="match_parent"
         android:background="#ffffff"
         android:gravity="center"
-        android:text="No numbers blocked"
+        android:text="@string/empty_list"
         android:textColor="#767676"
         android:textSize="30sp" />
 

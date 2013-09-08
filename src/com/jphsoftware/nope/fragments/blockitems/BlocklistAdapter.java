@@ -6,12 +6,13 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.net.Uri;
 import android.provider.BaseColumns;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.PhoneLookup;
 import android.support.v4.widget.CursorAdapter;
+import android.support.v4.widget.SimpleCursorAdapter;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,29 +23,41 @@ import android.widget.TextView;
 
 import com.jphsoftware.nope.R;
 import com.jphsoftware.nope.database.BlockItem;
-import com.jphsoftware.nope.database.DbUtil;
 
-public class BlocklistAdapter extends CursorAdapter {
+public class BlocklistAdapter extends SimpleCursorAdapter {
+
+	// Debugging
+	private static final String TAG = BlocklistAdapter.class.getSimpleName();
+	private static final boolean DEBUG = true;
 
 	private LayoutInflater inflator;
-	private static final String TAG = BlocklistAdapter.class.getSimpleName();
 	private Context context;
 	private static int s180DipInPixel = -1;
 
-	public BlocklistAdapter(Context context, Cursor cursor, int flags) {
-		super(context, cursor, flags);
+	public BlocklistAdapter(Context context, int layout, Cursor cursor,
+			String[] from, int[] to, int flags) {
+		super(context, layout, cursor, from, to, flags);
 		this.context = context;
 		inflator = LayoutInflater.from(context);
 	}
 
 	@Override
-	public void bindView(View view, Context context, Cursor cursor) {
+	public View newView(Context context, Cursor cursor, ViewGroup viewGroup) {
+		return inflator.inflate(R.layout.call_block_item, null);
+	}
 
+	@Override
+	public void bindView(View view, Context context, Cursor cursor) {
+		if (DEBUG) {
+			Log.d(TAG, "+++bindView called+++");
+			Log.d(TAG, "cursor: " + cursor);
+		}
 		String name = null;
 		String lastContacted = null;
 		String contactId = null;
 		Uri contactUri = null;
 
+		cursor.moveToFirst();
 		BlockItem item = DbUtil.generateObjectFromCursor(cursor);
 
 		ViewHolder holder;
@@ -105,12 +118,6 @@ public class BlocklistAdapter extends CursorAdapter {
 
 		holder.primaryActionView.setVisibility(View.VISIBLE);
 
-	}
-
-	@Override
-	public View newView(Context context, Cursor cursor, ViewGroup viewGroup) {
-		inflator.inflate(R.layout.call_block_item, null);
-		return null;
 	}
 
 	private class ViewHolder {

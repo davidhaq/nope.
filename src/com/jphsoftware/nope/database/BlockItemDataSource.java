@@ -1,6 +1,5 @@
 package com.jphsoftware.nope.database;
 
-
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -23,28 +22,18 @@ public class BlockItemDataSource extends SQLiteOpenHelper {
 	}
 
 	// Names and atrributes of tables that will hold block items
-	public static final String CALLBLOCK_TABLE_NAME = " call block database ";
-	public static final String SMSBLOCK_TABLE_NAME = " call block database ";
+	public static final String CALLBLOCK_TABLE_NAME = "callblockdatabase";
+	public static final String SMSBLOCK_TABLE_NAME = "callblockdatabase";
 	public static final String _ID = "_id";
 	public static final String _BYTECODE = "_bytecode";
-	public static final String _LASTCONTACT = "_lastcontact";
+	// public static final String _LASTCONTACT = "_lastcontact";
 
-	public static final String CALLTABLE_CREATE = " CREATE TABLE IF NOT EXISTS "
-			+ CALLBLOCK_TABLE_NAME
-			+ " ( "
-			+ _ID
-			+ " INTEGER PRIMARY KEY AUTOINCREMENT, "
-			+ _BYTECODE
-			+ " BLOB, "
-			+ _LASTCONTACT + " STRING ); ";
-	public static final String SMSTABLE_CREATE = " CREATE TABLE IF NOT EXISTS "
-			+ SMSBLOCK_TABLE_NAME
-			+ " ( "
-			+ _ID
-			+ " INTEGER PRIMARY KEY AUTOINCREMENT, "
-			+ _BYTECODE
-			+ " BLOB, "
-			+ _LASTCONTACT + " STRING ); ";
+	public static final String CALLTABLE_CREATE = "CREATE TABLE IF NOT EXISTS "
+			+ CALLBLOCK_TABLE_NAME + "(" + _ID
+			+ " INTEGER PRIMARY KEY AUTOINCREMENT," + _BYTECODE + " BLOB);";
+	public static final String SMSTABLE_CREATE = "CREATE TABLE IF NOT EXISTS "
+			+ SMSBLOCK_TABLE_NAME + "(" + _ID
+			+ " INTEGER PRIMARY KEY AUTOINCREMENT, " + _BYTECODE + " BLOB);";
 
 	@Override
 	public void onCreate(SQLiteDatabase db) {
@@ -146,8 +135,7 @@ public class BlockItemDataSource extends SQLiteOpenHelper {
 	 */
 	public Cursor query(String tableName) {
 		SQLiteDatabase db = getWritableDatabase();
-		return db.query(tableName, null, null, null, null, null, null + " "
-				+ _LASTCONTACT + " DESC");
+		return db.query(tableName, null, null, null, null, null, _ID + " DESC");
 	}
 
 }

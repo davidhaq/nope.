@@ -1,25 +1,21 @@
 package com.jphsoftware.nope.database;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 
+import android.util.Log;
+
+@SuppressWarnings("serial")
 public class BlockItem implements Serializable {
 
 	private String number;
-	private ArrayList<String> contactLog;
-
-	public BlockItem() {
-		super();
-	}
-
-	public BlockItem(String phoneNumber, ArrayList<String> contactLog) {
-		super();
-		this.number = phoneNumber;
-		this.contactLog = contactLog;
-	}
+	
+	private static final String TAG = BlockItem.class.getSimpleName();
+	public static final boolean DEBUG = true;
 
 	public BlockItem(String phoneNumber) {
-		super();
+		if(DEBUG)
+			Log.d(TAG, phoneNumber);
+		
 		this.number = phoneNumber;
 	}
 
@@ -31,16 +27,4 @@ public class BlockItem implements Serializable {
 		this.number = number;
 	}
 
-	public ArrayList<String> getContactLog() {
-		return contactLog;
-	}
-
-	public void setContactLog(ArrayList<String> contactLog) {
-		this.contactLog = contactLog;
-	}
-
-	public String getLastContact() {
-
-		return getContactLog().get(0);
-	}
 }

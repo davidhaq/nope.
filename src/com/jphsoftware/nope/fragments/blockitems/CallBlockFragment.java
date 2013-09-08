@@ -15,6 +15,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.CursorAdapter;
 import android.text.InputType;
+import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,19 +35,28 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.jphsoftware.nope.R;
+import com.jphsoftware.nope.database.BlockItem;
 import com.jphsoftware.nope.database.BlockItemDataSource;
+import com.jphsoftware.nope.database.DbUtil;
 import com.jphsoftware.nope.database.SimpleCursorLoader;
 
 public class CallBlockFragment extends SherlockListFragment implements
 		LoaderManager.LoaderCallbacks<Cursor> {
 
-	// Class debugging tag
+	// Class debugging tags
 	private static final String TAG = CallBlockFragment.class.getSimpleName();
+	private static final boolean DEBUG = true;
 
 	private ListView listView;
 	private BlockItemDataSource db;
 	private BlocklistAdapter adapter;
 	private ActionMode mMode;
+
+	boolean mListShown;
+	View mProgressContainer;
+	View mListContainer;
+
+	private static final int LOADER_ID = 1;
 
 	public CallBlockFragment() {
 
@@ -56,15 +66,24 @@ public class CallBlockFragment extends SherlockListFragment implements
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		listView = (ListView) getSherlockActivity().findViewById(
-				android.R.id.list);
 		db = new BlockItemDataSource(getSherlockActivity());
 		Cursor c = db.query(BlockItemDataSource.CALLBLOCK_TABLE_NAME);
 		adapter = new BlocklistAdapter(getSherlockActivity(), c,
 				CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
 
-		listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+	}
 
+	@Override
+	public void onActivityCreated(Bundle savedInstanceState) {
+		super.onActivityCreated(savedInstanceState);
+
+		db = new BlockItemDataSource(getSherlockActivity());
+		Cursor c = db.query(BlockItemDataSource.CALLBLOCK_TABLE_NAME);
+		adapter = new BlocklistAdapter(getSherlockActivity(), c,
+				CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
+		listView = (ListView) getSherlockActivity().findViewById(
+				android.R.id.list);
+		listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 		listView.setOnItemLongClickListener(new OnItemLongClickListener() {
 
 			public boolean onItemLongClick(AdapterView<?> parent, View view,
@@ -76,9 +95,21 @@ public class CallBlockFragment extends SherlockListFragment implements
 				return true;
 			}
 		});
+		if (DEBUG) {
+			Log.d(TAG, "+++ Calling initLoader()! +++");
+			if (getLoaderManager().getLoader(LOADER_ID) == null) {
+				Log.d(TAG, "+++ Initializing the new Loader... +++");
+			} else {
+				Log.d(TAG,
+						"+++ Reconnecting with existing Loader (id '1')... +++");
+			}
+		}
+		// Initialize a Loader with id '1'. If the Loader with this id already
+		// exists, then the LoaderManager will reuse the existing Loader.
+		getLoaderManager().initLoader(LOADER_ID, null, this);
+		listView.setAdapter(adapter);
 
-		getLoaderManager().initLoader(0, null, this);
-
+		// new UiThread().execute();
 	}
 
 	public Loader<Cursor> onCreateLoader(int loaderId, Bundle args) {
@@ -86,11 +117,22 @@ public class CallBlockFragment extends SherlockListFragment implements
 	}
 
 	public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-		adapter.swapCursor(cursor);
+		if (DEBUG) {
+			Log.d(TAG, "+++ onLoadFinished() called! +++");
+		}
 
-		// the list should now be shown
+		// Swap the new cursor in. (The framework will take care of closing the
+		// old cursor once we return)
+		adapter.swapCursor(cursor);
+		if (cursor.getCount() == 0) {
+			((TextView) getListView().getEmptyView())
+					.setText(getSherlockActivity().getResources().getString(
+							R.string.empty_list));
+			// TextView tvEmpty = (TextView) getListView().getEmptyView();
+		}
+		// The list should now be shown.
 		if (isResumed()) {
-			setListShown(true);
+			// setListShown(true);
 		} else {
 			setListShownNoAnimation(true);
 		}
@@ -133,6 +175,7 @@ public class CallBlockFragment extends SherlockListFragment implements
 		actionBar.setTitle(menuListArray[0]);
 		actionBar.setDisplayShowCustomEnabled(true);
 		actionBar.show();
+
 		layouts.recycle();
 		return view;
 
@@ -225,6 +268,10 @@ public class CallBlockFragment extends SherlockListFragment implements
 									"Phone number matches!:" + phoneNum,
 									Toast.LENGTH_LONG).show();
 							// Fill in for call block item addition
+							db.insert(
+									BlockItemDataSource.CALLBLOCK_TABLE_NAME,
+									DbUtil.generateContentValuesFromObject(new BlockItem(
+											phoneNum)));
 							adapter.notifyDataSetChanged();
 							alert.dismiss();
 						} else {
