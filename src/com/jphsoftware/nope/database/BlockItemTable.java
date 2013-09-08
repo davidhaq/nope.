@@ -36,14 +36,14 @@ public class BlockItemTable {
 			+ COLUMN_ID
 			+ " INTEGER PRIMARY KEY AUTOINCREMENT, "
 			+ COLUMN_NUMBER
-			+ " LONG ); ";
+			+ " STRING ); ";
 	private static final String SMSTABLE_CREATE = " CREATE TABLE IF NOT EXISTS "
 			+ SMSBLOCK_TABLE_NAME
 			+ " ( "
 			+ COLUMN_ID
 			+ " INTEGER PRIMARY KEY AUTOINCREMENT, "
 			+ COLUMN_NUMBER
-			+ " LONG ); ";
+			+ " STRING ); ";
 
 	
 	public static void onCreate(SQLiteDatabase db) {

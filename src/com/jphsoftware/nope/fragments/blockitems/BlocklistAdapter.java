@@ -10,7 +10,6 @@ import android.net.Uri;
 import android.provider.BaseColumns;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.PhoneLookup;
-import android.support.v4.widget.CursorAdapter;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.util.Log;
 import android.util.TypedValue;
@@ -22,7 +21,6 @@ import android.widget.QuickContactBadge;
 import android.widget.TextView;
 
 import com.jphsoftware.nope.R;
-import com.jphsoftware.nope.database.BlockItem;
 
 public class BlocklistAdapter extends SimpleCursorAdapter {
 
@@ -34,9 +32,10 @@ public class BlocklistAdapter extends SimpleCursorAdapter {
 	private Context context;
 	private static int s180DipInPixel = -1;
 
+	@SuppressWarnings("deprecation")
 	public BlocklistAdapter(Context context, int layout, Cursor cursor,
-			String[] from, int[] to, int flags) {
-		super(context, layout, cursor, from, to, flags);
+			String[] from, int[] to) {
+		super(context, layout, cursor, from, to);
 		this.context = context;
 		inflator = LayoutInflater.from(context);
 	}
@@ -50,15 +49,11 @@ public class BlocklistAdapter extends SimpleCursorAdapter {
 	public void bindView(View view, Context context, Cursor cursor) {
 		if (DEBUG) {
 			Log.d(TAG, "+++bindView called+++");
-			Log.d(TAG, "cursor: " + cursor);
 		}
 		String name = null;
 		String lastContacted = null;
 		String contactId = null;
 		Uri contactUri = null;
-
-		cursor.moveToFirst();
-		BlockItem item = DbUtil.generateObjectFromCursor(cursor);
 
 		ViewHolder holder;
 		if (view == null) {
@@ -77,7 +72,7 @@ public class BlocklistAdapter extends SimpleCursorAdapter {
 		}
 
 		Uri lookupUri = Uri.withAppendedPath(PhoneLookup.CONTENT_FILTER_URI,
-				Uri.encode(item.getNumber()));
+				Uri.encode(cursor.getString(0)));
 		String[] mPhoneNumberProjection = { PhoneLookup.DISPLAY_NAME,
 				BaseColumns._ID, PhoneLookup.LAST_TIME_CONTACTED };
 		Cursor cur = context.getContentResolver().query(lookupUri,
@@ -93,7 +88,7 @@ public class BlocklistAdapter extends SimpleCursorAdapter {
 					String.valueOf(contactId));
 			lastContacted = cur.getString(cur
 					.getColumnIndex(PhoneLookup.LAST_TIME_CONTACTED));
-			holder.quickContactView.assignContactFromPhone(item.getNumber(),
+			holder.quickContactView.assignContactFromPhone(cursor.getString(1),
 					true);
 			loadThumbnail(holder.quickContactView, contactUri);
 			InputStream input = ContactsContract.Contacts
@@ -103,14 +98,14 @@ public class BlocklistAdapter extends SimpleCursorAdapter {
 					.decodeStream(input));
 
 			holder.name.setText(name);
-			holder.phoneNum.setText(item.getNumber());
+			holder.phoneNum.setText(cursor.getString(1));
 			holder.lastContact.setText(lastContacted);
 			cur.close();
 		} else {
-			holder.quickContactView.assignContactFromPhone(item.getNumber(),
+			holder.quickContactView.assignContactFromPhone(cursor.getString(1),
 					true);
 			loadThumbnail(holder.quickContactView, null);
-			holder.name.setText(item.getNumber());
+			holder.name.setText(cursor.getString(1));
 			holder.phoneNum.setText("-");
 			holder.lastContact.setVisibility(View.INVISIBLE);
 			cur.close();
