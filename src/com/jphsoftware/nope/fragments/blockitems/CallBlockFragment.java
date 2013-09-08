@@ -37,8 +37,6 @@ import com.actionbarsherlock.view.MenuItem;
 import com.jphsoftware.nope.R;
 import com.jphsoftware.nope.database.BlockItem;
 import com.jphsoftware.nope.database.BlockItemDataSource;
-import com.jphsoftware.nope.database.DbUtil;
-import com.jphsoftware.nope.database.SimpleCursorLoader;
 
 public class CallBlockFragment extends SherlockListFragment implements
 		LoaderManager.LoaderCallbacks<Cursor> {

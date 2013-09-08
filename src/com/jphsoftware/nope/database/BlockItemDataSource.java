@@ -8,48 +8,30 @@ import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-public class BlockItemDataSource extends SQLiteOpenHelper {
+public class BlockItemDataSource {
 
+	// Debugging variables
 	private static final String TAG = BlockItemDataSource.class.getSimpleName();
+	private static final boolean DEBUG = true;
 
-	// Name and version of database
-	private static final String DATABASE_NAME = "blockitems.db";
-	private static final int DATABASE_VERSION = 1;
+	// database fields
+	private DatabaseHelper helper;
+	private SQLiteDatabase database;
 
 	public BlockItemDataSource(Context context) {
-		super(context, DATABASE_NAME, null, DATABASE_VERSION);
-		Log.d(TAG, "Database handler initiated");
+		helper = new DatabaseHelper(context);
+		if (DEBUG) {
+			Log.d(TAG, "Database helper initiated");
+		}
+
 	}
-
-	// Names and atrributes of tables that will hold block items
-	public static final String CALLBLOCK_TABLE_NAME = "callblockdatabase";
-	public static final String SMSBLOCK_TABLE_NAME = "callblockdatabase";
-	public static final String _ID = "_id";
-	public static final String _BYTECODE = "_bytecode";
-	// public static final String _LASTCONTACT = "_lastcontact";
-
-	public static final String CALLTABLE_CREATE = "CREATE TABLE IF NOT EXISTS "
-			+ CALLBLOCK_TABLE_NAME + "(" + _ID
-			+ " INTEGER PRIMARY KEY AUTOINCREMENT," + _BYTECODE + " BLOB);";
-	public static final String SMSTABLE_CREATE = "CREATE TABLE IF NOT EXISTS "
-			+ SMSBLOCK_TABLE_NAME + "(" + _ID
-			+ " INTEGER PRIMARY KEY AUTOINCREMENT, " + _BYTECODE + " BLOB);";
-
-	@Override
-	public void onCreate(SQLiteDatabase db) {
-
-		db.execSQL(CALLTABLE_CREATE);
-		db.execSQL(SMSTABLE_CREATE);
-		Log.d(TAG, "Creating database from defined schema:" + db);
+	
+	public void open() {
+		database = helper.getWritableDatabase();
 	}
-
-	@Override
-	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-		Log.d(TAG, "Upgrading database from version " + oldVersion
-				+ " to version " + newVersion + ". All data will be deleted ");
-		db.execSQL(getTableDrop(CALLBLOCK_TABLE_NAME));
-		db.execSQL(getTableDrop(SMSBLOCK_TABLE_NAME));
-		onCreate(db);
+	
+	public void close(){
+		helper.close();
 	}
 
 	/**
