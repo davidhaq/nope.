@@ -30,20 +30,20 @@ public class BlockItemTable {
 	// + " INTEGER PRIMARY KEY AUTOINCREMENT, "
 	// + COLUMN_NUMBER
 	// + " LONG, " + COLUMN_LOG + " STRING ); ";
-	private static final String CALLTABLE_CREATE = " CREATE TABLE IF NOT EXISTS "
+	private static final String CALLTABLE_CREATE = "CREATE TABLE IF NOT EXISTS "
 			+ CALLBLOCK_TABLE_NAME
-			+ " ( "
+			+ "("
 			+ COLUMN_ID
 			+ " INTEGER PRIMARY KEY AUTOINCREMENT, "
 			+ COLUMN_NUMBER
-			+ " STRING ); ";
-	private static final String SMSTABLE_CREATE = " CREATE TABLE IF NOT EXISTS "
+			+ " TEXT);";
+	private static final String SMSTABLE_CREATE = "CREATE TABLE IF NOT EXISTS "
 			+ SMSBLOCK_TABLE_NAME
-			+ " ( "
+			+ "("
 			+ COLUMN_ID
 			+ " INTEGER PRIMARY KEY AUTOINCREMENT, "
 			+ COLUMN_NUMBER
-			+ " STRING ); ";
+			+ " TEXT);";
 
 	
 	public static void onCreate(SQLiteDatabase db) {

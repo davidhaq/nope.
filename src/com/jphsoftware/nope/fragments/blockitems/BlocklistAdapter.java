@@ -10,7 +10,7 @@ import android.net.Uri;
 import android.provider.BaseColumns;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.PhoneLookup;
-import android.support.v4.widget.SimpleCursorAdapter;
+import android.support.v4.widget.CursorAdapter;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -21,8 +21,9 @@ import android.widget.QuickContactBadge;
 import android.widget.TextView;
 
 import com.jphsoftware.nope.R;
+import com.jphsoftware.nope.database.BlockItemTable;
 
-public class BlocklistAdapter extends SimpleCursorAdapter {
+public class BlocklistAdapter extends CursorAdapter {
 
 	// Debugging
 	private static final String TAG = BlocklistAdapter.class.getSimpleName();
@@ -32,47 +33,42 @@ public class BlocklistAdapter extends SimpleCursorAdapter {
 	private Context context;
 	private static int s180DipInPixel = -1;
 
-	@SuppressWarnings("deprecation")
-	public BlocklistAdapter(Context context, int layout, Cursor cursor,
-			String[] from, int[] to) {
-		super(context, layout, cursor, from, to);
+	public BlocklistAdapter(Context context, Cursor cursor) {
+		super(context, cursor, 0);
 		this.context = context;
 		inflator = LayoutInflater.from(context);
 	}
 
 	@Override
-	public View newView(Context context, Cursor cursor, ViewGroup viewGroup) {
-		return inflator.inflate(R.layout.call_block_item, null);
+	public View newView(Context context, Cursor cursor, ViewGroup parent) {
+		View v = inflator.inflate(R.layout.call_block_item, parent, false);
+		return v;
 	}
 
 	@Override
 	public void bindView(View view, Context context, Cursor cursor) {
 		if (DEBUG) {
 			Log.d(TAG, "+++bindView called+++");
+			Log.d(TAG, "number value: " + cursor.getString(1));
 		}
-		String name = null;
-		String lastContacted = null;
-		String contactId = null;
-		Uri contactUri = null;
+		String name;
+		String lastContacted;
+		String contactId;
+		Uri contactUri;
 
-		ViewHolder holder;
-		if (view == null) {
-			view = inflator.inflate(R.layout.call_block_item, null);
-			holder = new ViewHolder();
-			holder.primaryActionView = view
-					.findViewById(R.id.primary_action_view);
-			holder.quickContactView = (QuickContactBadge) view
-					.findViewById(R.id.quick_contact_photo);
-			holder.name = (TextView) view.findViewById(R.id.name);
-			holder.phoneNum = (TextView) view.findViewById(R.id.phoneNum);
-			holder.lastContact = (TextView) view.findViewById(R.id.lastCalled);
-			view.setTag(holder);
-		} else {
-			holder = (ViewHolder) view.getTag();
-		}
+		ViewHolder holder = new ViewHolder();
+		holder.primaryActionView = view.findViewById(R.id.primary_action_view);
+		holder.quickContactView = (QuickContactBadge) view
+				.findViewById(R.id.quick_contact_photo);
+		holder.name = (TextView) view.findViewById(R.id.name);
+		holder.phoneNum = (TextView) view.findViewById(R.id.phoneNum);
+		holder.lastContact = (TextView) view.findViewById(R.id.lastCalled);
+		
+		
 
 		Uri lookupUri = Uri.withAppendedPath(PhoneLookup.CONTENT_FILTER_URI,
-				Uri.encode(cursor.getString(0)));
+				Uri.encode(cursor.getString(cursor
+						.getColumnIndex(BlockItemTable.COLUMN_NUMBER))));
 		String[] mPhoneNumberProjection = { PhoneLookup.DISPLAY_NAME,
 				BaseColumns._ID, PhoneLookup.LAST_TIME_CONTACTED };
 		Cursor cur = context.getContentResolver().query(lookupUri,
@@ -88,7 +84,9 @@ public class BlocklistAdapter extends SimpleCursorAdapter {
 					String.valueOf(contactId));
 			lastContacted = cur.getString(cur
 					.getColumnIndex(PhoneLookup.LAST_TIME_CONTACTED));
-			holder.quickContactView.assignContactFromPhone(cursor.getString(1),
+			holder.quickContactView.assignContactFromPhone(cursor
+					.getString(cursor
+							.getColumnIndex(BlockItemTable.COLUMN_NUMBER)),
 					true);
 			loadThumbnail(holder.quickContactView, contactUri);
 			InputStream input = ContactsContract.Contacts
@@ -102,10 +100,13 @@ public class BlocklistAdapter extends SimpleCursorAdapter {
 			holder.lastContact.setText(lastContacted);
 			cur.close();
 		} else {
-			holder.quickContactView.assignContactFromPhone(cursor.getString(1),
+			holder.quickContactView.assignContactFromPhone(cursor
+					.getString(cursor
+							.getColumnIndex(BlockItemTable.COLUMN_NUMBER)),
 					true);
 			loadThumbnail(holder.quickContactView, null);
-			holder.name.setText(cursor.getString(1));
+			holder.name.setText(cursor.getString(cursor
+					.getColumnIndex(BlockItemTable.COLUMN_NUMBER)));
 			holder.phoneNum.setText("-");
 			holder.lastContact.setVisibility(View.INVISIBLE);
 			cur.close();

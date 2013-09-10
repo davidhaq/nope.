@@ -13,14 +13,15 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.text.InputType;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.Toast;
 
+import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockListFragment;
-import com.actionbarsherlock.view.ActionMode;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
@@ -41,35 +42,29 @@ public class CallBlockFragment extends SherlockListFragment implements
 	private SQLiteCursorLoader loader = null;
 	private static final int LOADER_ID = 1;
 
-	private ListView listView;
-	private ActionMode mMode;
-
-	boolean mListShown;
-	View mProgressContainer;
-	View mListContainer;
-
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-
-	}
-
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 
 		getHelper();
 
-		adapter = new BlocklistAdapter(getSherlockActivity(),
-				R.layout.call_block_item, null,
-				new String[] { BlockItemTable.COLUMN_NUMBER },
-				new int[] { R.id.name });
+		String[] menuListArray = getResources().getStringArray(
+				R.array.menu_list);
+		ActionBar actionBar = getSherlockActivity().getSupportActionBar();
+		actionBar.setTitle(menuListArray[0]);
+		actionBar.setDisplayShowCustomEnabled(true);
+		actionBar.show();
+
+		setHasOptionsMenu(true);
+		
+		adapter = new BlocklistAdapter(getSherlockActivity(), null);
 
 		setListAdapter(adapter);
-		setListShown(false);
 
 		if (DEBUG) {
 			Log.d(TAG, "+++ Calling initLoader()! +++");
+			getSherlockActivity().getSupportLoaderManager().initLoader(
+					LOADER_ID, null, this);
 			if (getLoaderManager().getLoader(LOADER_ID) == null) {
 				Log.d(TAG, "+++ Initializing the new Loader... +++");
 			} else {
@@ -77,8 +72,14 @@ public class CallBlockFragment extends SherlockListFragment implements
 						"+++ Reconnecting with existing Loader (id '1')... +++");
 			}
 		}
-		getActivity().getSupportLoaderManager().initLoader(LOADER_ID, null,
-				this);
+
+	}
+
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+			Bundle savedInstanceState) {
+		return inflater.inflate(R.layout.fragment_call_blocklist, container,
+				false);
 	}
 
 	private void getHelper() {
@@ -87,6 +88,10 @@ public class CallBlockFragment extends SherlockListFragment implements
 			if (DEBUG) {
 				Log.d(TAG,
 						"Creating a new instance of the database helper object");
+			}
+		} else {
+			if (DEBUG) {
+				Log.d(TAG, "Using existing database helper");
 			}
 		}
 	}
@@ -99,15 +104,15 @@ public class CallBlockFragment extends SherlockListFragment implements
 				+ BlockItemTable.COLUMN_NUMBER + " FROM "
 				+ BlockItemTable.CALLBLOCK_TABLE_NAME + " ORDER BY "
 				+ BlockItemTable.COLUMN_ID, null);
-		return null;
+		return loader;
 	}
 
 	@Override
 	public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
 		adapter.changeCursor(cursor);
-
 	}
 
+	@Override
 	public void onLoaderReset(Loader<Cursor> loader) {
 		adapter.changeCursor(null);
 	}
@@ -187,7 +192,7 @@ public class CallBlockFragment extends SherlockListFragment implements
 							values.put(BlockItemTable.COLUMN_NUMBER, input
 									.getText().toString());
 							loader.insert(BlockItemTable.CALLBLOCK_TABLE_NAME,
-									BlockItemTable.COLUMN_NUMBER, values);
+									null, values);
 
 							alert.dismiss();
 						} else {
@@ -213,112 +218,5 @@ public class CallBlockFragment extends SherlockListFragment implements
 		super.onSaveInstanceState(outState);
 
 	}
-
-	// private void onListItemSelect(int position) {
-	//
-	// SparseBooleanArray checked = listView.getCheckedItemPositions();
-	// boolean hasCheckedElement = false;
-	// for (int i = 0; i < checked.size() && !hasCheckedElement; i++) {
-	// hasCheckedElement = checked.valueAt(i);
-	// }
-	//
-	// if (hasCheckedElement) {
-	// if (mMode == null) {
-	// mMode = (getSherlockActivity())
-	// .startActionMode(new ModeCallback());
-	// mMode.setTitle(String.valueOf(checked.size()) + " selected");
-	// mMode.invalidate();
-	// } else {
-	// mMode.setTitle(String.valueOf(checked.size()) + " selected");
-	// mMode.invalidate();
-	// }
-	// } else {
-	// if (mMode != null) {
-	// mMode.finish();
-	// }
-	// }
-	// }
-
-	// protected final class ModeCallback implements ActionMode.Callback {
-	//
-	// private View mMultiSelectActionBarView;
-	// @SuppressWarnings("unused")
-	// private TextView mSelectedConvCount;
-	// @SuppressWarnings("unused")
-	// private HashSet<Integer> mSelectedItemIds;
-	//
-	// @Override
-	// public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-	// // Create the menu from the xml file
-	// MenuInflater inflater = getSherlockActivity()
-	// .getSupportMenuInflater();
-	// inflater.inflate(R.menu.item_multi_select_menu, menu);
-	//
-	// if (mMultiSelectActionBarView == null) {
-	// mMultiSelectActionBarView = LayoutInflater
-	// .from(getSherlockActivity())
-	// .inflate(
-	// R.layout.conversation_list_multi_select_actionbar,
-	// null);
-	//
-	// mSelectedConvCount = (TextView) mMultiSelectActionBarView
-	// .findViewById(R.id.selected_conv_count);
-	// }
-	// mode.setCustomView(mMultiSelectActionBarView);
-	// ((TextView) mMultiSelectActionBarView.findViewById(R.id.title))
-	// .setText(R.string.select_items);
-	// return true;
-	// }
-	//
-	// @Override
-	// public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-	// // Here, you can checked selected items to adapt available actions
-	// if (mMultiSelectActionBarView == null) {
-	// ViewGroup v = (ViewGroup) LayoutInflater
-	// .from(getSherlockActivity())
-	// .inflate(
-	// R.layout.conversation_list_multi_select_actionbar,
-	// null);
-	// mode.setCustomView(v);
-	//
-	// mSelectedConvCount = (TextView) v
-	// .findViewById(R.id.selected_conv_count);
-	// }
-	// return true;
-	// }
-	//
-	// @Override
-	// public void onDestroyActionMode(ActionMode mode) {
-	// // Destroying action mode, let's unselect all items
-	// mMode = null;
-	// }
-	//
-	// @Override
-	// public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-	// switch (item.getItemId()) {
-	// case R.id.delete:
-	//
-	// /** Getting the checked items from the listview */
-	// SparseBooleanArray checkedItemPositions = getListView()
-	// .getCheckedItemPositions();
-	// int itemCount = getListView().getCount();
-	// System.err.println("Item count: " + itemCount);
-	//
-	// for (int i = itemCount - 1; i >= 0; i--) {
-	// if (checkedItemPositions.get(i)) {
-	//
-	// }
-	// }
-	// checkedItemPositions.clear();
-	// adapter.notifyDataSetChanged();
-	//
-	// mode.finish(); // Action picked, so close the CAB
-	// return true;
-	// default:
-	// return false;
-	// }
-	//
-	// }
-	// }
 
 }
