@@ -27,7 +27,7 @@ public class BlocklistAdapter extends CursorAdapter {
 
 	// Debugging
 	private static final String TAG = BlocklistAdapter.class.getSimpleName();
-	private static final boolean DEBUG = true;
+	private static final boolean DEBUG = false;
 
 	private LayoutInflater inflator;
 	private Context context;

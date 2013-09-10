@@ -12,24 +12,8 @@ public class BlockItemTable {
 	public static final String SMSBLOCK_TABLE_NAME = " smsblock";
 	public static final String COLUMN_ID = "_id";
 	public static final String COLUMN_NUMBER = "_number";
-	// public static final String COLUMN_LOG = "_log";
 
-	// private static final String CALLTABLE_CREATE =
-	// " CREATE TABLE IF NOT EXISTS "
-	// + CALLBLOCK_TABLE_NAME
-	// + " ( "
-	// + COLUMN_ID
-	// + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-	// + COLUMN_NUMBER
-	// + " LONG, " + COLUMN_LOG + " STRING ); ";
-	// private static final String SMSTABLE_CREATE =
-	// " CREATE TABLE IF NOT EXISTS "
-	// + SMSBLOCK_TABLE_NAME
-	// + " ( "
-	// + COLUMN_ID
-	// + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-	// + COLUMN_NUMBER
-	// + " LONG, " + COLUMN_LOG + " STRING ); ";
+	//Table creationg query strings
 	private static final String CALLTABLE_CREATE = "CREATE TABLE IF NOT EXISTS "
 			+ CALLBLOCK_TABLE_NAME
 			+ "("

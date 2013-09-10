@@ -33,10 +33,11 @@ import com.jphsoftware.nope.database.DatabaseHelper;
 public class CallBlockFragment extends SherlockListFragment implements
 		LoaderManager.LoaderCallbacks<Cursor> {
 
-	// Class debugging tags
+	// debugging tags
 	private static final String TAG = CallBlockFragment.class.getSimpleName();
 	private static final boolean DEBUG = true;
 
+	// A few locally used objects
 	private DatabaseHelper db = null;
 	private BlocklistAdapter adapter = null;
 	private SQLiteCursorLoader loader = null;
@@ -56,7 +57,7 @@ public class CallBlockFragment extends SherlockListFragment implements
 		actionBar.show();
 
 		setHasOptionsMenu(true);
-		
+
 		adapter = new BlocklistAdapter(getSherlockActivity(), null);
 
 		setListAdapter(adapter);
@@ -148,8 +149,6 @@ public class CallBlockFragment extends SherlockListFragment implements
 
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
-						System.out
-								.println("Doing nothing since we're overriding");
 					}
 
 				}).create();
