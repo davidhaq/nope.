@@ -6,12 +6,14 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.net.Uri;
 import android.provider.BaseColumns;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.PhoneLookup;
 import android.support.v4.widget.CursorAdapter;
 import android.util.Log;
+import android.util.SparseBooleanArray;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,12 +32,14 @@ public class BlocklistAdapter extends CursorAdapter {
 	private static final boolean DEBUG = false;
 
 	private LayoutInflater inflator;
+	private SparseBooleanArray mSelectedItemsIds;
 	private Context context;
 	private static int s180DipInPixel = -1;
 
 	public BlocklistAdapter(Context context, Cursor cursor) {
 		super(context, cursor, 0);
 		this.context = context;
+		mSelectedItemsIds = new SparseBooleanArray();
 		inflator = LayoutInflater.from(context);
 	}
 
@@ -63,8 +67,6 @@ public class BlocklistAdapter extends CursorAdapter {
 		holder.name = (TextView) view.findViewById(R.id.name);
 		holder.phoneNum = (TextView) view.findViewById(R.id.phoneNum);
 		holder.lastContact = (TextView) view.findViewById(R.id.lastCalled);
-		
-		
 
 		Uri lookupUri = Uri.withAppendedPath(PhoneLookup.CONTENT_FILTER_URI,
 				Uri.encode(cursor.getString(cursor
@@ -113,7 +115,26 @@ public class BlocklistAdapter extends CursorAdapter {
 		}
 
 		holder.primaryActionView.setVisibility(View.VISIBLE);
+		view.setBackgroundColor(mSelectedItemsIds.get(cursor.getPosition()) ? 0x9934B5E4
+				: Color.TRANSPARENT);
 
+	}
+
+	public void toggleSelection(int position) {
+		selectView(position, !mSelectedItemsIds.get(position));
+	}
+
+	public int getSelectedCount() {
+		return mSelectedItemsIds.size();
+	}
+
+	public void selectView(int position, boolean value) {
+		if (value)
+			mSelectedItemsIds.put(position, value);
+		else
+			mSelectedItemsIds.delete(position);
+
+		notifyDataSetChanged();
 	}
 
 	private class ViewHolder {
