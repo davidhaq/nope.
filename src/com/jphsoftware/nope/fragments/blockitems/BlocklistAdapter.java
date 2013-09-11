@@ -137,6 +137,15 @@ public class BlocklistAdapter extends CursorAdapter {
 		notifyDataSetChanged();
 	}
 
+	public SparseBooleanArray getSelectedIds() {
+		return mSelectedItemsIds;
+	}
+
+	public void removeSelection() {
+		mSelectedItemsIds = new SparseBooleanArray();
+		notifyDataSetChanged();
+	}
+
 	private class ViewHolder {
 
 		// The quick contact badge for the contact.

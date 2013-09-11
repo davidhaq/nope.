@@ -69,7 +69,8 @@ public class CallBlockFragment extends SherlockListFragment implements
 
 		adapter = new BlocklistAdapter(getSherlockActivity(), null);
 
-		listView = getListView();
+		ListView listView = (ListView) getSherlockActivity().findViewById(
+				android.R.id.list);
 		listView.setItemsCanFocus(false);
 		listView.setOnItemLongClickListener(new ListView.OnItemLongClickListener() {
 
@@ -104,10 +105,6 @@ public class CallBlockFragment extends SherlockListFragment implements
 			Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.fragment_call_blocklist,
 				container, false);
-		ListView listView = (ListView) view.findViewById(android.R.id.list);
-
-		listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-
 		return view;
 	}
 
@@ -276,7 +273,6 @@ public class CallBlockFragment extends SherlockListFragment implements
 
 		} else {// add or remove selection for current list item
 			onListItemSelect(position);
-			v.setSelected(true);
 		}
 	}
 
@@ -332,6 +328,7 @@ public class CallBlockFragment extends SherlockListFragment implements
 		@Override
 		public void onDestroyActionMode(ActionMode mode) {
 			// Destroying action mode, let's unselect all items
+			adapter.removeSelection();
 			mMode = null;
 		}
 
@@ -341,14 +338,13 @@ public class CallBlockFragment extends SherlockListFragment implements
 			case R.id.delete:
 
 				/** Getting the checked items from the listview */
-				SparseBooleanArray checkedItemPositions = getListView()
-						.getCheckedItemPositions();
-				int itemCount = getListView().getCount();
+				SparseBooleanArray checkedItemPositions = adapter.getSelectedIds();
+				int itemCount = getListView().getCheckedItemPositions().size();
 				System.err.println("Item count: " + itemCount);
 
 				for (int i = itemCount - 1; i >= 0; i--) {
 					if (checkedItemPositions.get(i)) {
-						// loader.remove(callBlocks.get(i));
+
 					}
 				}
 				checkedItemPositions.clear();
