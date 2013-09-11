@@ -83,7 +83,7 @@ public class MainActivity extends SherlockFragmentActivity {
 				R.drawable.ic_drawer, R.string.drawer_open,
 				R.string.drawer_close) {
 			public void onDrawerClosed(View view) {
-				getSupportActionBar().setTitle(mTitle);
+				getSupportActionBar().setTitle(menuListArray[mMenuPosition]);
 				supportInvalidateOptionsMenu();
 				if (opened != null && opened == false) {
 					opened = true;
@@ -96,6 +96,7 @@ public class MainActivity extends SherlockFragmentActivity {
 			}
 
 			public void onDrawerOpened(View drawerView) {
+				mTitle = "Nope!";
 				getSupportActionBar().setTitle(mTitle);
 				supportInvalidateOptionsMenu(); // creates call to
 				// onPrepareOptionsMenu()
