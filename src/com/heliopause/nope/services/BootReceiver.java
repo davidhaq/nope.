@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 
 import com.heliopause.nope.Constants;
 
@@ -15,8 +16,7 @@ public class BootReceiver extends BroadcastReceiver {
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		// initializing shared prefs object
-		prefs = context.getSharedPreferences(Constants.SETTINGS_PREFS,
-				Context.MODE_PRIVATE);
+		prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
 		Intent callBlock = new Intent(context, CallBlockService.class);
 		Intent textBlock = new Intent(context, MsgBlockService.class);

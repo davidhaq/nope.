@@ -1,7 +1,18 @@
 package com.heliopause.nope.fragments;
 
-import com.actionbarsherlock.app.SherlockFragment;
+import com.heliopause.nope.R;
 
-public class SettingsFragment extends SherlockFragment {
+import android.os.Bundle;
+import android.support.v4.preference.PreferenceFragment;
+
+public class SettingsFragment extends PreferenceFragment {
+
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+
+		// Load the preferences from an XML resource
+		addPreferencesFromResource(R.xml.preferences);
+	}
 
 }
