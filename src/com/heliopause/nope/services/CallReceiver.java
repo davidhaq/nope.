@@ -1,4 +1,4 @@
-package com.heliopause.nope;
+package com.heliopause.nope.services;
 
 import com.heliopause.nope.database.BlockItemTable;
 import com.heliopause.nope.database.DatabaseHelper;
@@ -27,7 +27,10 @@ public class CallReceiver extends BroadcastReceiver {
 		this.context = context;
 		getHelper();
 		db = helper.getReadableDatabase();
-		String action = intent.getAction();
+
+		// Get the action if the intent isn't null.
+		String action = (intent == null) ? null : intent.getAction();
+
 		if (action.equalsIgnoreCase("android.intent.action.PHONE_STATE")) {
 			if (intent.getStringExtra(TelephonyManager.EXTRA_STATE).equals(
 					TelephonyManager.EXTRA_STATE_RINGING)) {

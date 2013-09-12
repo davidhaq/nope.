@@ -28,7 +28,7 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name="com.heliopause.nope.CallReceiver" >
+        <receiver android:name="com.heliopause.nope.services.CallReceiver" >
             <intent-filter android:priority="100" >
                 <action android:name="android.intent.action.PHONE_STATE" />
             </intent-filter>
