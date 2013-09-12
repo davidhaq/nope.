@@ -208,7 +208,8 @@ public class MsgBlockFragment extends SherlockListFragment implements
 
 						ContentValues values = new ContentValues(2);
 
-						values.put(BlockItemTable.COLUMN_NUMBER, phoneNum);
+						values.put(BlockItemTable.COLUMN_NUMBER,
+								PhoneNumberUtils.stripSeparators(phoneNum));
 						values.put(BlockItemTable.COLUMN_LAST_CONTACT, 1);
 						loader.insert(BlockItemTable.CALLBLOCK_TABLE_NAME,
 								null, values);

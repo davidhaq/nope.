@@ -1,22 +1,27 @@
 package com.jphsoftware.nope.database;
 
-import java.io.Serializable;
 
-import android.util.Log;
+public class BlockItem {
 
-@SuppressWarnings("serial")
-public class BlockItem implements Serializable {
-
+	private long id;
+	private int lastContact;
 	private String number;
-	
-	private static final String TAG = BlockItem.class.getSimpleName();
-	public static final boolean DEBUG = true;
 
-	public BlockItem(String phoneNumber) {
-		if(DEBUG)
-			Log.d(TAG, phoneNumber);
-		
-		this.number = phoneNumber;
+
+	public long getId() {
+		return id;
+	}
+
+	public void setId(long id) {
+		this.id = id;
+	}
+
+	public int getLastContact() {
+		return lastContact;
+	}
+
+	public void setLastContact(int lastContact) {
+		this.lastContact = lastContact;
 	}
 
 	public String getNumber() {

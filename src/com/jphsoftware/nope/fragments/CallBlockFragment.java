@@ -26,7 +26,9 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.commonsware.cwac.loaderex.acl.SQLiteCursorLoader;
 import com.jphsoftware.nope.R;
+import com.jphsoftware.nope.database.BlockItem;
 import com.jphsoftware.nope.database.BlockItemTable;
+import com.jphsoftware.nope.database.Comment;
 import com.jphsoftware.nope.database.DatabaseHelper;
 import com.jphsoftware.nope.fragments.blockitems.BlocklistAdapter;
 
@@ -41,7 +43,10 @@ public class CallBlockFragment extends SherlockListFragment implements
 	private DatabaseHelper db = null;
 	private BlocklistAdapter adapter = null;
 	private SQLiteCursorLoader loader = null;
+	private Cursor mCursor;
 	private static final int LOADER_ID = 1;
+	private String[] allColumns = { BlockItemTable.COLUMN_ID,
+			BlockItemTable.COLUMN_NUMBER, BlockItemTable.COLUMN_LAST_CONTACT };
 
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
@@ -126,6 +131,7 @@ public class CallBlockFragment extends SherlockListFragment implements
 
 	@Override
 	public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+		mCursor = cursor;
 		adapter.changeCursor(cursor);
 	}
 
@@ -171,8 +177,7 @@ public class CallBlockFragment extends SherlockListFragment implements
 
 					}
 
-				})
-				.setPositiveButton("Done", new Dialog.OnClickListener() {
+				}).setPositiveButton("Done", new Dialog.OnClickListener() {
 
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
@@ -209,7 +214,8 @@ public class CallBlockFragment extends SherlockListFragment implements
 
 						ContentValues values = new ContentValues(2);
 
-						values.put(BlockItemTable.COLUMN_NUMBER, phoneNum);
+						values.put(BlockItemTable.COLUMN_NUMBER,
+								PhoneNumberUtils.stripSeparators(phoneNum));
 						values.put(BlockItemTable.COLUMN_LAST_CONTACT, 1);
 						loader.insert(BlockItemTable.CALLBLOCK_TABLE_NAME,
 								null, values);
@@ -267,6 +273,23 @@ public class CallBlockFragment extends SherlockListFragment implements
 		loader.delete(BlockItemTable.CALLBLOCK_TABLE_NAME, "_ID=?",
 				new String[] { String.valueOf(position + 1) });
 
+	}
+
+	public BlockItem createBlock(String strippedPhoneNum) {
+		ContentValues values = new ContentValues();
+		values.put(BlockItemTable.COLUMN_NUMBER, strippedPhoneNum);
+		loader.insert(BlockItemTable.CALLBLOCK_TABLE_NAME, null, values);
+		BlockItem newComment = cursorToBlockItem(mCursor);
+		mCursor.close();
+		return newComment;
+	}
+
+	private BlockItem cursorToBlockItem(Cursor cursor) {
+		BlockItem block = new BlockItem();
+		block.setId(cursor.getLong(0));
+		block.setNumber(cursor.getString(1));
+		block.setLastContact(cursor.getInt(2));
+		return block;
 	}
 
 	@Override

@@ -55,7 +55,7 @@ public class BlocklistAdapter extends CursorAdapter {
 			Log.d(TAG,
 					"lcontact value: "
 							+ cursor.getInt(cursor
-									.getColumnIndex(BlockItemTable.COLUMN_NUMBER)));
+									.getColumnIndex(BlockItemTable.COLUMN_LAST_CONTACT)));
 		}
 		String name;
 		int lastContacted;
