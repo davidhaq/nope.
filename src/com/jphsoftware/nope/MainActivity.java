@@ -26,7 +26,7 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.Window;
 import com.jphsoftware.nope.fragments.AboutFragment;
-import com.jphsoftware.nope.fragments.AntiSMSSpamFragment;
+import com.jphsoftware.nope.fragments.SpamBlockFragment;
 import com.jphsoftware.nope.fragments.CallBlockFragment;
 import com.jphsoftware.nope.fragments.MsgBlockFragment;
 import com.jphsoftware.nope.fragments.SettingsFragment;
@@ -47,7 +47,7 @@ public class MainActivity extends SherlockFragmentActivity {
 
 	Fragment cbFrag = new CallBlockFragment();
 	Fragment smFrag = new MsgBlockFragment();
-	Fragment asFrag = new AntiSMSSpamFragment();
+	Fragment asFrag = new SpamBlockFragment();
 	Fragment sFrag = new SettingsFragment();
 	Fragment abFrag = new AboutFragment();
 
@@ -90,7 +90,7 @@ public class MainActivity extends SherlockFragmentActivity {
 					if (prefs != null) {
 						Editor editor = prefs.edit();
 						editor.putBoolean(OPENED_KEY, true);
-						editor.apply();
+						editor.commit();
 					}
 				}
 			}
@@ -168,6 +168,10 @@ public class MainActivity extends SherlockFragmentActivity {
 			if (mMenuPosition == 0 || mMenuPosition == 1) {
 				if (menu.findItem(R.id.add_block_item) != null) {
 					menu.findItem(R.id.add_block_item).setVisible(!drawerOpen);
+				}
+			} else if (mMenuPosition == 2) {
+				if (menu.findItem(R.id.spam_block_toggle) != null) {
+					menu.findItem(R.id.spam_block_toggle).setVisible(!drawerOpen);
 				}
 			}
 		}

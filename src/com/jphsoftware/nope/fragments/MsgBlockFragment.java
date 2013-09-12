@@ -34,7 +34,7 @@ public class MsgBlockFragment extends SherlockListFragment implements
 		LoaderManager.LoaderCallbacks<Cursor> {
 
 	// debugging tags
-	private static final String TAG = CallBlockFragment.class.getSimpleName();
+	private static final String TAG = MsgBlockFragment.class.getSimpleName();
 	private static final boolean DEBUG = true;
 
 	// A few locally used objects

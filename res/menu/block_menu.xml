@@ -4,8 +4,8 @@
     <item
         android:id="@+id/add_block_item"
         android:icon="@drawable/ic_add"
-        android:showAsAction="ifRoom|collapseActionView"
-        android:title="@string/add_call_block_entry">
+        android:showAsAction="always"
+        android:title="@string/add_block_entry">
     </item>
 
 </menu>
