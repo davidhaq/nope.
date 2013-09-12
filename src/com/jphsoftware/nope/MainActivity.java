@@ -27,9 +27,9 @@ import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.Window;
 import com.jphsoftware.nope.fragments.AboutFragment;
 import com.jphsoftware.nope.fragments.AntiSMSSpamFragment;
-import com.jphsoftware.nope.fragments.SMSBlockFragment;
+import com.jphsoftware.nope.fragments.CallBlockFragment;
+import com.jphsoftware.nope.fragments.MsgBlockFragment;
 import com.jphsoftware.nope.fragments.SettingsFragment;
-import com.jphsoftware.nope.fragments.blockitems.CallBlockFragment;
 
 public class MainActivity extends SherlockFragmentActivity {
 
@@ -46,7 +46,7 @@ public class MainActivity extends SherlockFragmentActivity {
 	private Boolean opened = null;
 
 	Fragment cbFrag = new CallBlockFragment();
-	Fragment smFrag = new SMSBlockFragment();
+	Fragment smFrag = new MsgBlockFragment();
 	Fragment asFrag = new AntiSMSSpamFragment();
 	Fragment sFrag = new SettingsFragment();
 	Fragment abFrag = new AboutFragment();
@@ -166,8 +166,8 @@ public class MainActivity extends SherlockFragmentActivity {
 		boolean drawerOpen = mDrawerLayout.isDrawerVisible(mDrawerList);
 		if (menu.hasVisibleItems()) {
 			if (mMenuPosition == 0 || mMenuPosition == 1) {
-				if (menu.findItem(R.id.add_call_block) != null) {
-					menu.findItem(R.id.add_call_block).setVisible(!drawerOpen);
+				if (menu.findItem(R.id.add_block_item) != null) {
+					menu.findItem(R.id.add_block_item).setVisible(!drawerOpen);
 				}
 			}
 		}

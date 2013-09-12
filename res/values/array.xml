@@ -19,7 +19,7 @@
 
     <string-array name="layout_resources_list">
         <item>@layout/fragment_call_blocklist</item>
-        <item>@layout/fragment_sms_mms_blocklist</item>
+        <item>@layout/fragment_msg_blocklist</item>
         <item>@layout/fragment_call_blocklist</item>
         <item>@layout/fragment_call_blocklist</item>
         <item>@layout/fragment_call_blocklist</item>

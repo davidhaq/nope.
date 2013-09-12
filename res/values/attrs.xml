@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <declare-styleable name="CallBlockListItemView">
+    <declare-styleable name="BlockListItemView">
         <attr name="list_item_height" format="dimension" />
         <attr name="list_section_header_height" format="dimension" />
         <attr name="activated_background" format="reference" />

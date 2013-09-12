@@ -1,4 +1,4 @@
-package com.jphsoftware.nope.fragments.blockitems;
+package com.jphsoftware.nope.fragments;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -28,8 +28,9 @@ import com.commonsware.cwac.loaderex.acl.SQLiteCursorLoader;
 import com.jphsoftware.nope.R;
 import com.jphsoftware.nope.database.BlockItemTable;
 import com.jphsoftware.nope.database.DatabaseHelper;
+import com.jphsoftware.nope.fragments.blockitems.BlocklistAdapter;
 
-public class CallBlockFragment extends SherlockListFragment implements
+public class MsgBlockFragment extends SherlockListFragment implements
 		LoaderManager.LoaderCallbacks<Cursor> {
 
 	// debugging tags
@@ -40,7 +41,7 @@ public class CallBlockFragment extends SherlockListFragment implements
 	private DatabaseHelper db = null;
 	private BlocklistAdapter adapter = null;
 	private SQLiteCursorLoader loader = null;
-	private static final int LOADER_ID = 1;
+	private static final int LOADER_ID = 2;
 
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
@@ -51,7 +52,7 @@ public class CallBlockFragment extends SherlockListFragment implements
 		String[] menuListArray = getResources().getStringArray(
 				R.array.menu_list);
 		ActionBar actionBar = getSherlockActivity().getSupportActionBar();
-		actionBar.setTitle(menuListArray[0]);
+		actionBar.setTitle(menuListArray[1]);
 		actionBar.setDisplayShowCustomEnabled(true);
 		actionBar.show();
 
@@ -93,7 +94,7 @@ public class CallBlockFragment extends SherlockListFragment implements
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		View view = inflater.inflate(R.layout.fragment_call_blocklist,
+		View view = inflater.inflate(R.layout.fragment_msg_blocklist,
 				container, false);
 		return view;
 	}
@@ -118,7 +119,7 @@ public class CallBlockFragment extends SherlockListFragment implements
 		loader = new SQLiteCursorLoader(getSherlockActivity(), db, "SELECT "
 				+ BlockItemTable.COLUMN_ID + ", "
 				+ BlockItemTable.COLUMN_NUMBER + " FROM "
-				+ BlockItemTable.CALLBLOCK_TABLE_NAME + " ORDER BY "
+				+ BlockItemTable.MSGBLOCK_TABLE_NAME + " ORDER BY "
 				+ BlockItemTable.COLUMN_ID, null);
 		return loader;
 	}
@@ -136,14 +137,14 @@ public class CallBlockFragment extends SherlockListFragment implements
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		getSherlockActivity().getSupportMenuInflater().inflate(
-				R.menu.call_block_menu, menu);
+				R.menu.block_menu, menu);
 	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// handle item selection
 		switch (item.getItemId()) {
-		case R.id.add_call_block:
+		case R.id.add_block_item:
 			add();
 			return true;
 		default:
@@ -157,10 +158,20 @@ public class CallBlockFragment extends SherlockListFragment implements
 		input.setInputType(InputType.TYPE_CLASS_PHONE);
 
 		final AlertDialog alert = new AlertDialog.Builder(getSherlockActivity())
-				.setTitle("Add Number")
+				.setTitle("Add Text Block")
 				.setMessage("Please enter a phone number below").setView(input)
 				.setCancelable(true)
-				.setPositiveButton("Done", new Dialog.OnClickListener() {
+				.setNegativeButton("Cancel", new Dialog.OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						if (DEBUG) {
+							Log.d(TAG, "Canceling add item dialog");
+						}
+
+					}
+
+				}).setPositiveButton("Done", new Dialog.OnClickListener() {
 
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
@@ -203,9 +214,6 @@ public class CallBlockFragment extends SherlockListFragment implements
 								null, values);
 
 						alert.dismiss();
-
-						// Dismiss once everything is OK.
-						// alert.dismiss();
 					}
 				});
 			}
@@ -224,9 +232,8 @@ public class CallBlockFragment extends SherlockListFragment implements
 
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
-						if (DEBUG) {
+						if (DEBUG)
 							Log.d(TAG, "Canceling delete dialog");
-						}
 
 					}
 
@@ -242,7 +249,8 @@ public class CallBlockFragment extends SherlockListFragment implements
 
 			@Override
 			public void onDismiss(DialogInterface dialog) {
-				System.err.println("Dismissing delete dialog");
+				if (DEBUG)
+					Log.d(TAG, "Dismissing delete dialog");
 				adapter.notifyDataSetChanged();
 
 			}
@@ -252,7 +260,7 @@ public class CallBlockFragment extends SherlockListFragment implements
 	}
 
 	protected void processDelete(int position) {
-		loader.delete(BlockItemTable.CALLBLOCK_TABLE_NAME, "_ID=?",
+		loader.delete(BlockItemTable.MSGBLOCK_TABLE_NAME, "_ID=?",
 				new String[] { String.valueOf(position + 1) });
 
 	}

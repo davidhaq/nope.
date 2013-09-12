@@ -43,7 +43,7 @@ public class BlocklistAdapter extends CursorAdapter {
 
 	@Override
 	public View newView(Context context, Cursor cursor, ViewGroup parent) {
-		View v = inflator.inflate(R.layout.call_block_item, parent, false);
+		View v = inflator.inflate(R.layout.block_item, parent, false);
 		return v;
 	}
 
