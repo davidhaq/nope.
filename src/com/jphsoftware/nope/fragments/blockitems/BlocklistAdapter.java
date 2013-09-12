@@ -52,10 +52,6 @@ public class BlocklistAdapter extends CursorAdapter {
 		if (DEBUG) {
 			Log.d(TAG, "+++bindView called+++");
 			Log.d(TAG, "number value: " + cursor.getString(1));
-			Log.d(TAG,
-					"lcontact value: "
-							+ cursor.getInt(cursor
-									.getColumnIndex(BlockItemTable.COLUMN_LAST_CONTACT)));
 		}
 		String name;
 		int lastContacted;
@@ -82,8 +78,8 @@ public class BlocklistAdapter extends CursorAdapter {
 		// Set the last contacted string based on whether or not we've ever been
 		// contacted
 		lastContacted = cursor.getInt(cursor
-				.getColumnIndex(BlockItemTable.COLUMN_NUMBER));
-		boolean contactedBefore = (lastContacted == 1) ? true : false;
+				.getColumnIndex(BlockItemTable.COLUMN_LAST_CONTACT));
+		boolean contactedBefore = (lastContacted == -1337) ? false : true;
 		if (contactedBefore) {
 			lastContactedString = formatTimeStampString(context, lastContacted);
 		} else {
@@ -125,7 +121,6 @@ public class BlocklistAdapter extends CursorAdapter {
 					.getColumnIndex(BlockItemTable.COLUMN_NUMBER)));
 			holder.phoneNum.setText("-");
 			holder.lastContact.setText(lastContactedString);
-			// holder.lastContact.setVisibility(View.INVISIBLE);
 			cur.close();
 		}
 

@@ -7,25 +7,25 @@ public class BlockItemTable {
 
 	private static final String TAG = BlockItemTable.class.getSimpleName();
 
-	// Names and atrributes of tables that will hold block items
+	// Names and attributes of tables that will hold block items
 	public static final String CALLBLOCK_TABLE_NAME = "callblock";
-	public static final String MSGBLOCK_TABLE_NAME = " msgblock";
+	public static final String MSGBLOCK_TABLE_NAME = "msgblock";
 	public static final String COLUMN_ID = "_id";
 	public static final String COLUMN_NUMBER = "_number";
 	public static final String COLUMN_LAST_CONTACT = "_lcontact";
 
-	// Table creationg query strings
+	// Table creating query strings
 	private static final String CALLTABLE_CREATE = "CREATE TABLE IF NOT EXISTS "
 			+ CALLBLOCK_TABLE_NAME
-			+ "("
+			+ "(\n"
 			+ COLUMN_ID
-			+ " INTEGER PRIMARY KEY AUTOINCREMENT, "
+			+ " INTEGER PRIMARY KEY AUTOINCREMENT, \n"
 			+ COLUMN_NUMBER
-			+ " TEXT, " + COLUMN_LAST_CONTACT + " INTEGER);";
+			+ " TEXT, \n" + COLUMN_LAST_CONTACT + " INTEGER DEFAULT -1337);";
 	private static final String SMSTABLE_CREATE = "CREATE TABLE IF NOT EXISTS "
-			+ MSGBLOCK_TABLE_NAME + "(" + COLUMN_ID
-			+ " INTEGER PRIMARY KEY AUTOINCREMENT, " + COLUMN_NUMBER
-			+ " TEXT, " + COLUMN_LAST_CONTACT + " INTEGER);";
+			+ MSGBLOCK_TABLE_NAME + "(\n" + COLUMN_ID
+			+ " INTEGER PRIMARY KEY AUTOINCREMENT, \n" + COLUMN_NUMBER
+			+ " TEXT, \n" + COLUMN_LAST_CONTACT + " INTEGER DEFAULT -1337);";
 
 	public static void onCreate(SQLiteDatabase db) {
 

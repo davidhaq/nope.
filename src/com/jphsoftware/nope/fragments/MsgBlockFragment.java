@@ -26,6 +26,7 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.commonsware.cwac.loaderex.acl.SQLiteCursorLoader;
 import com.jphsoftware.nope.R;
+import com.jphsoftware.nope.database.BlockItem;
 import com.jphsoftware.nope.database.BlockItemTable;
 import com.jphsoftware.nope.database.DatabaseHelper;
 import com.jphsoftware.nope.fragments.blockitems.BlocklistAdapter;
@@ -41,6 +42,7 @@ public class MsgBlockFragment extends SherlockListFragment implements
 	private DatabaseHelper db = null;
 	private BlocklistAdapter adapter = null;
 	private SQLiteCursorLoader loader = null;
+	private Cursor mCursor;
 	private static final int LOADER_ID = 2;
 
 	@Override
@@ -118,14 +120,17 @@ public class MsgBlockFragment extends SherlockListFragment implements
 
 		loader = new SQLiteCursorLoader(getSherlockActivity(), db, "SELECT "
 				+ BlockItemTable.COLUMN_ID + ", "
-				+ BlockItemTable.COLUMN_NUMBER + " FROM "
+				+ BlockItemTable.COLUMN_NUMBER + ", "
+				+ BlockItemTable.COLUMN_LAST_CONTACT + " FROM "
 				+ BlockItemTable.MSGBLOCK_TABLE_NAME + " ORDER BY "
-				+ BlockItemTable.COLUMN_ID, null);
+				+ BlockItemTable.COLUMN_LAST_CONTACT, null);
 		return loader;
 	}
 
+
 	@Override
 	public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+		mCursor = cursor;
 		adapter.changeCursor(cursor);
 	}
 
@@ -204,14 +209,13 @@ public class MsgBlockFragment extends SherlockListFragment implements
 					public void onClick(View view) {
 						String temp = input.getText().toString();
 						String phoneNum = PhoneNumberUtils.formatNumber(temp);
-						// Fill in for call block item addition
 
+						// Create a block item in the database
 						ContentValues values = new ContentValues(2);
-
 						values.put(BlockItemTable.COLUMN_NUMBER,
 								PhoneNumberUtils.stripSeparators(phoneNum));
-						values.put(BlockItemTable.COLUMN_LAST_CONTACT, 1);
-						loader.insert(BlockItemTable.CALLBLOCK_TABLE_NAME,
+						values.put(BlockItemTable.COLUMN_LAST_CONTACT, -1337);
+						loader.insert(BlockItemTable.MSGBLOCK_TABLE_NAME,
 								null, values);
 
 						alert.dismiss();
@@ -242,7 +246,7 @@ public class MsgBlockFragment extends SherlockListFragment implements
 
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
-						processDelete(position);
+						processDelete(cursorToBlockItem(mCursor));
 					}
 
 				}).create();
@@ -260,10 +264,21 @@ public class MsgBlockFragment extends SherlockListFragment implements
 
 	}
 
-	protected void processDelete(int position) {
-		loader.delete(BlockItemTable.MSGBLOCK_TABLE_NAME, "_ID=?",
-				new String[] { String.valueOf(position + 1) });
+	protected void processDelete(BlockItem block) {
+		loader.delete(BlockItemTable.CALLBLOCK_TABLE_NAME, "_NUMBER=?",
+				new String[] { String.valueOf(block.getNumber()) });
 
+	}
+
+	private BlockItem cursorToBlockItem(Cursor cursor) {
+		BlockItem block = new BlockItem();
+		block.setId(cursor.getInt(cursor
+				.getColumnIndex(BlockItemTable.COLUMN_ID)));
+		block.setNumber(cursor.getString(cursor
+				.getColumnIndex(BlockItemTable.COLUMN_NUMBER)));
+		block.setLastContact(cursor.getInt(cursor
+				.getColumnIndex(BlockItemTable.COLUMN_LAST_CONTACT)));
+		return block;
 	}
 
 	@Override
