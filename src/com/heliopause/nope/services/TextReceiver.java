@@ -3,12 +3,14 @@ package com.heliopause.nope.services;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.telephony.SmsMessage;
 import android.util.Log;
 
+import com.heliopause.nope.Constants;
 import com.heliopause.nope.database.BlockItemTable;
 import com.heliopause.nope.database.DatabaseHelper;
 
@@ -26,7 +28,17 @@ public class TextReceiver extends BroadcastReceiver {
 	@Override
 	public void onReceive(Context context, Intent intent) {
 
+		// Set the context
 		this.context = context;
+
+		// Check is the listener is disabled
+		SharedPreferences prefs = context.getSharedPreferences(
+				Constants.SETTINGS_PREFS, Context.MODE_PRIVATE);
+		boolean turnedOn = prefs.getBoolean(Constants.MSG_BLOCK_SERVICE_STATUS, true);
+		if (!turnedOn) {
+			return;
+		}
+
 		getHelper();
 		db = helper.getReadableDatabase();
 

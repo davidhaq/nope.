@@ -1,24 +1,26 @@
 package com.heliopause.nope.services;
 
-import com.heliopause.nope.Constants;
-import com.heliopause.nope.database.BlockItemTable;
-import com.heliopause.nope.database.DatabaseHelper;
-
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.telephony.TelephonyManager;
+import android.os.Bundle;
+import android.telephony.SmsMessage;
 import android.util.Log;
 
-public class CallReceiver extends BroadcastReceiver {
+import com.heliopause.nope.Constants;
+import com.heliopause.nope.database.BlockItemTable;
+import com.heliopause.nope.database.DatabaseHelper;
+
+public class SpamReceiver extends BroadcastReceiver {
 
 	// Debug constants
-	private static final boolean DEBUG = true;
-	private static final String TAG = CallReceiver.class.getSimpleName();
+	private static final boolean DEBUG = false;
+	private static final String TAG = SpamReceiver.class.getSimpleName();
 
+	// Database checking objects
 	private SQLiteDatabase db;
 	private DatabaseHelper helper;
 	private Context context;
@@ -32,8 +34,8 @@ public class CallReceiver extends BroadcastReceiver {
 		// Check is the listener is disabled
 		SharedPreferences prefs = context.getSharedPreferences(
 				Constants.SETTINGS_PREFS, Context.MODE_PRIVATE);
-		boolean turnedOn = prefs.getBoolean(Constants.CALL_BLOCK_SERVICE_STATUS,
-				true);
+		boolean turnedOn = prefs.getBoolean(
+				Constants.SPAM_BLOCK_SERVICE_STATUS, true);
 		if (!turnedOn) {
 			return;
 		}
@@ -41,22 +43,28 @@ public class CallReceiver extends BroadcastReceiver {
 		getHelper();
 		db = helper.getReadableDatabase();
 
-		// Get the action if the intent isn't null.
-		String action = (intent == null) ? null : intent.getAction();
-
-		if (action.equalsIgnoreCase("android.intent.action.PHONE_STATE")) {
-			if (intent.getStringExtra(TelephonyManager.EXTRA_STATE).equals(
-					TelephonyManager.EXTRA_STATE_RINGING)) {
-				if (isOnBlockList(intent
-						.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER))) {
-					if (DEBUG)
-						Log.d(TAG, "Phone number is on block list!");
-				} else {
-					if (DEBUG)
-						Log.d(TAG,
-								"Phone number was not detected on block list");
+		Bundle bundle = intent.getExtras();
+		SmsMessage[] msgs = null;
+		String str = "";
+		if (bundle != null) {
+			// ---retrieve the sender of the sms received.---
+			Object[] pdus = (Object[]) bundle.get("pdus");
+			msgs = new SmsMessage[pdus.length];
+			for (int i = 0; i < msgs.length; i++) {
+				msgs[i] = SmsMessage.createFromPdu((byte[]) pdus[i]);
+				str += msgs[i].getOriginatingAddress();
+				if (DEBUG) {
+					Log.d(TAG, "Sender: " + str);
 				}
 			}
+			if (isOnBlockList(str)) {
+				if (DEBUG)
+					Log.d(TAG, "Phone number is on block list!");
+			} else {
+				if (DEBUG)
+					Log.d(TAG, "Phone number was not detected on block list");
+			}
+
 		}
 
 	}
@@ -77,8 +85,8 @@ public class CallReceiver extends BroadcastReceiver {
 
 	private boolean isOnBlockList(String incomingNum) {
 
-		Cursor c = db.rawQuery("SELECT * FROM "
-				+ BlockItemTable.CALLBLOCK_TABLE_NAME + " WHERE "
+		Cursor c = db.rawQuery("SELECT " + BlockItemTable.COLUMN_NUMBER
+				+ " FROM " + BlockItemTable.MSGBLOCK_TABLE_NAME + " WHERE "
 				+ BlockItemTable.COLUMN_NUMBER + "=?;",
 				new String[] { incomingNum });
 		if (c != null) {
@@ -88,4 +96,5 @@ public class CallReceiver extends BroadcastReceiver {
 		}
 
 	}
+
 }
