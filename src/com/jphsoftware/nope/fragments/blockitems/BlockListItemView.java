@@ -7,16 +7,16 @@ import android.widget.LinearLayout;
 /**
  * An entry in the call log.
  */
-public class CallBlockListItemView extends LinearLayout {
-    public CallBlockListItemView(Context context) {
+public class BlockListItemView extends LinearLayout {
+    public BlockListItemView(Context context) {
         super(context);
     }
 
-    public CallBlockListItemView(Context context, AttributeSet attrs) {
+    public BlockListItemView(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public CallBlockListItemView(Context context, AttributeSet attrs, int defStyle) {
+    public BlockListItemView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
     }
 
