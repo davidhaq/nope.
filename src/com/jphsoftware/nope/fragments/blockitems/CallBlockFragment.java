@@ -1,9 +1,5 @@
 package com.jphsoftware.nope.fragments.blockitems;
 
-import java.util.HashSet;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.ContentValues;
@@ -12,9 +8,9 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.telephony.PhoneNumberUtils;
 import android.text.InputType;
 import android.util.Log;
-import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,12 +18,9 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockListFragment;
-import com.actionbarsherlock.view.ActionMode;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
@@ -48,9 +41,6 @@ public class CallBlockFragment extends SherlockListFragment implements
 	private BlocklistAdapter adapter = null;
 	private SQLiteCursorLoader loader = null;
 	private static final int LOADER_ID = 1;
-
-	private ListView listView;
-	private ActionMode mMode;
 
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
@@ -78,7 +68,7 @@ public class CallBlockFragment extends SherlockListFragment implements
 			public boolean onItemLongClick(AdapterView<?> parent, View view,
 					int position, long id) {
 
-				onListItemSelect(position);
+				deleteItem(position);
 				return true;
 			}
 
@@ -166,7 +156,7 @@ public class CallBlockFragment extends SherlockListFragment implements
 		final EditText input = new EditText(getActivity());
 		input.setInputType(InputType.TYPE_CLASS_PHONE);
 
-		final AlertDialog alert = new AlertDialog.Builder(getActivity())
+		final AlertDialog alert = new AlertDialog.Builder(getSherlockActivity())
 				.setTitle("Add Number")
 				.setMessage("Please enter a phone number below").setView(input)
 				.setCancelable(true)
@@ -182,7 +172,7 @@ public class CallBlockFragment extends SherlockListFragment implements
 
 			@Override
 			public void onDismiss(DialogInterface dialog) {
-				System.err.println("Dismissing dialog");
+				System.err.println("Dismissing add numberdialog");
 				adapter.notifyDataSetChanged();
 
 			}
@@ -201,31 +191,18 @@ public class CallBlockFragment extends SherlockListFragment implements
 					// number.
 					@Override
 					public void onClick(View view) {
-						String phoneNum = input.getText().toString();
-						Pattern validPhone = Pattern
-								.compile("\\(\\d{3}\\)\\d{3}-\\d{4}");
-						Matcher matcher = validPhone.matcher(phoneNum);
+						String temp = input.getText().toString();
+						String phoneNum = PhoneNumberUtils.formatNumber(temp);
+						// Fill in for call block item addition
 
-						if (matcher.matches()) {
-							Toast.makeText(getSherlockActivity(),
-									"Phone number matches!:" + phoneNum,
-									Toast.LENGTH_LONG).show();
-							// Fill in for call block item addition
+						ContentValues values = new ContentValues(2);
 
-							ContentValues values = new ContentValues(1);
-							values.put(BlockItemTable.COLUMN_NUMBER, input
-									.getText().toString());
-							loader.insert(BlockItemTable.CALLBLOCK_TABLE_NAME,
-									null, values);
+						values.put(BlockItemTable.COLUMN_NUMBER, phoneNum);
+						values.put(BlockItemTable.COLUMN_LAST_CONTACT, 1);
+						loader.insert(BlockItemTable.CALLBLOCK_TABLE_NAME,
+								null, values);
 
-							alert.dismiss();
-						} else {
-							Toast.makeText(
-									getSherlockActivity(),
-									"Phone number must be in the format (XXX)XXX-XXXX. Please try again.",
-									Toast.LENGTH_LONG).show();
-							input.requestFocus();
-						}
+						alert.dismiss();
 
 						// Dismiss once everything is OK.
 						// alert.dismiss();
@@ -237,126 +214,53 @@ public class CallBlockFragment extends SherlockListFragment implements
 
 	}
 
+	protected void deleteItem(final int position) {
+
+		final AlertDialog alert = new AlertDialog.Builder(getSherlockActivity())
+				.setTitle("Delete?")
+				.setMessage("This block item will be deleted.")
+				.setCancelable(true)
+				.setNegativeButton("Cancel", new Dialog.OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						if (DEBUG) {
+							Log.d(TAG, "Canceling delete dialog");
+						}
+
+					}
+
+				}).setPositiveButton("Delete", new Dialog.OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						processDelete(position);
+					}
+
+				}).create();
+		alert.setOnDismissListener(new DialogInterface.OnDismissListener() {
+
+			@Override
+			public void onDismiss(DialogInterface dialog) {
+				System.err.println("Dismissing delete dialog");
+				adapter.notifyDataSetChanged();
+
+			}
+		});
+		alert.show();
+
+	}
+
+	protected void processDelete(int position) {
+		loader.delete(BlockItemTable.CALLBLOCK_TABLE_NAME, "_ID=?",
+				new String[] { String.valueOf(position + 1) });
+
+	}
+
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
 
-	}
-
-	private void onListItemSelect(int position) {
-
-		adapter.toggleSelection(position);
-		boolean hasCheckedItems = adapter.getSelectedCount() > 0;
-
-		if (hasCheckedItems && mMode == null)
-			// there are some selected items, start the actionMode
-			mMode = getSherlockActivity().startActionMode(new ModeCallback());
-		else if (!hasCheckedItems && mMode != null)
-			// there no selected items, finish the actionMode
-			mMode.finish();
-
-		if (mMode != null)
-			mMode.setTitle(String.valueOf(adapter.getSelectedCount())
-					+ " selected");
-	}
-
-	@Override
-	public void onListItemClick(ListView l, View v, int position, long id) {
-		// TODO Auto-generated method stub
-		super.onListItemClick(l, v, position, id);
-		if (mMode == null) {
-			/*
-			 * no items selected, so perform item click actions like moving to
-			 * next activity
-			 */
-			System.err.println("No Items selected");
-
-		} else {// add or remove selection for current list item
-			onListItemSelect(position);
-		}
-	}
-
-	protected final class ModeCallback implements ActionMode.Callback {
-
-		private View mMultiSelectActionBarView;
-		@SuppressWarnings("unused")
-		private TextView mSelectedConvCount;
-		@SuppressWarnings("unused")
-		private HashSet<Long> mSelectedItemIds;
-
-		@Override
-		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-			// Create the menu from the xml file
-			MenuInflater inflater = getSherlockActivity()
-					.getSupportMenuInflater();
-			mSelectedItemIds = new HashSet<Long>();
-			inflater.inflate(R.menu.item_multi_select_menu, menu);
-
-			if (mMultiSelectActionBarView == null) {
-				mMultiSelectActionBarView = LayoutInflater
-						.from(getSherlockActivity())
-						.inflate(
-								R.layout.conversation_list_multi_select_actionbar,
-								null);
-
-				mSelectedConvCount = (TextView) mMultiSelectActionBarView
-						.findViewById(R.id.selected_conv_count);
-			}
-			mode.setCustomView(mMultiSelectActionBarView);
-			((TextView) mMultiSelectActionBarView.findViewById(R.id.title))
-					.setText(R.string.select_items);
-			return true;
-		}
-
-		@Override
-		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-			// Here, you can checked selected items to adapt available actions
-			if (mMultiSelectActionBarView == null) {
-				ViewGroup v = (ViewGroup) LayoutInflater
-						.from(getSherlockActivity())
-						.inflate(
-								R.layout.conversation_list_multi_select_actionbar,
-								null);
-				mode.setCustomView(v);
-
-				mSelectedConvCount = (TextView) v
-						.findViewById(R.id.selected_conv_count);
-			}
-			return true;
-		}
-
-		@Override
-		public void onDestroyActionMode(ActionMode mode) {
-			// Destroying action mode, let's unselect all items
-			adapter.removeSelection();
-			mMode = null;
-		}
-
-		@Override
-		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-			switch (item.getItemId()) {
-			case R.id.delete:
-
-				/** Getting the checked items from the listview */
-				SparseBooleanArray checkedItemPositions = adapter.getSelectedIds();
-				int itemCount = getListView().getCheckedItemPositions().size();
-				System.err.println("Item count: " + itemCount);
-
-				for (int i = itemCount - 1; i >= 0; i--) {
-					if (checkedItemPositions.get(i)) {
-
-					}
-				}
-				checkedItemPositions.clear();
-				adapter.notifyDataSetChanged();
-
-				mode.finish(); // Action picked, so close the CAB
-				return true;
-			default:
-				return false;
-			}
-
-		}
 	}
 
 }

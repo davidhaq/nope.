@@ -12,24 +12,21 @@ public class BlockItemTable {
 	public static final String SMSBLOCK_TABLE_NAME = " smsblock";
 	public static final String COLUMN_ID = "_id";
 	public static final String COLUMN_NUMBER = "_number";
+	public static final String COLUMN_LAST_CONTACT = "_lcontact";
 
-	//Table creationg query strings
+	// Table creationg query strings
 	private static final String CALLTABLE_CREATE = "CREATE TABLE IF NOT EXISTS "
 			+ CALLBLOCK_TABLE_NAME
 			+ "("
 			+ COLUMN_ID
 			+ " INTEGER PRIMARY KEY AUTOINCREMENT, "
 			+ COLUMN_NUMBER
-			+ " TEXT);";
+			+ " TEXT, " + COLUMN_LAST_CONTACT + " INTEGER);";
 	private static final String SMSTABLE_CREATE = "CREATE TABLE IF NOT EXISTS "
-			+ SMSBLOCK_TABLE_NAME
-			+ "("
-			+ COLUMN_ID
-			+ " INTEGER PRIMARY KEY AUTOINCREMENT, "
-			+ COLUMN_NUMBER
-			+ " TEXT);";
+			+ SMSBLOCK_TABLE_NAME + "(" + COLUMN_ID
+			+ " INTEGER PRIMARY KEY AUTOINCREMENT, " + COLUMN_NUMBER
+			+ " TEXT, " + COLUMN_LAST_CONTACT + " INTEGER);";
 
-	
 	public static void onCreate(SQLiteDatabase db) {
 
 		db.execSQL(CALLTABLE_CREATE);

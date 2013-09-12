@@ -6,14 +6,14 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.net.Uri;
 import android.provider.BaseColumns;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.PhoneLookup;
 import android.support.v4.widget.CursorAdapter;
+import android.text.format.DateUtils;
+import android.text.format.Time;
 import android.util.Log;
-import android.util.SparseBooleanArray;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,17 +29,15 @@ public class BlocklistAdapter extends CursorAdapter {
 
 	// Debugging
 	private static final String TAG = BlocklistAdapter.class.getSimpleName();
-	private static final boolean DEBUG = false;
+	private static final boolean DEBUG = true;
 
 	private LayoutInflater inflator;
-	private SparseBooleanArray mSelectedItemsIds;
 	private Context context;
 	private static int s180DipInPixel = -1;
 
 	public BlocklistAdapter(Context context, Cursor cursor) {
 		super(context, cursor, 0);
 		this.context = context;
-		mSelectedItemsIds = new SparseBooleanArray();
 		inflator = LayoutInflater.from(context);
 	}
 
@@ -54,9 +52,14 @@ public class BlocklistAdapter extends CursorAdapter {
 		if (DEBUG) {
 			Log.d(TAG, "+++bindView called+++");
 			Log.d(TAG, "number value: " + cursor.getString(1));
+			Log.d(TAG,
+					"lcontact value: "
+							+ cursor.getInt(cursor
+									.getColumnIndex(BlockItemTable.COLUMN_NUMBER)));
 		}
 		String name;
-		String lastContacted;
+		int lastContacted;
+		String lastContactedString = null;
 		String contactId;
 		Uri contactUri;
 
@@ -76,6 +79,18 @@ public class BlocklistAdapter extends CursorAdapter {
 		Cursor cur = context.getContentResolver().query(lookupUri,
 				mPhoneNumberProjection, null, null, null);
 
+		// Set the last contacted string based on whether or not we've ever been
+		// contacted
+		lastContacted = cursor.getInt(cursor
+				.getColumnIndex(BlockItemTable.COLUMN_NUMBER));
+		boolean contactedBefore = (lastContacted == 1) ? true : false;
+		if (contactedBefore) {
+			lastContactedString = formatTimeStampString(context, lastContacted);
+		} else {
+			lastContactedString = context.getResources().getString(
+					R.string.never_contacted);
+		}
+
 		if (cur.moveToFirst()) {
 
 			name = cur.getString(cur
@@ -84,8 +99,7 @@ public class BlocklistAdapter extends CursorAdapter {
 			contactUri = Uri.withAppendedPath(
 					ContactsContract.Contacts.CONTENT_URI,
 					String.valueOf(contactId));
-			lastContacted = cur.getString(cur
-					.getColumnIndex(PhoneLookup.LAST_TIME_CONTACTED));
+
 			holder.quickContactView.assignContactFromPhone(cursor
 					.getString(cursor
 							.getColumnIndex(BlockItemTable.COLUMN_NUMBER)),
@@ -99,7 +113,7 @@ public class BlocklistAdapter extends CursorAdapter {
 
 			holder.name.setText(name);
 			holder.phoneNum.setText(cursor.getString(1));
-			holder.lastContact.setText(lastContacted);
+			holder.lastContact.setText(lastContactedString);
 			cur.close();
 		} else {
 			holder.quickContactView.assignContactFromPhone(cursor
@@ -110,40 +124,13 @@ public class BlocklistAdapter extends CursorAdapter {
 			holder.name.setText(cursor.getString(cursor
 					.getColumnIndex(BlockItemTable.COLUMN_NUMBER)));
 			holder.phoneNum.setText("-");
-			holder.lastContact.setVisibility(View.INVISIBLE);
+			holder.lastContact.setText(lastContactedString);
+			// holder.lastContact.setVisibility(View.INVISIBLE);
 			cur.close();
 		}
 
 		holder.primaryActionView.setVisibility(View.VISIBLE);
-		view.setBackgroundColor(mSelectedItemsIds.get(cursor.getPosition()) ? 0x9934B5E4
-				: Color.TRANSPARENT);
 
-	}
-
-	public void toggleSelection(int position) {
-		selectView(position, !mSelectedItemsIds.get(position));
-	}
-
-	public int getSelectedCount() {
-		return mSelectedItemsIds.size();
-	}
-
-	public void selectView(int position, boolean value) {
-		if (value)
-			mSelectedItemsIds.put(position, value);
-		else
-			mSelectedItemsIds.delete(position);
-
-		notifyDataSetChanged();
-	}
-
-	public SparseBooleanArray getSelectedIds() {
-		return mSelectedItemsIds;
-	}
-
-	public void removeSelection() {
-		mSelectedItemsIds = new SparseBooleanArray();
-		notifyDataSetChanged();
 	}
 
 	private class ViewHolder {
@@ -187,6 +174,45 @@ public class BlocklistAdapter extends CursorAdapter {
 							contactUri);
 			view.setImageBitmap(BitmapFactory.decodeStream(input));
 		}
+	}
+
+	public static String formatTimeStampString(Context context, long when) {
+		return formatTimeStampString(context, when, false);
+	}
+
+	@SuppressWarnings("deprecation")
+	public static String formatTimeStampString(Context context, long when,
+			boolean fullFormat) {
+		Time then = new Time();
+		then.set(when);
+		Time now = new Time();
+		now.setToNow();
+
+		// Basic settings for formatDateTime() we want for all cases.
+		int format_flags = DateUtils.FORMAT_NO_NOON_MIDNIGHT
+				| DateUtils.FORMAT_ABBREV_ALL | DateUtils.FORMAT_CAP_AMPM;
+
+		// If the message is from a different year, show the date and year.
+		if (then.year != now.year) {
+			format_flags |= DateUtils.FORMAT_SHOW_YEAR
+					| DateUtils.FORMAT_SHOW_DATE;
+		} else if (then.yearDay != now.yearDay) {
+			// If it is from a different day than today, show only the date.
+			format_flags |= DateUtils.FORMAT_SHOW_DATE;
+		} else {
+			// Otherwise, if the message is from today, show the time.
+			format_flags |= DateUtils.FORMAT_SHOW_TIME;
+		}
+
+		// If the caller has asked for full details, make sure to show the date
+		// and time no matter what we've determined above (but still make
+		// showing
+		// the year only happen if it is a different year from today).
+		if (fullFormat) {
+			format_flags |= (DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_TIME);
+		}
+
+		return DateUtils.formatDateTime(context, when, format_flags);
 	}
 
 }
