@@ -9,11 +9,11 @@ import android.content.SharedPreferences;
 import android.os.IBinder;
 import android.util.Log;
 
-public class MsgBlockService extends Service {
+public class SpamBlockService extends Service {
 
 	// Debugging constants
 	private static final boolean DEBUG = true;
-	private static final String TAG = MsgBlockService.class.getSimpleName();
+	private static final String TAG = SpamBlockService.class.getSimpleName();
 
 	public static TextReceiver receiver = new TextReceiver();
 	SharedPreferences prefs;
@@ -28,7 +28,7 @@ public class MsgBlockService extends Service {
 	public void onCreate() {
 		super.onCreate();
 		if (DEBUG) {
-			Log.d(TAG, "MsgBlock service onCreate; registering receiver");
+			Log.d(TAG, "SpamBlock service onCreate; registering receiver");
 		}
 		IntentFilter filter = new IntentFilter();
 		filter.addAction("android.provider.Telephony.SMS_RECEIVED");
@@ -41,7 +41,7 @@ public class MsgBlockService extends Service {
 	public void onDestroy() {
 		super.onDestroy();
 		if (DEBUG) {
-			Log.d(TAG, "MsgBlock service onDestroy; unregistering receiver");
+			Log.d(TAG, "SpamBlock service onDestroy; unregistering receiver");
 		}
 
 		unregisterReceiver(receiver);
@@ -52,7 +52,7 @@ public class MsgBlockService extends Service {
 	public void onStart(Intent intent, int startid) {
 		if (DEBUG) {
 			Log.d(TAG,
-					"MsgBlock service onStart; starting forground notification");
+					"SpamBlock service onStart; starting forground notification");
 		}
 		startForeground(startid, new Notification());
 	}
