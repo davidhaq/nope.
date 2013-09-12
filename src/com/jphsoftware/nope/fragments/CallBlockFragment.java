@@ -28,7 +28,6 @@ import com.commonsware.cwac.loaderex.acl.SQLiteCursorLoader;
 import com.jphsoftware.nope.R;
 import com.jphsoftware.nope.database.BlockItem;
 import com.jphsoftware.nope.database.BlockItemTable;
-import com.jphsoftware.nope.database.Comment;
 import com.jphsoftware.nope.database.DatabaseHelper;
 import com.jphsoftware.nope.fragments.blockitems.BlocklistAdapter;
 
@@ -45,8 +44,6 @@ public class CallBlockFragment extends SherlockListFragment implements
 	private SQLiteCursorLoader loader = null;
 	private Cursor mCursor;
 	private static final int LOADER_ID = 1;
-	private String[] allColumns = { BlockItemTable.COLUMN_ID,
-			BlockItemTable.COLUMN_NUMBER, BlockItemTable.COLUMN_LAST_CONTACT };
 
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
@@ -74,7 +71,8 @@ public class CallBlockFragment extends SherlockListFragment implements
 			public boolean onItemLongClick(AdapterView<?> parent, View view,
 					int position, long id) {
 
-				deleteItem(position);
+				mCursor.moveToPosition(position + 1);
+				deleteItem(mCursor);
 				return true;
 			}
 
@@ -125,7 +123,7 @@ public class CallBlockFragment extends SherlockListFragment implements
 				+ BlockItemTable.COLUMN_ID + ", "
 				+ BlockItemTable.COLUMN_NUMBER + " FROM "
 				+ BlockItemTable.CALLBLOCK_TABLE_NAME + " ORDER BY "
-				+ BlockItemTable.COLUMN_ID, null);
+				+ BlockItemTable.COLUMN_NUMBER, null);
 		return loader;
 	}
 
@@ -210,20 +208,12 @@ public class CallBlockFragment extends SherlockListFragment implements
 					public void onClick(View view) {
 						String temp = input.getText().toString();
 						String phoneNum = PhoneNumberUtils.formatNumber(temp);
-						// Fill in for call block item addition
-
-						ContentValues values = new ContentValues(2);
-
-						values.put(BlockItemTable.COLUMN_NUMBER,
-								PhoneNumberUtils.stripSeparators(phoneNum));
-						values.put(BlockItemTable.COLUMN_LAST_CONTACT, 1);
-						loader.insert(BlockItemTable.CALLBLOCK_TABLE_NAME,
-								null, values);
+						
+						//Create a block item in the database
+						createBlock(PhoneNumberUtils.stripSeparators(phoneNum));
 
 						alert.dismiss();
 
-						// Dismiss once everything is OK.
-						// alert.dismiss();
 					}
 				});
 			}
@@ -232,7 +222,7 @@ public class CallBlockFragment extends SherlockListFragment implements
 
 	}
 
-	protected void deleteItem(final int position) {
+	protected void deleteItem(final Cursor c) {
 
 		final AlertDialog alert = new AlertDialog.Builder(getSherlockActivity())
 				.setTitle("Delete?")
@@ -252,7 +242,7 @@ public class CallBlockFragment extends SherlockListFragment implements
 
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
-						processDelete(position);
+						processDelete(cursorToBlockItem(c));
 					}
 
 				}).create();
@@ -269,15 +259,16 @@ public class CallBlockFragment extends SherlockListFragment implements
 
 	}
 
-	protected void processDelete(int position) {
-		loader.delete(BlockItemTable.CALLBLOCK_TABLE_NAME, "_ID=?",
-				new String[] { String.valueOf(position + 1) });
+	protected void processDelete(BlockItem block) {
+		loader.delete(BlockItemTable.CALLBLOCK_TABLE_NAME, "_NUMBER=?",
+				new String[] { String.valueOf(block.getNumber()) });
 
 	}
 
 	public BlockItem createBlock(String strippedPhoneNum) {
 		ContentValues values = new ContentValues();
 		values.put(BlockItemTable.COLUMN_NUMBER, strippedPhoneNum);
+		values.put(BlockItemTable.COLUMN_LAST_CONTACT, 1);
 		loader.insert(BlockItemTable.CALLBLOCK_TABLE_NAME, null, values);
 		BlockItem newComment = cursorToBlockItem(mCursor);
 		mCursor.close();
