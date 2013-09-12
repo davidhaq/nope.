@@ -1,4 +1,4 @@
-package com.jphsoftware.nope.fragments;
+package com.heliopause.nope.fragments;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -15,7 +15,7 @@ import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
-import com.jphsoftware.nope.R;
+import com.heliopause.nope.R;
 
 public class SpamBlockFragment extends SherlockFragment {
 
@@ -25,7 +25,7 @@ public class SpamBlockFragment extends SherlockFragment {
 	private TextView message;
 
 	private Boolean toggleState = null;
-	private static final String TOGGLE_KEY = "TOGGLE_KEY";
+	private static final String SPAM_TOGGLE_KEY = "spam_block_service_state";
 
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
@@ -55,7 +55,14 @@ public class SpamBlockFragment extends SherlockFragment {
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 
 		prefs = getSherlockActivity().getPreferences(Context.MODE_PRIVATE);
-		toggleState = prefs.getBoolean(TOGGLE_KEY, false);
+		toggleState = prefs.getBoolean(SPAM_TOGGLE_KEY, false);
+		if (toggleState) {
+			message.setText(getSherlockActivity().getResources().getString(
+					R.string.spam_block_on));
+		} else {
+			message.setText(getSherlockActivity().getResources().getString(
+					R.string.spam_block_off));
+		}
 
 		getSherlockActivity().getSupportMenuInflater().inflate(
 				R.menu.spam_menu, menu);
@@ -69,15 +76,17 @@ public class SpamBlockFragment extends SherlockFragment {
 					boolean isChecked) {
 				if (prefs != null) {
 					if (isChecked) {
+						//Placeholder to turn on spam blocking service
 						message.setText(getSherlockActivity().getResources()
 								.getString(R.string.spam_block_on));
 					} else {
+						//placeholder to turn off spam blocking service
 						message.setText(getSherlockActivity().getResources()
 								.getString(R.string.spam_block_off));
 					}
 					toggle.setChecked(isChecked);
 					Editor editor = prefs.edit();
-					editor.putBoolean(TOGGLE_KEY, isChecked);
+					editor.putBoolean(SPAM_TOGGLE_KEY, isChecked);
 					editor.commit();
 
 				}

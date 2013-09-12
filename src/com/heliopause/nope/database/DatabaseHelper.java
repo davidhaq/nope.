@@ -1,4 +1,4 @@
-package com.jphsoftware.nope.database;
+package com.heliopause.nope.database;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;

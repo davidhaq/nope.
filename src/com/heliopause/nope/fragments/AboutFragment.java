@@ -1,4 +1,4 @@
-package com.jphsoftware.nope.fragments;
+package com.heliopause.nope.fragments;
 
 import com.actionbarsherlock.app.SherlockFragment;
 

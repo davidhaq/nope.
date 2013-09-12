@@ -1,4 +1,4 @@
-package com.jphsoftware.nope.fragments.blockitems;
+package com.heliopause.nope.fragments.blockitems;
 
 import java.io.InputStream;
 
@@ -22,8 +22,8 @@ import android.widget.ImageView;
 import android.widget.QuickContactBadge;
 import android.widget.TextView;
 
-import com.jphsoftware.nope.R;
-import com.jphsoftware.nope.database.BlockItemTable;
+import com.heliopause.nope.R;
+import com.heliopause.nope.database.BlockItemTable;
 
 public class BlocklistAdapter extends CursorAdapter {
 

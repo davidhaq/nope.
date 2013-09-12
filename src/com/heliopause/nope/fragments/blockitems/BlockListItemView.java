@@ -1,4 +1,4 @@
-package com.jphsoftware.nope.fragments.blockitems;
+package com.heliopause.nope.fragments.blockitems;
 
 import android.content.Context;
 import android.util.AttributeSet;

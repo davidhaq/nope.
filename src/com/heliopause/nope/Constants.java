@@ -1,4 +1,4 @@
-package com.jphsoftware.nope;
+package com.heliopause.nope;
 
 public class Constants {
 	

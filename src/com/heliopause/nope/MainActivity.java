@@ -1,4 +1,4 @@
-package com.jphsoftware.nope;
+package com.heliopause.nope;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -25,11 +25,11 @@ import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.Window;
-import com.jphsoftware.nope.fragments.AboutFragment;
-import com.jphsoftware.nope.fragments.SpamBlockFragment;
-import com.jphsoftware.nope.fragments.CallBlockFragment;
-import com.jphsoftware.nope.fragments.MsgBlockFragment;
-import com.jphsoftware.nope.fragments.SettingsFragment;
+import com.heliopause.nope.fragments.AboutFragment;
+import com.heliopause.nope.fragments.CallBlockFragment;
+import com.heliopause.nope.fragments.MsgBlockFragment;
+import com.heliopause.nope.fragments.SettingsFragment;
+import com.heliopause.nope.fragments.SpamBlockFragment;
 
 public class MainActivity extends SherlockFragmentActivity {
 

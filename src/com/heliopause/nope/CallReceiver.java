@@ -1,7 +1,7 @@
-package com.jphsoftware.nope;
+package com.heliopause.nope;
 
-import com.jphsoftware.nope.database.BlockItemTable;
-import com.jphsoftware.nope.database.DatabaseHelper;
+import com.heliopause.nope.database.BlockItemTable;
+import com.heliopause.nope.database.DatabaseHelper;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;

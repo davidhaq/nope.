@@ -1,4 +1,4 @@
-package com.jphsoftware.nope.fragments;
+package com.heliopause.nope.fragments;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -25,11 +25,11 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.commonsware.cwac.loaderex.acl.SQLiteCursorLoader;
-import com.jphsoftware.nope.R;
-import com.jphsoftware.nope.database.BlockItem;
-import com.jphsoftware.nope.database.BlockItemTable;
-import com.jphsoftware.nope.database.DatabaseHelper;
-import com.jphsoftware.nope.fragments.blockitems.BlocklistAdapter;
+import com.heliopause.nope.R;
+import com.heliopause.nope.database.BlockItem;
+import com.heliopause.nope.database.BlockItemTable;
+import com.heliopause.nope.database.DatabaseHelper;
+import com.heliopause.nope.fragments.blockitems.BlocklistAdapter;
 
 public class MsgBlockFragment extends SherlockListFragment implements
 		LoaderManager.LoaderCallbacks<Cursor> {
