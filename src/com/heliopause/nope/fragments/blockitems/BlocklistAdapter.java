@@ -11,6 +11,7 @@ import android.provider.BaseColumns;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.PhoneLookup;
 import android.support.v4.widget.CursorAdapter;
+import android.telephony.PhoneNumberUtils;
 import android.text.format.DateUtils;
 import android.text.format.Time;
 import android.util.Log;
@@ -108,7 +109,9 @@ public class BlocklistAdapter extends CursorAdapter {
 					.decodeStream(input));
 
 			holder.name.setText(name);
-			holder.phoneNum.setText(cursor.getString(1));
+			holder.phoneNum.setText(PhoneNumberUtils.formatNumber(cursor
+					.getString(cursor
+							.getColumnIndex(BlockItemTable.COLUMN_NUMBER))));
 			holder.lastContact.setText(lastContactedString);
 			cur.close();
 		} else {
@@ -117,8 +120,9 @@ public class BlocklistAdapter extends CursorAdapter {
 							.getColumnIndex(BlockItemTable.COLUMN_NUMBER)),
 					true);
 			loadThumbnail(holder.quickContactView, null);
-			holder.name.setText(cursor.getString(cursor
-					.getColumnIndex(BlockItemTable.COLUMN_NUMBER)));
+			holder.name.setText(PhoneNumberUtils.formatNumber(cursor
+					.getString(cursor
+							.getColumnIndex(BlockItemTable.COLUMN_NUMBER))));
 			holder.phoneNum.setText("-");
 			holder.lastContact.setText(lastContactedString);
 			cur.close();
