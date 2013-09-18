@@ -1,24 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
-    <PreferenceCategory 
-        android:title="@string/pref_call_block_title"
-        android:key="pref_key_call_block_settings">
-        <CheckBoxPreference
-            android:key="pref_key_auto_delete"
-            android:summary="@string/pref_summary_auto_delete"
-            android:title="@string/pref_title_auto_delete"
-            android:defaultValue="false"... />
-        <Preference 
-            android:key="pref_key_sms_delete_limit"
-            android:dependency="pref_key_auto_delete"
-            android:summary="@string/pref_summary_delete_limit"
-            android:title="@string/pref_title_sms_delete"... />
-        <Preference 
-            android:key="pref_key_mms_delete_limit"
-            android:dependency="pref_key_auto_delete"
-            android:summary="@string/pref_summary_delete_limit"
-            android:title="@string/pref_title_mms_delete" ... />
+
+    <PreferenceCategory
+        android:key="pref_key_call_block_settings"
+        android:title="@string/pref_call_block_title" >
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="pref_key_call_block_service_state"
+            android:summary="@string/pref_summary_call_blocking_service"
+            android:title="@string/pref_title_call_blocking_service" />
+
+        <ListPreference
+            android:defaultValue="300"
+            android:dependency="pref_key_call_block_service_state"
+            android:entries="@array/pref_call_block_method_entries"
+            android:entryValues="@array/pref_call_block_method_values"
+            android:key="pref_key_call_block_method"
+            android:summary="@string/pref_summary_call_block_method"
+            android:title="@string/pref_title_call_block_method" />
     </PreferenceCategory>
-    
+    <PreferenceCategory
+        android:key="pref_key_text_block_settings"
+        android:title="@string/pref_text_block_title" >
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="pref_key_text_block_service_state"
+            android:summary="@string/pref_summary_text_blocking_service"
+            android:title="@string/pref_title_text_blocking_service" />
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:key="pref_key_spam_block_settings"
+        android:title="@string/pref_spam_block_title" >
+        <EditTextPreference
+            android:defaultValue="3"
+            android:inputType="number"
+            android:key="pref_key_spam_block_consecutive"
+            android:summary="@string/pref_summary_spam_block_consecutive"
+            android:title="@string/pref_title_spam_block_consecutive" >
+        </EditTextPreference>
+    </PreferenceCategory>
 
 </PreferenceScreen>

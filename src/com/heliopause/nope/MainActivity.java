@@ -6,6 +6,7 @@ import android.content.SharedPreferences.Editor;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -43,11 +44,7 @@ public class MainActivity extends SherlockFragmentActivity {
 
 	private static final String OPENED_KEY = "OPENED_KEY";
 	private SharedPreferences prefs = null;
-	private SharedPreferences settings = null;
 	private Boolean opened = null;
-	private Boolean textServiceStatus = null;
-	private Boolean callServiceStatus = null;
-	private Boolean spamServiceStatus = null;
 
 	Fragment cbFrag = new CallBlockFragment();
 	Fragment smFrag = new MsgBlockFragment();
@@ -129,12 +126,6 @@ public class MainActivity extends SherlockFragmentActivity {
 			@Override
 			public void run() {
 
-				settings = getSharedPreferences(Constants.SETTINGS_PREFS,
-						Context.MODE_PRIVATE);
-				textServiceStatus = settings.getBoolean(Constants.MSG_BLOCK_SERVICE_STATUS, true);
-				callServiceStatus = settings.getBoolean(Constants.CALL_BLOCK_SERVICE_STATUS, true);
-				spamServiceStatus = settings.getBoolean(Constants.SPAM_BLOCK_SERVICE_STATUS, true);
-				
 				prefs = getPreferences(MODE_PRIVATE);
 				opened = prefs.getBoolean(OPENED_KEY, false);
 				if (opened == false) {
@@ -142,6 +133,8 @@ public class MainActivity extends SherlockFragmentActivity {
 				}
 			}
 		}).start();
+		
+		PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 
 	}
 

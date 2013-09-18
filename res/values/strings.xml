@@ -19,8 +19,18 @@
     <string name="drawer_close">This button will closed the navigation drawer.</string>
     <string name="spam_block_on">You are currently being protected from text spam. To configure this feature, visit the Settings menu.</string>
     <string name="spam_block_off">Text spam blocking is currently turned off.</string>
-    
+
     <!-- Strings for the preferences fragment -->
-    <string name="pref_call_block_title">Call Blocking</string>
+    <string name="pref_call_block_title">Call Block</string>
+    <string name="pref_title_call_blocking_service">Call Blocking</string>
+    <string name="pref_summary_call_blocking_service">Call blocking toggle switch. Turn on if you want to block calls from your list.</string>
+    <string name="pref_title_call_block_method">Blocking Method</string>
+    <string name="pref_summary_call_block_method">This setting is to choose which call blocking method to use.</string>
+    <string name="pref_text_block_title">Text Block</string>
+    <string name="pref_title_text_blocking_service">Text Blocking</string>
+    <string name="pref_summary_text_blocking_service">Text blocking toggle switch. Turn on if you want to block texts from your list.</string>
+    <string name="pref_spam_block_title">Spam Block</string>
+    <string name="pref_title_spam_block_consecutive">Text Block Threshold</string>
+    <string name="pref_summary_spam_block_consecutive">The number of consecutive texts from the same number you can receive before the blocker considers it spam, and starts blocking that number.</string>
 
 </resources>

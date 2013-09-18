@@ -59,6 +59,7 @@ public class CallBlockFragment extends SherlockListFragment implements
 		actionBar.show();
 
 		setHasOptionsMenu(true);
+		setRetainInstance(true);
 
 		adapter = new BlocklistAdapter(getSherlockActivity(), null);
 
@@ -79,16 +80,21 @@ public class CallBlockFragment extends SherlockListFragment implements
 		listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 		setListAdapter(adapter);
 
-		if (DEBUG) {
-			Log.d(TAG, "+++ Calling initLoader()! +++");
+		if (getSherlockActivity().getSupportLoaderManager()
+				.getLoader(LOADER_ID) != null) {
+			if (DEBUG) {
+				Log.d(TAG, "+++ Reconnecting with existing Loader (id "
+						+ LOADER_ID + ")... +++");
+			}
 			getSherlockActivity().getSupportLoaderManager().initLoader(
 					LOADER_ID, null, this);
-			if (getLoaderManager().getLoader(LOADER_ID) == null) {
-				Log.d(TAG, "+++ Initializing the new Loader... +++");
-			} else {
+		} else {
+			if (DEBUG) {
 				Log.d(TAG,
-						"+++ Reconnecting with existing Loader (id '1')... +++");
+						"+++ Loader did not previously exist. Initializing the new Loader... +++");
 			}
+			getSherlockActivity().getSupportLoaderManager().initLoader(
+					LOADER_ID, null, this);
 		}
 
 	}
@@ -118,6 +124,10 @@ public class CallBlockFragment extends SherlockListFragment implements
 	@Override
 	public Loader<Cursor> onCreateLoader(int loaderId, Bundle args) {
 
+		if (DEBUG) {
+			Log.d(TAG, "++++ onCreateLoader ++++");
+		}
+
 		loader = new SQLiteCursorLoader(getSherlockActivity(), db, "SELECT "
 				+ BlockItemTable.COLUMN_ID + ", "
 				+ BlockItemTable.COLUMN_NUMBER + ", "
@@ -129,12 +139,18 @@ public class CallBlockFragment extends SherlockListFragment implements
 
 	@Override
 	public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+		if (DEBUG) {
+			Log.d(TAG, "++++ onLoadFinished ++++");
+		}
 		mCursor = cursor;
 		adapter.changeCursor(cursor);
 	}
 
 	@Override
 	public void onLoaderReset(Loader<Cursor> loader) {
+		if (DEBUG) {
+			Log.d(TAG, "++++ onLoaderReset ++++");
+		}
 		adapter.changeCursor(null);
 	}
 

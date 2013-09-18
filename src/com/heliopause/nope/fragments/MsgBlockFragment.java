@@ -59,6 +59,7 @@ public class MsgBlockFragment extends SherlockListFragment implements
 		actionBar.show();
 
 		setHasOptionsMenu(true);
+		setRetainInstance(true);
 
 		adapter = new BlocklistAdapter(getSherlockActivity(), null);
 
@@ -79,16 +80,21 @@ public class MsgBlockFragment extends SherlockListFragment implements
 		listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 		setListAdapter(adapter);
 
-		if (DEBUG) {
-			Log.d(TAG, "+++ Calling initLoader()! +++");
+		if (getSherlockActivity().getSupportLoaderManager()
+				.getLoader(LOADER_ID) != null) {
+			if (DEBUG) {
+				Log.d(TAG, "+++ Reconnecting with existing Loader (id "
+						+ LOADER_ID + ")... +++");
+			}
 			getSherlockActivity().getSupportLoaderManager().initLoader(
 					LOADER_ID, null, this);
-			if (getLoaderManager().getLoader(LOADER_ID) == null) {
-				Log.d(TAG, "+++ Initializing the new Loader... +++");
-			} else {
+		} else {
+			if (DEBUG) {
 				Log.d(TAG,
-						"+++ Reconnecting with existing Loader (id '1')... +++");
+						"+++ Loader did not previously exist. Initializing the new Loader... +++");
 			}
+			getSherlockActivity().getSupportLoaderManager().initLoader(
+					LOADER_ID, null, this);
 		}
 
 	}
@@ -117,6 +123,10 @@ public class MsgBlockFragment extends SherlockListFragment implements
 
 	@Override
 	public Loader<Cursor> onCreateLoader(int loaderId, Bundle args) {
+		
+		if (DEBUG) {
+			Log.d(TAG, "++++ onCreateLoader ++++");
+		}
 
 		loader = new SQLiteCursorLoader(getSherlockActivity(), db, "SELECT "
 				+ BlockItemTable.COLUMN_ID + ", "
@@ -127,15 +137,20 @@ public class MsgBlockFragment extends SherlockListFragment implements
 		return loader;
 	}
 
-
 	@Override
 	public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+		if(DEBUG){
+			Log.d(TAG, "++++ onLoadFinished ++++");
+		}
 		mCursor = cursor;
 		adapter.changeCursor(cursor);
 	}
 
 	@Override
 	public void onLoaderReset(Loader<Cursor> loader) {
+		if(DEBUG){
+			Log.d(TAG, "++++ onLoaderReset ++++");
+		}
 		adapter.changeCursor(null);
 	}
 
@@ -215,8 +230,8 @@ public class MsgBlockFragment extends SherlockListFragment implements
 						values.put(BlockItemTable.COLUMN_NUMBER,
 								PhoneNumberUtils.stripSeparators(phoneNum));
 						values.put(BlockItemTable.COLUMN_LAST_CONTACT, -1337);
-						loader.insert(BlockItemTable.MSGBLOCK_TABLE_NAME,
-								null, values);
+						loader.insert(BlockItemTable.MSGBLOCK_TABLE_NAME, null,
+								values);
 
 						alert.dismiss();
 					}
@@ -265,7 +280,7 @@ public class MsgBlockFragment extends SherlockListFragment implements
 	}
 
 	protected void processDelete(BlockItem block) {
-		loader.delete(BlockItemTable.CALLBLOCK_TABLE_NAME, "_NUMBER=?",
+		loader.delete(BlockItemTable.MSGBLOCK_TABLE_NAME, "_NUMBER=?",
 				new String[] { String.valueOf(block.getNumber()) });
 
 	}
