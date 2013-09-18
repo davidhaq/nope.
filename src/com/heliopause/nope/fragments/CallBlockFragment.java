@@ -36,12 +36,12 @@ public class CallBlockFragment extends SherlockListFragment implements
 
 	// debugging tags
 	private static final String TAG = CallBlockFragment.class.getSimpleName();
-	private static final boolean DEBUG = true;
+	private static final boolean DEBUG = false;
 
 	// A few locally used objects
 	private DatabaseHelper db = null;
 	private BlocklistAdapter adapter = null;
-	private SQLiteCursorLoader loader = null;
+	private SQLiteCursorLoader loader;
 	private Cursor mCursor;
 	private static final int LOADER_ID = 1;
 
@@ -49,20 +49,22 @@ public class CallBlockFragment extends SherlockListFragment implements
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 
+		// Create the DBhelper object
 		getHelper();
 
+		// Setup actionbar
 		String[] menuListArray = getResources().getStringArray(
 				R.array.menu_list);
 		ActionBar actionBar = getSherlockActivity().getSupportActionBar();
 		actionBar.setTitle(menuListArray[0]);
 		actionBar.setDisplayShowCustomEnabled(true);
 		actionBar.show();
-
 		setHasOptionsMenu(true);
-		setRetainInstance(true);
 
+		// Setup the list adapter
 		adapter = new BlocklistAdapter(getSherlockActivity(), null);
 
+		// Set listview and make items long clickable
 		ListView listView = (ListView) getSherlockActivity().findViewById(
 				android.R.id.list);
 		listView.setItemsCanFocus(false);
@@ -77,25 +79,13 @@ public class CallBlockFragment extends SherlockListFragment implements
 			}
 
 		});
-		listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+
+		// Actually set the list adapter after all the list setup
 		setListAdapter(adapter);
 
-		if (getSherlockActivity().getSupportLoaderManager()
-				.getLoader(LOADER_ID) != null) {
-			if (DEBUG) {
-				Log.d(TAG, "+++ Reconnecting with existing Loader (id "
-						+ LOADER_ID + ")... +++");
-			}
-			getSherlockActivity().getSupportLoaderManager().initLoader(
-					LOADER_ID, null, this);
-		} else {
-			if (DEBUG) {
-				Log.d(TAG,
-						"+++ Loader did not previously exist. Initializing the new Loader... +++");
-			}
-			getSherlockActivity().getSupportLoaderManager().initLoader(
-					LOADER_ID, null, this);
-		}
+		// Setup the blockitem loader
+		getSherlockActivity().getSupportLoaderManager().initLoader(LOADER_ID,
+				null, this);
 
 	}
 
@@ -142,6 +132,7 @@ public class CallBlockFragment extends SherlockListFragment implements
 		if (DEBUG) {
 			Log.d(TAG, "++++ onLoadFinished ++++");
 		}
+		this.loader = (SQLiteCursorLoader) loader;
 		mCursor = cursor;
 		adapter.changeCursor(cursor);
 	}

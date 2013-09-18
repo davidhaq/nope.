@@ -46,11 +46,7 @@ public class MainActivity extends SherlockFragmentActivity {
 	private SharedPreferences prefs = null;
 	private Boolean opened = null;
 
-	Fragment cbFrag = new CallBlockFragment();
-	Fragment smFrag = new MsgBlockFragment();
-	Fragment asFrag = new SpamBlockFragment();
-	Fragment sFrag = new SettingsFragment();
-	Fragment abFrag = new AboutFragment();
+	private Fragment fragment;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -113,15 +109,15 @@ public class MainActivity extends SherlockFragmentActivity {
 		};
 
 		mDrawerLayout.setDrawerListener(mDrawerToggle);
-		if (savedInstanceState == null) {
-			mMenuPosition = 0;
-			selectItem(0, true);
+
+		if (savedInstanceState != null) {
+			mMenuPosition = savedInstanceState.getInt("position");
 
 		} else {
-
-			mMenuPosition = savedInstanceState.getInt("position");
-			selectItem(mMenuPosition, false);
+			mMenuPosition = 0;
+			selectItem(0, true);
 		}
+
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
@@ -133,7 +129,7 @@ public class MainActivity extends SherlockFragmentActivity {
 				}
 			}
 		}).start();
-		
+
 		PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 
 	}
@@ -196,43 +192,48 @@ public class MainActivity extends SherlockFragmentActivity {
 	// Swaps fragments that are shown in the main view
 	private void selectItem(int position, boolean firstload) {
 
+		FragmentManager fragmentManager = getSupportFragmentManager();
+		FragmentTransaction ft = fragmentManager.beginTransaction();
+		String tag = null;
 		if (firstload = true) {
-			FragmentManager fragmentManager = getSupportFragmentManager();
-			FragmentTransaction ft = fragmentManager.beginTransaction();
-
 			// Create a new fragment and specify
 			// the fragment to show based on position
 			switch (position) {
 			case 0:
-				ft.replace(R.id.content_frame, cbFrag);
+				fragment = new CallBlockFragment();
+				tag = "cbFrag";
 				mMenuPosition = 0;
 				((HomeMenuAdapter) mDrawerList.getAdapter())
 						.onItemSelected(mMenuPosition);
 				System.err.println("Call Block");
 				break;
 			case 1:
-				ft.replace(R.id.content_frame, smFrag);
+				fragment = new MsgBlockFragment();
+				tag = "mbFrag";
 				mMenuPosition = 1;
 				((HomeMenuAdapter) mDrawerList.getAdapter())
 						.onItemSelected(mMenuPosition);
 				System.err.println("SMS Blocklist");
 				break;
 			case 2:
-				ft.replace(R.id.content_frame, asFrag);
+				fragment = new SpamBlockFragment();
+				tag = "sbFrag";
 				mMenuPosition = 2;
 				((HomeMenuAdapter) mDrawerList.getAdapter())
 						.onItemSelected(mMenuPosition);
 				System.err.println("Anti Text Spam");
 				break;
 			case 3:
-				ft.replace(R.id.content_frame, sFrag);
+				fragment = new SettingsFragment();
+				tag = "stFrag";
 				mMenuPosition = 3;
 				((HomeMenuAdapter) mDrawerList.getAdapter())
 						.onItemSelected(mMenuPosition);
 				System.err.println("Settings");
 				break;
 			case 4:
-				ft.replace(R.id.content_frame, abFrag);
+				fragment = new AboutFragment();
+				tag = "abFrag";
 				mMenuPosition = 4;
 				((HomeMenuAdapter) mDrawerList.getAdapter())
 						.onItemSelected(mMenuPosition);
@@ -247,8 +248,10 @@ public class MainActivity extends SherlockFragmentActivity {
 			mDrawerLayout.closeDrawer(mDrawerList);
 
 			// Insert the fragment by replacing any existing fragment
+			ft.replace(R.id.content_frame, fragment, tag);
 			ft.commit();
 		} else {
+
 			if (mMenuPosition == position) {
 
 				// Highlight the selected item, update the title, and close the
@@ -258,43 +261,44 @@ public class MainActivity extends SherlockFragmentActivity {
 				mDrawerLayout.closeDrawer(mDrawerList);
 
 			} else {
-
-				FragmentManager fragmentManager = getSupportFragmentManager();
-				FragmentTransaction ft = fragmentManager.beginTransaction();
-
-				// Create a new fragment and specify
+				// Set the fragment by ID and specify
 				// the fragment to show based on position
 				switch (position) {
 				case 0:
-					ft.replace(R.id.content_frame, cbFrag);
+					fragment = (CallBlockFragment) getSupportFragmentManager()
+							.findFragmentByTag("cbFrag");
 					mMenuPosition = 0;
 					((HomeMenuAdapter) mDrawerList.getAdapter())
 							.onItemSelected(mMenuPosition);
 					System.err.println("Call Block");
 					break;
 				case 1:
-					ft.replace(R.id.content_frame, smFrag);
+					fragment = (CallBlockFragment) getSupportFragmentManager()
+							.findFragmentByTag("mbFrag");
 					mMenuPosition = 1;
 					((HomeMenuAdapter) mDrawerList.getAdapter())
 							.onItemSelected(mMenuPosition);
 					System.err.println("SMS Blocklist");
 					break;
 				case 2:
-					ft.replace(R.id.content_frame, asFrag);
+					fragment = (CallBlockFragment) getSupportFragmentManager()
+							.findFragmentByTag("sbFrag");
 					mMenuPosition = 2;
 					((HomeMenuAdapter) mDrawerList.getAdapter())
 							.onItemSelected(mMenuPosition);
 					System.err.println("Anti Text Spam");
 					break;
 				case 3:
-					ft.replace(R.id.content_frame, sFrag);
+					fragment = (CallBlockFragment) getSupportFragmentManager()
+							.findFragmentByTag("stFrag");
 					mMenuPosition = 3;
 					((HomeMenuAdapter) mDrawerList.getAdapter())
 							.onItemSelected(mMenuPosition);
 					System.err.println("Settings");
 					break;
 				case 4:
-					ft.replace(R.id.content_frame, abFrag);
+					fragment = (CallBlockFragment) getSupportFragmentManager()
+							.findFragmentByTag("abFrag");
 					mMenuPosition = 4;
 					((HomeMenuAdapter) mDrawerList.getAdapter())
 							.onItemSelected(mMenuPosition);
@@ -308,7 +312,8 @@ public class MainActivity extends SherlockFragmentActivity {
 				setTitle(menuListArray[position]);
 				mDrawerLayout.closeDrawer(mDrawerList);
 
-				// Insert the fragment by replacing any existing fragment
+				// attach to the fragment and commit
+				ft.replace(R.id.content_frame, fragment);
 				ft.commit();
 			}
 		}
