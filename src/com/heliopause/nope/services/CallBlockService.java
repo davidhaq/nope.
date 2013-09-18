@@ -12,7 +12,7 @@ import android.util.Log;
 public class CallBlockService extends Service {
 
 	// Debugging constants
-	private static final boolean DEBUG = false;
+	private static final boolean DEBUG = true;
 	private static final String TAG = CallBlockService.class.getSimpleName();
 
 	public static CallReceiver receiver = new CallReceiver();

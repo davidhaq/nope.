@@ -26,7 +26,7 @@ public class BootReceiver extends BroadcastReceiver {
 		// them. If they aren't, don't do anything.
 		if (prefs.getBoolean(Constants.MSG_BLOCK_SERVICE_STATUS, true)) {
 
-			// start service and notify user with toast notification
+			// start service
 			context.startService(textBlock);
 		} else {
 			// do nothing
@@ -34,7 +34,7 @@ public class BootReceiver extends BroadcastReceiver {
 		}
 		if (prefs.getBoolean(Constants.CALL_BLOCK_SERVICE_STATUS, true)) {
 
-			// start service and notify user with toast notification
+			// start service
 			context.startService(callBlock);
 		} else {
 			// do nothing
@@ -42,7 +42,7 @@ public class BootReceiver extends BroadcastReceiver {
 		}
 		if (prefs.getBoolean(Constants.SPAM_BLOCK_SERVICE_STATUS, true)) {
 
-			// start service and notify user with toast notification
+			// start service
 			context.startService(spamBlock);
 		} else {
 			// do nothing

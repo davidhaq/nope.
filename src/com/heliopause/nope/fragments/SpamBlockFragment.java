@@ -1,31 +1,26 @@
 package com.heliopause.nope.fragments;
 
-import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
+import com.heliopause.nope.Constants;
 import com.heliopause.nope.R;
 
 public class SpamBlockFragment extends SherlockFragment {
 
-	private CompoundButton toggle;
-	private MenuItem toggleMenuItem;
 	private SharedPreferences prefs;
 	private TextView message;
 
 	private Boolean toggleState = null;
-	private static final String SPAM_TOGGLE_KEY = "spam_block_service_state";
 
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
@@ -54,8 +49,10 @@ public class SpamBlockFragment extends SherlockFragment {
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 
-		prefs = getSherlockActivity().getPreferences(Context.MODE_PRIVATE);
-		toggleState = prefs.getBoolean(SPAM_TOGGLE_KEY, false);
+		prefs = PreferenceManager
+				.getDefaultSharedPreferences(getSherlockActivity());
+		toggleState = prefs.getBoolean(Constants.SPAM_BLOCK_SERVICE_STATUS,
+				false);
 		if (toggleState) {
 			message.setText(getSherlockActivity().getResources().getString(
 					R.string.spam_block_on));
@@ -64,36 +61,6 @@ public class SpamBlockFragment extends SherlockFragment {
 					R.string.spam_block_off));
 		}
 
-		getSherlockActivity().getSupportMenuInflater().inflate(
-				R.menu.spam_menu, menu);
-		toggleMenuItem = menu.findItem(R.id.spam_block_toggle);
-		toggle = (CompoundButton) toggleMenuItem.getActionView().findViewById(
-				R.id.toggle_spam_button);
-		toggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-
-			@Override
-			public void onCheckedChanged(CompoundButton buttonView,
-					boolean isChecked) {
-				if (prefs != null) {
-					if (isChecked) {
-						//Placeholder to turn on spam blocking service
-						message.setText(getSherlockActivity().getResources()
-								.getString(R.string.spam_block_on));
-					} else {
-						//placeholder to turn off spam blocking service
-						message.setText(getSherlockActivity().getResources()
-								.getString(R.string.spam_block_off));
-					}
-					toggle.setChecked(isChecked);
-					Editor editor = prefs.edit();
-					editor.putBoolean(SPAM_TOGGLE_KEY, isChecked);
-					editor.commit();
-
-				}
-
-			}
-		});
-		toggle.setChecked(toggleState);
 	}
 
 	@Override
