@@ -1,6 +1,7 @@
 package com.heliopause.nope;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.res.Configuration;
@@ -31,6 +32,9 @@ import com.heliopause.nope.fragments.CallBlockFragment;
 import com.heliopause.nope.fragments.MsgBlockFragment;
 import com.heliopause.nope.fragments.SettingsFragment;
 import com.heliopause.nope.fragments.SpamBlockFragment;
+import com.heliopause.nope.services.CallBlockService;
+import com.heliopause.nope.services.MsgBlockService;
+import com.heliopause.nope.services.SpamBlockService;
 
 public class MainActivity extends SherlockFragmentActivity {
 
@@ -44,6 +48,7 @@ public class MainActivity extends SherlockFragmentActivity {
 
 	private static final String OPENED_KEY = "OPENED_KEY";
 	private SharedPreferences prefs = null;
+	private SharedPreferences settings = null;
 	private Boolean opened = null;
 
 	private Fragment fragment;
@@ -86,6 +91,8 @@ public class MainActivity extends SherlockFragmentActivity {
 					opened = true;
 					if (prefs != null) {
 						Editor editor = prefs.edit();
+						editor.putBoolean(Constants.SPAM_BLOCK_SERVICE_STATUS,
+								true);
 						editor.putBoolean(OPENED_KEY, true);
 						editor.commit();
 					}
@@ -93,7 +100,7 @@ public class MainActivity extends SherlockFragmentActivity {
 			}
 
 			public void onDrawerOpened(View drawerView) {
-				mTitle = "Nope!";
+				mTitle = "nope.";
 				getSupportActionBar().setTitle(mTitle);
 				supportInvalidateOptionsMenu(); // creates call to
 				// onPrepareOptionsMenu()
@@ -118,6 +125,7 @@ public class MainActivity extends SherlockFragmentActivity {
 			selectItem(0, true);
 		}
 
+		settings = PreferenceManager.getDefaultSharedPreferences(this);
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
@@ -125,13 +133,31 @@ public class MainActivity extends SherlockFragmentActivity {
 				prefs = getPreferences(MODE_PRIVATE);
 				opened = prefs.getBoolean(OPENED_KEY, false);
 				if (opened == false) {
+
 					mDrawerLayout.openDrawer(mDrawerList);
 				}
 			}
 		}).start();
-
 		PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+		startServicesOnFirstOpen();
+	}
 
+	private void startServicesOnFirstOpen() {
+		Intent callBlock = new Intent(this, CallBlockService.class);
+		Intent textBlock = new Intent(this, MsgBlockService.class);
+		Intent spamBlock = new Intent(this, SpamBlockService.class);
+
+		if (settings.getBoolean(Constants.MSG_BLOCK_SERVICE_STATUS, true)) {
+			startService(textBlock);
+		}
+		if (settings.getBoolean(Constants.CALL_BLOCK_SERVICE_STATUS, true)) {
+
+			startService(callBlock);
+		}
+		if (settings.getBoolean(Constants.SPAM_BLOCK_SERVICE_STATUS, true)) {
+
+			startService(spamBlock);
+		}
 	}
 
 	@Override
@@ -162,7 +188,6 @@ public class MainActivity extends SherlockFragmentActivity {
 		// If the nav drawer is open, hide action items related to the content
 		// view
 
-		// System.err.println("onPrepareOptionsMenu called");
 		boolean drawerOpen = mDrawerLayout.isDrawerVisible(mDrawerList);
 		if (menu.hasVisibleItems()) {
 			if (mMenuPosition == 0 || mMenuPosition == 1) {
