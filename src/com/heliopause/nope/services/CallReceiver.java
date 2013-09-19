@@ -1,9 +1,5 @@
 package com.heliopause.nope.services;
 
-import com.heliopause.nope.Constants;
-import com.heliopause.nope.database.BlockItemTable;
-import com.heliopause.nope.database.DatabaseHelper;
-
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -12,6 +8,10 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+
+import com.heliopause.nope.Constants;
+import com.heliopause.nope.database.BlockItemTable;
+import com.heliopause.nope.database.DatabaseHelper;
 
 public class CallReceiver extends BroadcastReceiver {
 
@@ -32,8 +32,8 @@ public class CallReceiver extends BroadcastReceiver {
 		// Check is the listener is disabled
 		SharedPreferences prefs = context.getSharedPreferences(
 				Constants.SETTINGS_PREFS, Context.MODE_PRIVATE);
-		boolean turnedOn = prefs.getBoolean(Constants.CALL_BLOCK_SERVICE_STATUS,
-				true);
+		boolean turnedOn = prefs.getBoolean(
+				Constants.CALL_BLOCK_SERVICE_STATUS, true);
 		if (!turnedOn) {
 			return;
 		}
@@ -76,16 +76,28 @@ public class CallReceiver extends BroadcastReceiver {
 	}
 
 	private boolean isOnBlockList(String incomingNum) {
+		Log.d(TAG, incomingNum);
+		int count = 0;
+		Cursor c = null;
 
-		Cursor c = db.rawQuery("SELECT * FROM "
-				+ BlockItemTable.CALLBLOCK_TABLE_NAME + " WHERE "
-				+ BlockItemTable.COLUMN_NUMBER + "=?;",
-				new String[] { incomingNum });
-		if (c != null) {
-			return true;
-		} else {
-			return false;
+		c = db.rawQuery("SELECT " + BlockItemTable.COLUMN_NUMBER + " FROM "
+				+ BlockItemTable.CALLBLOCK_TABLE_NAME, null);
+
+		c.moveToFirst();
+		while (!c.isAfterLast()) {
+			Log.d(TAG,
+					c.getString(c.getColumnIndex(BlockItemTable.COLUMN_NUMBER)));
+			if (incomingNum.contains(c.getString(c
+					.getColumnIndex(BlockItemTable.COLUMN_NUMBER)))) {
+
+				count++;
+				Log.d(TAG, "Count inside if: " + count);
+			}
+			Log.d(TAG, "Count outside if: " + count);
+			c.moveToNext();
 		}
+		Log.d(TAG, "Count outside while: " + count);
+		return count > 0;
 
 	}
 }

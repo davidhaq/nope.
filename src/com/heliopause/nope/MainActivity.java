@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ActionBarDrawerToggle;
@@ -17,6 +18,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.view.Display;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -26,7 +28,6 @@ import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
-import com.actionbarsherlock.view.Window;
 import com.heliopause.nope.fragments.AboutFragment;
 import com.heliopause.nope.fragments.CallBlockFragment;
 import com.heliopause.nope.fragments.MsgBlockFragment;
@@ -66,6 +67,7 @@ public class MainActivity extends SherlockFragmentActivity {
 		// grab and set some things in the actionBarSherlock
 		actionBar = getSupportActionBar();
 		actionBar.setDisplayHomeAsUpEnabled(true);
+		setSupportProgressBarIndeterminateVisibility(false);
 
 		// Make sure we get the array of menu item strings.
 		menuListArray = getResources().getStringArray(R.array.menu_list);
@@ -138,7 +140,12 @@ public class MainActivity extends SherlockFragmentActivity {
 				}
 			}
 		}).start();
-		PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
+			PreferenceManager.setDefaultValues(this, R.xml.preferences_compat,
+					false);
+		} else {
+			PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+		}
 		startServicesOnFirstOpen();
 	}
 

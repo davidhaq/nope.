@@ -9,8 +9,10 @@ import com.heliopause.nope.services.SpamBlockService;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.preference.PreferenceFragment;
+import android.util.Log;
 
 public class SettingsFragment extends PreferenceFragment implements
 		OnSharedPreferenceChangeListener {
@@ -20,7 +22,12 @@ public class SettingsFragment extends PreferenceFragment implements
 		super.onCreate(savedInstanceState);
 
 		// Load the preferences from an XML resource
-		addPreferencesFromResource(R.xml.preferences);
+		Log.d("SettingsFragment", ""+Build.VERSION.SDK_INT);
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
+			addPreferencesFromResource(R.xml.preferences_compat);
+		} else {
+			addPreferencesFromResource(R.xml.preferences);
+		}
 
 	}
 
