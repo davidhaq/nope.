@@ -42,11 +42,26 @@ public class CallReceiver extends BroadcastReceiver {
 		String state = (intent == null) ? null : intent.getStringExtra("state");
 
 		if (state.equals(TelephonyManager.EXTRA_STATE_RINGING)) {
+			Intent ringingIntent = new Intent(context, CallBlockService.class);
+			ringingIntent.setAction(CallBlockService.c);
+			String incomingNum = intent
+					.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER);
+			ringingIntent.putExtra(TelephonyManager.EXTRA_INCOMING_NUMBER,
+					incomingNum);
+			context.startService(ringingIntent);
 
 		} else if (state.equals(TelephonyManager.EXTRA_STATE_OFFHOOK)) {
 
-		} else if (state.equals(TelephonyManager.EXTRA_STATE_IDLE)) {
+			Intent offHookIntent = new Intent(context, CallBlockService.class);
+			offHookIntent.setAction(CallBlockService.f);
+			offHookIntent.putExtras(intent);
+			context.startService(offHookIntent);
 
+		} else if (state.equals(TelephonyManager.EXTRA_STATE_IDLE)) {
+			Intent idleIntent = new Intent(context, CallBlockService.class);
+			idleIntent.setAction(CallBlockService.e);
+			idleIntent.putExtras(intent);
+			context.startService(idleIntent);
 		}
 
 		if (intent.getStringExtra(TelephonyManager.EXTRA_STATE).equals(

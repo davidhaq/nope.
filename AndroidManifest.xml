@@ -46,6 +46,26 @@
             </intent-filter>
         </activity>
 
+        <receiver
+            android:name="com.heliopause.nope.services.CallReceiver"
+            android:enabled="true" >
+            <intent-filter android:priority="999" >
+                <action android:name="android.intent.action.PHONE_STATE" />
+            </intent-filter>
+        </receiver>
+        <receiver
+            android:name="com.heliopause.nope.services.MsgBlockService"
+            android:enabled="true" >
+            <intent-filter android:priority="998" >
+                <action android:name="android.provider.Telephony.SMS_RECEIVED" />
+            </intent-filter>
+        </receiver>
+        <receiver android:name="com.heliopause.nope.services.BootReceiver" >
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
         <service
             android:name="com.heliopause.nope.services.SpamBlockService"
             android:label="@string/app_name"
@@ -61,12 +81,6 @@
             android:label="@string/app_name"
             android:stopWithTask="false" >
         </service>
-
-        <receiver android:name="com.heliopause.nope.services.CallReceiver" >
-            <intent-filter android:priority="100" >
-                <action android:name="android.intent.action.PHONE_STATE" />
-            </intent-filter>
-        </receiver>
     </application>
 
 </manifest>
