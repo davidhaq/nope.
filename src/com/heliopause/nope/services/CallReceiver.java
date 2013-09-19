@@ -39,25 +39,29 @@ public class CallReceiver extends BroadcastReceiver {
 		db = helper.getReadableDatabase();
 
 		// Get the action if the intent isn't null.
-		String action = (intent == null) ? null : intent.getAction();
+		String state = (intent == null) ? null : intent.getStringExtra("state");
 
-		if (action.equalsIgnoreCase("android.intent.action.PHONE_STATE")) {
-			if (intent.getStringExtra(TelephonyManager.EXTRA_STATE).equals(
-					TelephonyManager.EXTRA_STATE_RINGING)) {
-				if (isOnBlockList(intent
-						.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER))) {
-					if (DEBUG) {
-						Log.d(TAG, "Phone number is on block list!");
-					}
-					blockCall(context);
-				} else {
-					if (DEBUG)
-						Log.d(TAG,
-								"Phone number was not detected on block list");
-				}
-			}
+		if (state.equals(TelephonyManager.EXTRA_STATE_RINGING)) {
+
+		} else if (state.equals(TelephonyManager.EXTRA_STATE_OFFHOOK)) {
+
+		} else if (state.equals(TelephonyManager.EXTRA_STATE_IDLE)) {
+
 		}
 
+		if (intent.getStringExtra(TelephonyManager.EXTRA_STATE).equals(
+				TelephonyManager.EXTRA_STATE_RINGING)) {
+			if (isOnBlockList(intent
+					.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER))) {
+				if (DEBUG) {
+					Log.d(TAG, "Phone number is on block list!");
+				}
+				blockCall(context);
+			} else {
+				if (DEBUG)
+					Log.d(TAG, "Phone number was not detected on block list");
+			}
+		}
 	}
 
 	private void getHelper() {
@@ -112,17 +116,18 @@ public class CallReceiver extends BroadcastReceiver {
 					KeyEvent.ACTION_UP, KeyEvent.KEYCODE_HEADSETHOOK));
 			context.sendOrderedBroadcast(buttonUp,
 					"android.permission.CALL_PRIVILEGED");
-			
-			Intent headSetUnPluggedintent = new Intent(Intent.ACTION_HEADSET_PLUG);
-		    //headSetUnPluggedintent.addFlags(Intent.FLAG_RECEIVER_REGISTERED_ONLY);
-		    headSetUnPluggedintent.putExtra("state", 0);
-		    headSetUnPluggedintent.putExtra("name", "Headset");
-		    try {
-		        context.sendOrderedBroadcast(headSetUnPluggedintent, null);
-		    } catch (Exception e) {
-		        // TODO Auto-generated catch block
-		        e.printStackTrace();
-		    }
+
+			Intent headSetUnPluggedintent = new Intent(
+					Intent.ACTION_HEADSET_PLUG);
+			// headSetUnPluggedintent.addFlags(Intent.FLAG_RECEIVER_REGISTERED_ONLY);
+			headSetUnPluggedintent.putExtra("state", 0);
+			headSetUnPluggedintent.putExtra("name", "Headset");
+			try {
+				context.sendOrderedBroadcast(headSetUnPluggedintent, null);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 
 	}
