@@ -11,7 +11,7 @@
             android:title="@string/pref_title_call_blocking_service" />
 
         <ListPreference
-            android:defaultValue="300"
+            android:defaultValue="@string/pref_blocking_method_three"
             android:dependency="pref_key_call_block_service_state"
             android:entries="@array/pref_call_block_method_entries"
             android:entryValues="@array/pref_call_block_method_values"
@@ -36,7 +36,8 @@
             android:key="pref_key_spam_block_service_state"
             android:summary="@string/pref_summary_spam_blocking_service"
             android:title="@string/pref_title_spam_blocking_service" />
-        <EditTextPreference
+
+        <EditTextPreference
             android:defaultValue="3"
             android:dependency="pref_key_spam_block_service_state"
             android:inputType="number"

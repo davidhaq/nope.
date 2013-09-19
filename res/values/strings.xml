@@ -24,6 +24,11 @@
     <string name="pref_summary_call_blocking_service">Call blocking toggle switch. Turn on if you want to block calls from your list.</string>
     <string name="pref_title_call_block_method">Blocking Method</string>
     <string name="pref_summary_call_block_method">This setting is to choose which call blocking method to use.</string>
+    <string name="pref_blocking_method_one">callBlockMethodOne</string>
+    <string name="pref_blocking_method_two">callBlockMethodTwo</string>
+    <string name="pref_blocking_method_three">callBlockMethodThree</string>
+    <string name="pref_blocking_method_four">callBlockMethodFour</string>
+    
     <string name="pref_text_block_title">Text Block</string>
     <string name="pref_title_text_blocking_service">Text Blocking</string>
     <string name="pref_summary_text_blocking_service">Text blocking toggle switch. Turn on if you want to block texts from your list.</string>
