@@ -1,14 +1,21 @@
 package com.heliopause.nope.services;
 
+import java.lang.reflect.Method;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Build;
+import android.os.RemoteException;
 import android.preference.PreferenceManager;
 import android.telephony.TelephonyManager;
+import android.util.Log;
+import android.view.KeyEvent;
 
+import com.android.internal.telephony.ITelephony;
 import com.heliopause.nope.Constants;
 import com.heliopause.nope.database.BlockItemTable;
 import com.heliopause.nope.database.DatabaseHelper;
@@ -22,49 +29,67 @@ public class CallReceiver extends BroadcastReceiver {
 	private SQLiteDatabase db;
 	private DatabaseHelper helper;
 	private SharedPreferences settings;
+	private ITelephony telephonyService;
+
+	private int version;
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
+		if (!intent.getAction().equals("android.intent.action.PHONE_STATE")) {
+			return;
+		} else {
 
-		// Grab the SharedPrefs
-		settings = PreferenceManager.getDefaultSharedPreferences(context);
+			// Grab the SharedPrefs
+			settings = PreferenceManager.getDefaultSharedPreferences(context);
 
-		helper = new DatabaseHelper(context);
-		db = helper.getReadableDatabase();
+			helper = new DatabaseHelper(context);
+			db = helper.getReadableDatabase();
 
-		// Get the action if the intent isn't null.
-		String state = (intent == null) ? null : intent.getStringExtra("state");
+			version = getVersion();
+			String method = settings.getString("pref_key_call_block_method",
+					Constants.CALL_BLOCK_METHOD_THREE);
 
-		if (settings.getBoolean(Constants.CALL_BLOCK_SERVICE_STATUS, true)
-				&& isOnBlockList(intent
-						.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER))) {
-
-			if (state.equals(TelephonyManager.EXTRA_STATE_RINGING)) {
-				Intent ringingIntent = new Intent(context,
-						CallBlockService.class);
-				ringingIntent.setAction(CallBlockService.c);
+			if (intent.getStringExtra(TelephonyManager.EXTRA_STATE).equals(
+					TelephonyManager.EXTRA_STATE_RINGING)) {
 				String incomingNum = intent
 						.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER);
-				ringingIntent.putExtra(TelephonyManager.EXTRA_INCOMING_NUMBER,
-						incomingNum);
-				context.startService(ringingIntent);
-
-			} else if (state.equals(TelephonyManager.EXTRA_STATE_OFFHOOK)) {
-
-				Intent offHookIntent = new Intent(context,
-						CallBlockService.class);
-				offHookIntent.setAction(CallBlockService.f);
-				offHookIntent.putExtras(intent);
-				context.startService(offHookIntent);
-
-			} else if (state.equals(TelephonyManager.EXTRA_STATE_IDLE)) {
-				Intent idleIntent = new Intent(context, CallBlockService.class);
-				idleIntent.setAction(CallBlockService.e);
-				idleIntent.putExtras(intent);
-				context.startService(idleIntent);
+				boolean isBlocked = isOnBlockList(intent
+						.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER));
+				if (isBlocked) {
+					if (DEBUG) {
+						Log.d(TAG, "Phone number is on block list!");
+					}
+					if (method
+							.equalsIgnoreCase(Constants.CALL_BLOCK_METHOD_ONE)) {
+						intent.putExtra(TelephonyManager.EXTRA_STATE_RINGING,
+								incomingNum);
+						incomingCallActionMethodOne(context, version);
+					}
+				} else {
+					if (DEBUG)
+						Log.d(TAG,
+								"Phone number was not detected on block list");
+					return;
+				}
 			}
-		} else {
-			return;
+			if (intent.getStringExtra(TelephonyManager.EXTRA_STATE).equals(
+					TelephonyManager.EXTRA_STATE_OFFHOOK)) {
+				if (DEBUG)
+					Log.d(TAG, "WE in offhook state now.");
+				if (method.equalsIgnoreCase(Constants.CALL_BLOCK_METHOD_ONE)) {
+					try {
+						synchronized (this) {
+							Log.d(TAG, "Waiting for 1 sec ");
+							this.wait(1000);
+						}
+					} catch (Exception e) {
+						Log.d(TAG, "Exception while waiting !!");
+						e.printStackTrace();
+					}
+					offHookCallActionMethodOne(context, version);
+
+				}
+			}
 		}
 	}
 
@@ -91,4 +116,124 @@ public class CallReceiver extends BroadcastReceiver {
 
 	}
 
+	// ********Call Blocking methods begin here************
+
+	// Method 1 (Answer and Hang up)
+	private void incomingCallActionMethodOne(Context context, int version) {
+
+		if (DEBUG) {
+			Log.d(TAG, "Inside of incomingCallActionMethodOne");
+		}
+		if (version == 7) {
+			if (DEBUG) {
+				Log.d(TAG, "Answering call using API 7 method");
+			}
+			// Simulate a press of the headset button to pick up the call
+			Intent buttonDown = new Intent(Intent.ACTION_MEDIA_BUTTON);
+			buttonDown.putExtra(Intent.EXTRA_KEY_EVENT, new KeyEvent(
+					KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_HEADSETHOOK));
+			context.sendOrderedBroadcast(buttonDown,
+					"android.permission.CALL_PRIVILEGED");
+		} else if ((version > 7) && (version < 16)) {
+			if (DEBUG) {
+				Log.d(TAG, "Answering call using API 8-18 method");
+			}
+			// froyo and beyond trigger on buttonUp instead of buttonDown
+			Intent buttonUp = new Intent(Intent.ACTION_MEDIA_BUTTON);
+			buttonUp.putExtra(Intent.EXTRA_KEY_EVENT, new KeyEvent(
+					KeyEvent.ACTION_UP, KeyEvent.KEYCODE_HEADSETHOOK));
+			context.sendOrderedBroadcast(buttonUp,
+					"android.permission.CALL_PRIVILEGED");
+		} else if (version > 16) {
+			Intent headSetUnPluggedintent = new Intent(
+					Intent.ACTION_HEADSET_PLUG);
+			// headSetUnPluggedintent
+			// .addFlags(Intent.FLAG_RECEIVER_REGISTERED_ONLY);
+			headSetUnPluggedintent.putExtra("state", 1);
+			headSetUnPluggedintent.putExtra("name", "Headset");
+			// TODO: Should we require a permission?
+			try {
+				context.sendOrderedBroadcast(headSetUnPluggedintent, null);
+				Log.d(TAG, "ACTION_HEADSET_PLUG broadcasted ...");
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				// e.printStackTrace();
+				Log.d(TAG, "Catch block of ACTION_HEADSET_PLUG broadcast");
+				Log.d(TAG, "Call Answered From Catch Block !!");
+			}
+		}
+	}
+
+	private void offHookCallActionMethodOne(Context context, int version) {
+
+		if (DEBUG) {
+			Log.d(TAG, "Version number: " + version);
+		}
+
+		if (version == 7) {
+			getTeleService(context);
+			try {
+				telephonyService.endCall();
+			} catch (RemoteException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} else if ((version > 7) && (version < 16)) {
+			Intent headSetUnPluggedintent = new Intent(
+					Intent.ACTION_HEADSET_PLUG);
+			headSetUnPluggedintent
+					.addFlags(Intent.FLAG_RECEIVER_REGISTERED_ONLY);
+			headSetUnPluggedintent.putExtra("state", 0);
+			headSetUnPluggedintent.putExtra("name", "Headset");
+			context.sendOrderedBroadcast(headSetUnPluggedintent, null);
+
+		} else if (version > 16) {
+			getTeleService(context);
+			try {
+				telephonyService.endCall();
+			} catch (RemoteException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
+	}
+
+	private void getTeleService(Context context) {
+		TelephonyManager tm = (TelephonyManager) context
+				.getSystemService(Context.TELEPHONY_SERVICE);
+		try {
+			// Java reflection to gain access to TelephonyManager's
+			// ITelephony getter
+			Log.v(TAG, "Get getTeleService...");
+			Class<?> c = Class.forName(tm.getClass().getName());
+			Method m = c.getDeclaredMethod("getITelephony");
+			m.setAccessible(true);
+			telephonyService = (ITelephony) m.invoke(tm);
+		} catch (Exception e) {
+			e.printStackTrace();
+			Log.e(TAG, "FATAL ERROR: could not connect to telephony subsystem");
+			Log.e(TAG, "Exception object: " + e);
+		}
+	}
+
+	public int getVersion() {
+		try {
+			int n = Build.VERSION.class.getField("SDK_INT").getInt(null);
+			version = n;
+			return version;
+		} catch (SecurityException localSecurityException) {
+			while (true)
+				version = Build.VERSION.SDK_INT;
+		} catch (NoSuchFieldException localNoSuchFieldException) {
+			while (true)
+				version = Build.VERSION.SDK_INT;
+		} catch (IllegalArgumentException localIllegalArgumentException) {
+			while (true)
+				version = Build.VERSION.SDK_INT;
+		} catch (IllegalAccessException localIllegalAccessException) {
+			while (true)
+				version = Build.VERSION.SDK_INT;
+		}
+	}
 }

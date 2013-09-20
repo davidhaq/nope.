@@ -49,12 +49,12 @@
         <receiver
             android:name="com.heliopause.nope.services.CallReceiver"
             android:enabled="true" >
-            <intent-filter android:priority="999" >
+            <intent-filter>
                 <action android:name="android.intent.action.PHONE_STATE" />
             </intent-filter>
         </receiver>
         <receiver
-            android:name="com.heliopause.nope.services.MsgBlockService"
+            android:name="com.heliopause.nope.services.TextReceiver"
             android:enabled="true" >
             <intent-filter android:priority="998" >
                 <action android:name="android.provider.Telephony.SMS_RECEIVED" />
