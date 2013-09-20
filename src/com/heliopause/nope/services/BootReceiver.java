@@ -10,13 +10,13 @@ import com.heliopause.nope.Constants;
 
 public class BootReceiver extends BroadcastReceiver {
 
-	private SharedPreferences prefs;
+	private SharedPreferences settings;
 
 	// Receive boot completed system broadcast
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		// initializing shared prefs object
-		prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		settings = PreferenceManager.getDefaultSharedPreferences(context);
 
 		Intent callBlock = new Intent(context, CallBlockService.class);
 		Intent textBlock = new Intent(context, MsgBlockService.class);
@@ -24,7 +24,7 @@ public class BootReceiver extends BroadcastReceiver {
 
 		// Check if Services are set to be enabled. If they are, start
 		// them. If they aren't, don't do anything.
-		if (prefs.getBoolean(Constants.MSG_BLOCK_SERVICE_STATUS, true)) {
+		if (settings.getBoolean(Constants.MSG_BLOCK_SERVICE_STATUS, true)) {
 
 			// start service
 			context.startService(textBlock);
@@ -32,7 +32,7 @@ public class BootReceiver extends BroadcastReceiver {
 			// do nothing
 			return;
 		}
-		if (prefs.getBoolean(Constants.CALL_BLOCK_SERVICE_STATUS, true)) {
+		if (settings.getBoolean(Constants.CALL_BLOCK_SERVICE_STATUS, true)) {
 
 			// start service
 			context.startService(callBlock);
@@ -40,7 +40,7 @@ public class BootReceiver extends BroadcastReceiver {
 			// do nothing
 			return;
 		}
-		if (prefs.getBoolean(Constants.SPAM_BLOCK_SERVICE_STATUS, true)) {
+		if (settings.getBoolean(Constants.SPAM_BLOCK_SERVICE_STATUS, true)) {
 
 			// start service
 			context.startService(spamBlock);
