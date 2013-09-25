@@ -38,12 +38,18 @@ public class CallReceiver extends BroadcastReceiver {
 		if (!intent.getAction().equals("android.intent.action.PHONE_STATE")) {
 			return;
 		} else {
-
-			// Grab the SharedPrefs
-			settings = PreferenceManager.getDefaultSharedPreferences(context);
+			if (DEBUG) {
+				Log.d(TAG, "CallReceiver pinged");
+				Log.d(TAG,
+						""
+								+ intent.getStringExtra(TelephonyManager.EXTRA_STATE));
+			}
 
 			helper = new DatabaseHelper(context);
 			db = helper.getReadableDatabase();
+
+			// Grab the SharedPrefs
+			settings = PreferenceManager.getDefaultSharedPreferences(context);
 
 			version = getVersion();
 			String method = settings.getString("pref_key_call_block_method",
@@ -63,7 +69,7 @@ public class CallReceiver extends BroadcastReceiver {
 							.equalsIgnoreCase(Constants.CALL_BLOCK_METHOD_ONE)) {
 						intent.putExtra(TelephonyManager.EXTRA_STATE_RINGING,
 								incomingNum);
-						incomingCallActionMethodOne(context, version);
+						incomingCallActionMethodOne(intent, context, version);
 					}
 				} else {
 					if (DEBUG)
@@ -91,6 +97,7 @@ public class CallReceiver extends BroadcastReceiver {
 				}
 			}
 		}
+
 	}
 
 	private boolean isOnBlockList(String incomingNum) {
@@ -119,7 +126,8 @@ public class CallReceiver extends BroadcastReceiver {
 	// ********Call Blocking methods begin here************
 
 	// Method 1 (Answer and Hang up)
-	private void incomingCallActionMethodOne(Context context, int version) {
+	private void incomingCallActionMethodOne(Intent intent, Context context,
+			int version) {
 
 		if (DEBUG) {
 			Log.d(TAG, "Inside of incomingCallActionMethodOne");
@@ -134,33 +142,22 @@ public class CallReceiver extends BroadcastReceiver {
 					KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_HEADSETHOOK));
 			context.sendOrderedBroadcast(buttonDown,
 					"android.permission.CALL_PRIVILEGED");
-		} else if ((version > 7) && (version < 16)) {
+			return;
+		} else if (version > 7) {
 			if (DEBUG) {
-				Log.d(TAG, "Answering call using API 8-18 method");
+				Log.d(TAG, "Answering call using API 8 and above methods");
 			}
-			// froyo and beyond trigger on buttonUp instead of buttonDown
 			Intent buttonUp = new Intent(Intent.ACTION_MEDIA_BUTTON);
 			buttonUp.putExtra(Intent.EXTRA_KEY_EVENT, new KeyEvent(
 					KeyEvent.ACTION_UP, KeyEvent.KEYCODE_HEADSETHOOK));
-			context.sendOrderedBroadcast(buttonUp,
-					"android.permission.CALL_PRIVILEGED");
-		} else if (version > 16) {
-			Intent headSetUnPluggedintent = new Intent(
-					Intent.ACTION_HEADSET_PLUG);
-			// headSetUnPluggedintent
-			// .addFlags(Intent.FLAG_RECEIVER_REGISTERED_ONLY);
-			headSetUnPluggedintent.putExtra("state", 1);
-			headSetUnPluggedintent.putExtra("name", "Headset");
-			// TODO: Should we require a permission?
 			try {
-				context.sendOrderedBroadcast(headSetUnPluggedintent, null);
-				Log.d(TAG, "ACTION_HEADSET_PLUG broadcasted ...");
+				context.sendOrderedBroadcast(buttonUp,
+						"android.permission.CALL_PRIVILEGED");
+				Log.d(TAG, "ACTION_MEDIA_BUTTON broadcasted...");
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				// e.printStackTrace();
-				Log.d(TAG, "Catch block of ACTION_HEADSET_PLUG broadcast");
-				Log.d(TAG, "Call Answered From Catch Block !!");
+				Log.d(TAG, "Catch block of ACTION_MEDIA_BUTTON broadcast !");
 			}
+
 		}
 	}
 
