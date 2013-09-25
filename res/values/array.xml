@@ -27,7 +27,7 @@
     <string-array name="pref_call_block_method_entries">
         <item>Answer and End Call</item>
         <item>Send to Voicemail</item>
-        <item>Silence (Default)</item>
+        <item>Silence</item>
     </string-array>
     <string-array name="pref_call_block_method_values">
         <item>@string/pref_blocking_method_one</item>

@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.media.AudioManager;
 import android.os.Build;
 import android.os.RemoteException;
 import android.preference.PreferenceManager;
@@ -29,6 +30,7 @@ public class CallReceiver extends BroadcastReceiver {
 	private SQLiteDatabase db;
 	private DatabaseHelper helper;
 	private SharedPreferences settings;
+	private SharedPreferences prefs;
 	private ITelephony telephonyService;
 
 	private int version;
@@ -50,6 +52,7 @@ public class CallReceiver extends BroadcastReceiver {
 
 			// Grab the SharedPrefs
 			settings = PreferenceManager.getDefaultSharedPreferences(context);
+			prefs = context.getSharedPreferences("prefs", Context.MODE_PRIVATE);
 
 			version = getVersion();
 			String method = settings.getString("pref_key_call_block_method",
@@ -57,8 +60,7 @@ public class CallReceiver extends BroadcastReceiver {
 
 			if (intent.getStringExtra(TelephonyManager.EXTRA_STATE).equals(
 					TelephonyManager.EXTRA_STATE_RINGING)) {
-				String incomingNum = intent
-						.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER);
+
 				boolean isBlocked = isOnBlockList(intent
 						.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER));
 				if (isBlocked) {
@@ -67,9 +69,21 @@ public class CallReceiver extends BroadcastReceiver {
 					}
 					if (method
 							.equalsIgnoreCase(Constants.CALL_BLOCK_METHOD_ONE)) {
-						intent.putExtra(TelephonyManager.EXTRA_STATE_RINGING,
-								incomingNum);
 						incomingCallActionMethodOne(intent, context, version);
+					} else if (method
+							.equalsIgnoreCase(Constants.CALL_BLOCK_METHOD_TWO)) {
+
+					} else if (method
+							.equalsIgnoreCase(Constants.CALL_BLOCK_METHOD_THREE)) {
+						incomingCallActionMethodThree(context, version);
+						new Thread(new Runnable() {
+							@Override
+							public void run() {
+								prefs.edit().putBoolean("blocked", true)
+										.commit();
+							}
+						}).start();
+
 					}
 				} else {
 					if (DEBUG)
@@ -94,6 +108,36 @@ public class CallReceiver extends BroadcastReceiver {
 					}
 					offHookCallActionMethodOne(context, version);
 
+				}
+			}
+			if (intent.getStringExtra(TelephonyManager.EXTRA_STATE).equals(
+					TelephonyManager.EXTRA_STATE_IDLE)) {
+				if (DEBUG)
+					Log.d(TAG, "idle state");
+				if (method.equalsIgnoreCase(Constants.CALL_BLOCK_METHOD_THREE)) {
+					if (prefs.getBoolean("blocked", false)) {
+						if (DEBUG)
+							Log.d(TAG, "hurray! it was blocked!");
+						try {
+							synchronized (this) {
+								Log.d(TAG, "Waiting for 1 sec ");
+								this.wait(1000);
+							}
+						} catch (Exception e) {
+							Log.d(TAG, "Exception while waiting!");
+							e.printStackTrace();
+						}
+						if (DEBUG)
+							Log.d(TAG, "is blocked!");
+						new Thread(new Runnable() {
+							@Override
+							public void run() {
+								prefs.edit().putBoolean("blocked", false);
+								prefs.edit().commit();
+							}
+						}).start();
+						idleCallActionMethodThree(context, version);
+					}
 				}
 			}
 		}
@@ -163,10 +207,6 @@ public class CallReceiver extends BroadcastReceiver {
 
 	private void offHookCallActionMethodOne(Context context, int version) {
 
-		if (DEBUG) {
-			Log.d(TAG, "Version number: " + version);
-		}
-
 		if (version == 7) {
 			getTeleService(context);
 			try {
@@ -194,6 +234,19 @@ public class CallReceiver extends BroadcastReceiver {
 			}
 		}
 
+	}
+
+	private void incomingCallActionMethodThree(Context context, int version) {
+		AudioManager am;
+		am = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+		am.setRingerMode(AudioManager.RINGER_MODE_SILENT);
+		return;
+	}
+
+	private void idleCallActionMethodThree(Context context, int version) {
+		AudioManager am;
+		am = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+		am.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
 	}
 
 	private void getTeleService(Context context) {
