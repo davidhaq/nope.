@@ -72,10 +72,19 @@ public class CallReceiver extends BroadcastReceiver {
 						incomingCallActionMethodOne(intent, context, version);
 					} else if (method
 							.equalsIgnoreCase(Constants.CALL_BLOCK_METHOD_TWO)) {
+						// Ignore call method
+						incomingCallActionMethodTwo(context);
+						new Thread(new Runnable() {
+							@Override
+							public void run() {
+								prefs.edit().putBoolean("blocked", true)
+										.commit();
+							}
+						}).start();
 
 					} else if (method
 							.equalsIgnoreCase(Constants.CALL_BLOCK_METHOD_THREE)) {
-						incomingCallActionMethodThree(context, version);
+						incomingCallActionMethodThree(context);
 						new Thread(new Runnable() {
 							@Override
 							public void run() {
@@ -114,7 +123,22 @@ public class CallReceiver extends BroadcastReceiver {
 					TelephonyManager.EXTRA_STATE_IDLE)) {
 				if (DEBUG)
 					Log.d(TAG, "idle state");
-				if (method.equalsIgnoreCase(Constants.CALL_BLOCK_METHOD_THREE)) {
+				if (method.equalsIgnoreCase(Constants.CALL_BLOCK_METHOD_TWO)) {
+					if (prefs.getBoolean("blocked", false)) {
+						if (DEBUG)
+							Log.d(TAG, "hurray! it was blocked!");
+						new Thread(new Runnable() {
+							@Override
+							public void run() {
+								prefs.edit().putBoolean("blocked", false);
+								prefs.edit().commit();
+							}
+						}).start();
+						idleCallActionMethodThree(context);
+					}
+
+				} else if (method
+						.equalsIgnoreCase(Constants.CALL_BLOCK_METHOD_THREE)) {
 					if (prefs.getBoolean("blocked", false)) {
 						if (DEBUG)
 							Log.d(TAG, "hurray! it was blocked!");
@@ -136,7 +160,7 @@ public class CallReceiver extends BroadcastReceiver {
 								prefs.edit().commit();
 							}
 						}).start();
-						idleCallActionMethodThree(context, version);
+						idleCallActionMethodThree(context);
 					}
 				}
 			}
@@ -236,14 +260,31 @@ public class CallReceiver extends BroadcastReceiver {
 
 	}
 
-	private void incomingCallActionMethodThree(Context context, int version) {
+	// Method 2 (Send to voicemail)
+	private void incomingCallActionMethodTwo(Context context) {
+		AudioManager am;
+		am = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+		am.setRingerMode(AudioManager.RINGER_MODE_SILENT);
+		getTeleService(context);
+
+		try {
+			telephonyService.endCall();
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
+	// Method 3 (Silence)
+	private void incomingCallActionMethodThree(Context context) {
 		AudioManager am;
 		am = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
 		am.setRingerMode(AudioManager.RINGER_MODE_SILENT);
 		return;
 	}
 
-	private void idleCallActionMethodThree(Context context, int version) {
+	private void idleCallActionMethodThree(Context context) {
 		AudioManager am;
 		am = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
 		am.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
@@ -252,6 +293,7 @@ public class CallReceiver extends BroadcastReceiver {
 	private void getTeleService(Context context) {
 		TelephonyManager tm = (TelephonyManager) context
 				.getSystemService(Context.TELEPHONY_SERVICE);
+
 		try {
 			// Java reflection to gain access to TelephonyManager's
 			// ITelephony getter

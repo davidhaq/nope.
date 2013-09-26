@@ -31,6 +31,7 @@ public class CallBlockService extends Service {
 		}
 		IntentFilter filter = new IntentFilter();
 		filter.addAction(TelephonyManager.ACTION_PHONE_STATE_CHANGED);
+		filter.setPriority(999);
 		registerReceiver(receiver, filter);
 
 	}
