@@ -41,7 +41,7 @@ public class CallBlockFragment extends SherlockListFragment implements
 	// A few locally used objects
 	private DatabaseHelper db = null;
 	private BlocklistAdapter adapter = null;
-	private SQLiteCursorLoader loader;
+	public static SQLiteCursorLoader loader;
 	private Cursor mCursor;
 	private static final int LOADER_ID = 1;
 

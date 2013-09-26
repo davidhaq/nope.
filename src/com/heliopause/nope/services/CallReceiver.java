@@ -3,6 +3,7 @@ package com.heliopause.nope.services;
 import java.lang.reflect.Method;
 
 import android.content.BroadcastReceiver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -20,11 +21,12 @@ import com.android.internal.telephony.ITelephony;
 import com.heliopause.nope.Constants;
 import com.heliopause.nope.database.BlockItemTable;
 import com.heliopause.nope.database.DatabaseHelper;
+import com.heliopause.nope.fragments.CallBlockFragment;
 
 public class CallReceiver extends BroadcastReceiver {
 
 	// Debug constants
-	private static final boolean DEBUG = true;
+	private static final boolean DEBUG = false;
 	private static final String TAG = CallReceiver.class.getSimpleName();
 
 	private SQLiteDatabase db;
@@ -67,6 +69,8 @@ public class CallReceiver extends BroadcastReceiver {
 					if (DEBUG) {
 						Log.d(TAG, "Phone number is on block list!");
 					}
+					updateItemTime(intent
+							.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER));
 					if (method
 							.equalsIgnoreCase(Constants.CALL_BLOCK_METHOD_ONE)) {
 						incomingCallActionMethodOne(intent, context, version);
@@ -189,6 +193,37 @@ public class CallReceiver extends BroadcastReceiver {
 		}
 		return count > 0;
 
+	}
+
+	private void updateItemTime(String number) {
+
+		Log.d(TAG, "Number: " + number);
+		// Counter to tell if a number is on the blocklist.
+		int ID = 0;
+		Cursor c = db.rawQuery("SELECT * FROM "
+				+ BlockItemTable.CALLBLOCK_TABLE_NAME, null);
+
+		// Move to the first row, just in case.
+		c.moveToFirst();
+
+		// Scan through all the numbers in the column. If any match, count is
+		// incremented signifying that the number was found in the list
+		while (!c.isAfterLast()) {
+			if (number.contains(c.getString(c
+					.getColumnIndex(BlockItemTable.COLUMN_NUMBER)))) {
+				Log.d(TAG, "Found one in here!");
+				ID = c.getInt(c.getColumnIndex(BlockItemTable.COLUMN_ID));
+			}
+			c.moveToNext();
+		}
+
+		Log.d(TAG, "ROW ID: " + ID);
+
+		ContentValues cv = new ContentValues();
+		cv.put(BlockItemTable.COLUMN_LAST_CONTACT,
+				(int) System.currentTimeMillis());
+		CallBlockFragment.loader.update(BlockItemTable.CALLBLOCK_TABLE_NAME,
+				cv, BlockItemTable.COLUMN_ID + "='" + ID + "'", null);
 	}
 
 	// ********Call Blocking methods begin here************
