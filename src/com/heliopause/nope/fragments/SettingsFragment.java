@@ -22,7 +22,7 @@ public class SettingsFragment extends PreferenceFragment implements
 		super.onCreate(savedInstanceState);
 
 		// Load the preferences from an XML resource
-		Log.d("SettingsFragment", ""+Build.VERSION.SDK_INT);
+		Log.d("SettingsFragment", "" + Build.VERSION.SDK_INT);
 		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
 			addPreferencesFromResource(R.xml.preferences_compat);
 		} else {
