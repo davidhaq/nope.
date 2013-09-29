@@ -2,8 +2,6 @@ package com.heliopause.nope.services;
 
 import java.util.HashMap;
 
-import com.heliopause.nope.Constants;
-
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -11,10 +9,17 @@ import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
 import android.text.TextUtils;
+import android.util.Log;
+
+import com.heliopause.nope.Constants;
 
 public class Configuration {
 
-	private static Configuration instance = null;
+	// Debug constants
+	private static final boolean DEBUG = true;
+	private static final String TAG = Configuration.class.getSimpleName();
+
+	public static Configuration instance = null;
 	private Context context;
 	public boolean mAdvanced = false;
 	boolean mBlockUnknownNumber;
@@ -26,10 +31,14 @@ public class Configuration {
 
 	public static Configuration getInstance(Context paramContext) {
 		if (instance == null) {
+			if (DEBUG)
+				Log.d(TAG, "Creating new configuration instance");
 			instance = new Configuration();
 			instance.context = paramContext;
 			instance.loadPreference();
 		}
+		if (DEBUG)
+			Log.d(TAG, "Using configuration instance");
 		return instance;
 	}
 
@@ -99,10 +108,15 @@ public class Configuration {
 
 	public void loadPreference() {
 
+		if (DEBUG)
+			Log.d(TAG, "calling loadPreference");
 		SharedPreferences localSharedPreferences = PreferenceManager
-				.getDefaultSharedPreferences(this.context);
+				.getDefaultSharedPreferences(context);
 		this.mEnabled = localSharedPreferences.getBoolean(
-				Constants.SPAM_BLOCK_SERVICE_STATUS, true);
+				Constants.SPAM_BLOCK_SERVICE_STATUS, false);
+		if (DEBUG)
+			Log.d(TAG, "SpamBlock status: " + mEnabled);
+
 	}
 
 	static class MyMessage {

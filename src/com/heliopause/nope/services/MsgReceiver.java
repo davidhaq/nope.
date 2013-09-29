@@ -33,6 +33,9 @@ public class MsgReceiver extends BroadcastReceiver {
 			return;
 		} else {
 
+			if (DEBUG)
+				Log.d(TAG, "Msg onReceive");
+
 			// Grab the database
 			helper = new DatabaseHelper(context);
 			db = helper.getReadableDatabase();
@@ -43,8 +46,7 @@ public class MsgReceiver extends BroadcastReceiver {
 
 			String address = "";
 			String body = "";
-			Configuration localConfiguration = Configuration
-					.getInstance(context);
+			Configuration localConfiguration;
 
 			if (!intent.getExtras().isEmpty()) {
 				// ---retrieve the sender of the sms received.---
@@ -55,7 +57,8 @@ public class MsgReceiver extends BroadcastReceiver {
 
 					address = msgs[i].getOriginatingAddress();
 					body = msgs[i].getMessageBody();
-
+					localConfiguration = Configuration.getInstance(context);
+					
 					if (DEBUG) {
 						Log.d(TAG, "Sender: " + address);
 					}
@@ -67,6 +70,7 @@ public class MsgReceiver extends BroadcastReceiver {
 						updateItemTime(PhoneNumberUtils
 								.stripSeparators(address));
 						abortBroadcast();
+						return;
 					} else {
 
 						if (DEBUG)
@@ -79,6 +83,7 @@ public class MsgReceiver extends BroadcastReceiver {
 								if (DEBUG)
 									Log.d(TAG, "aborting broadcast");
 								abortBroadcast();
+								return;
 							}
 						} else {
 							if (DEBUG)
@@ -86,6 +91,7 @@ public class MsgReceiver extends BroadcastReceiver {
 							i++;
 							if (DEBUG)
 								Log.d(TAG, "i: " + i);
+							return;
 						}
 					}
 

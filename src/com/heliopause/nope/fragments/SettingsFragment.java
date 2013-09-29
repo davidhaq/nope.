@@ -11,6 +11,7 @@ import android.util.Log;
 import com.heliopause.nope.Constants;
 import com.heliopause.nope.R;
 import com.heliopause.nope.services.CallBlockService;
+import com.heliopause.nope.services.Configuration;
 import com.heliopause.nope.services.MsgBlockService;
 
 public class SettingsFragment extends PreferenceFragment implements
@@ -67,6 +68,14 @@ public class SettingsFragment extends PreferenceFragment implements
 			} else {
 				getActivity().stopService(
 						new Intent(getActivity(), MsgBlockService.class));
+			}
+		}
+		if (key.equals(Constants.SPAM_BLOCK_SERVICE_STATUS)) {
+			if (sharedPreferences.getBoolean(
+					Constants.SPAM_BLOCK_SERVICE_STATUS, false)) {
+				Configuration.instance = null;
+			} else {
+				Configuration.instance = null;
 			}
 		}
 
