@@ -29,7 +29,7 @@ import com.heliopause.nope.database.BlockItemTable;
 public class BlocklistAdapter extends CursorAdapter {
 
 	// Debugging
-	private static final boolean DEBUG = true;
+	private static final boolean DEBUG = false;
 	private static final String TAG = BlocklistAdapter.class.getSimpleName();
 
 	private LayoutInflater inflator;
