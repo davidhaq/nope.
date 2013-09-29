@@ -11,7 +11,7 @@ import android.util.Log;
 public class MsgBlockService extends Service {
 
 	// Debugging constants
-	private static final boolean DEBUG = true;
+	private static final boolean DEBUG = false;
 	private static final String TAG = MsgBlockService.class.getSimpleName();
 
 	public static MsgReceiver receiver = new MsgReceiver();

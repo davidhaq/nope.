@@ -12,7 +12,7 @@ import android.util.Log;
 public class CallBlockService extends Service {
 
 	// Debugging constants
-	private static final boolean DEBUG = true;
+	private static final boolean DEBUG = false;
 	private static final String TAG = CallBlockService.class.getSimpleName();
 
 	public static CallReceiver receiver = new CallReceiver();
@@ -26,9 +26,8 @@ public class CallBlockService extends Service {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		if (DEBUG) {
-			Log.d(TAG, TAG+" onCreate called.");
-		}
+		if (DEBUG)
+			Log.d(TAG, "onCreate called.");
 		IntentFilter filter = new IntentFilter();
 		filter.addAction(TelephonyManager.ACTION_PHONE_STATE_CHANGED);
 		filter.setPriority(999);
@@ -39,17 +38,15 @@ public class CallBlockService extends Service {
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		if (DEBUG) {
-			Log.d(TAG, TAG+" onDestroy called.");
-		}
+		if (DEBUG)
+			Log.d(TAG, "onDestroy called.");
 		unregisterReceiver(receiver);
 	}
 
 	@Override
 	public void onStart(Intent intent, int startid) {
-		if (DEBUG) {
-			Log.d(TAG, TAG+" onStart called.");
-		}
+		if (DEBUG)
+			Log.d(TAG, "onStart called.");
 		startForeground(startid, new Notification());
 	}
 }

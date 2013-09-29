@@ -11,7 +11,7 @@ import android.util.Log;
 public class SpamBlockService extends Service {
 
 	// Debugging constants
-	private static final boolean DEBUG = true;
+	private static final boolean DEBUG = false;
 	private static final String TAG = SpamBlockService.class.getSimpleName();
 
 	public static SpamReceiver receiver = new SpamReceiver();
@@ -30,7 +30,7 @@ public class SpamBlockService extends Service {
 
 		IntentFilter filter = new IntentFilter();
 		filter.addAction("android.provider.Telephony.SMS_RECEIVED");
-		filter.setPriority(999);
+		filter.setPriority(998);
 		registerReceiver(receiver, filter);
 
 	}
