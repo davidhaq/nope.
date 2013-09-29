@@ -37,14 +37,6 @@
             android:summary="@string/pref_summary_spam_blocking_service"
             android:title="@string/pref_title_spam_blocking_service" />
 
-        <EditTextPreference
-            android:defaultValue="3"
-            android:dependency="pref_key_spam_block_service_state"
-            android:inputType="number"
-            android:key="pref_key_spam_block_consecutive"
-            android:summary="@string/pref_summary_spam_block_consecutive"
-            android:title="@string/pref_title_spam_block_consecutive" >
-        </EditTextPreference>
     </PreferenceCategory>
 
 </PreferenceScreen>

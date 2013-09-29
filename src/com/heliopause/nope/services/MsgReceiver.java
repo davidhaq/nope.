@@ -58,7 +58,7 @@ public class MsgReceiver extends BroadcastReceiver {
 					address = msgs[i].getOriginatingAddress();
 					body = msgs[i].getMessageBody();
 					localConfiguration = Configuration.getInstance(context);
-					
+
 					if (DEBUG) {
 						Log.d(TAG, "Sender: " + address);
 					}

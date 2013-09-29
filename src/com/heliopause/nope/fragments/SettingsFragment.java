@@ -6,7 +6,6 @@ import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.preference.PreferenceFragment;
-import android.util.Log;
 
 import com.heliopause.nope.Constants;
 import com.heliopause.nope.R;
@@ -22,7 +21,6 @@ public class SettingsFragment extends PreferenceFragment implements
 		super.onCreate(savedInstanceState);
 
 		// Load the preferences from an XML resource
-		Log.d("SettingsFragment", "" + Build.VERSION.SDK_INT);
 		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
 			addPreferencesFromResource(R.xml.preferences_compat);
 		} else {
