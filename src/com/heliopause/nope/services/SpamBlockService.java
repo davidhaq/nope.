@@ -2,7 +2,6 @@ package com.heliopause.nope.services;
 
 import android.app.Notification;
 import android.app.Service;
-import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -15,9 +14,8 @@ public class SpamBlockService extends Service {
 	private static final boolean DEBUG = true;
 	private static final String TAG = SpamBlockService.class.getSimpleName();
 
-	public static TextReceiver receiver = new TextReceiver();
+	public static SpamReceiver receiver = new SpamReceiver();
 	SharedPreferences prefs;
-	static ContentResolver cr = null;
 
 	@Override
 	public IBinder onBind(Intent intent) {
@@ -27,12 +25,12 @@ public class SpamBlockService extends Service {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		if (DEBUG) {
-			Log.d(TAG, "SpamBlock service onCreate; registering receiver");
-		}
+		if (DEBUG)
+			Log.d(TAG, "service onCreate; registering receiver");
+
 		IntentFilter filter = new IntentFilter();
 		filter.addAction("android.provider.Telephony.SMS_RECEIVED");
-		filter.setPriority(99999999);
+		filter.setPriority(999);
 		registerReceiver(receiver, filter);
 
 	}
@@ -40,9 +38,8 @@ public class SpamBlockService extends Service {
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		if (DEBUG) {
-			Log.d(TAG, "SpamBlock service onDestroy; unregistering receiver");
-		}
+		if (DEBUG)
+			Log.d(TAG, "service onDestroy; unregistering receiver");
 
 		unregisterReceiver(receiver);
 
@@ -50,10 +47,9 @@ public class SpamBlockService extends Service {
 
 	@Override
 	public void onStart(Intent intent, int startid) {
-		if (DEBUG) {
-			Log.d(TAG,
-					"SpamBlock service onStart; starting forground notification");
-		}
+		if (DEBUG)
+			Log.d(TAG, "service onStart; starting forground notification");
+
 		startForeground(startid, new Notification());
 	}
 }

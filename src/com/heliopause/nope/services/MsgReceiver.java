@@ -14,11 +14,11 @@ import com.heliopause.nope.Constants;
 import com.heliopause.nope.database.BlockItemTable;
 import com.heliopause.nope.database.DatabaseHelper;
 
-public class TextReceiver extends BroadcastReceiver {
+public class MsgReceiver extends BroadcastReceiver {
 
 	// Debug constants
 	private static final boolean DEBUG = true;
-	private static final String TAG = TextReceiver.class.getSimpleName();
+	private static final String TAG = MsgReceiver.class.getSimpleName();
 
 	// Database checking objects
 	private SQLiteDatabase db;

@@ -14,7 +14,7 @@ public class MsgBlockService extends Service {
 	private static final boolean DEBUG = true;
 	private static final String TAG = MsgBlockService.class.getSimpleName();
 
-	public static TextReceiver receiver = new TextReceiver();
+	public static MsgReceiver receiver = new MsgReceiver();
 	SharedPreferences prefs;
 
 	@Override
@@ -25,9 +25,9 @@ public class MsgBlockService extends Service {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		if (DEBUG) {
-			Log.d(TAG, "MsgBlock service onCreate; registering receiver");
-		}
+		if (DEBUG)
+			Log.d(TAG, "service onCreate; registering receiver");
+
 		IntentFilter filter = new IntentFilter();
 		filter.addAction("android.provider.Telephony.SMS_RECEIVED");
 		filter.setPriority(999);
@@ -38,9 +38,8 @@ public class MsgBlockService extends Service {
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		if (DEBUG) {
-			Log.d(TAG, "MsgBlock service onDestroy; unregistering receiver");
-		}
+		if (DEBUG)
+			Log.d(TAG, "service onDestroy; unregistering receiver");
 
 		unregisterReceiver(receiver);
 
@@ -49,8 +48,7 @@ public class MsgBlockService extends Service {
 	@Override
 	public void onStart(Intent intent, int startid) {
 		if (DEBUG)
-			Log.d(TAG,
-					"MsgBlock service onStart; starting forground notification");
+			Log.d(TAG, "service onStart; starting forground notification");
 
 		startForeground(startid, new Notification());
 	}
