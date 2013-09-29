@@ -26,7 +26,7 @@ import com.heliopause.nope.fragments.CallBlockFragment;
 public class CallReceiver extends BroadcastReceiver {
 
 	// Debug constants
-	private static final boolean DEBUG = true;
+	private static final boolean DEBUG = false;
 	private static final String TAG = CallReceiver.class.getSimpleName();
 
 	private SQLiteDatabase db;
@@ -43,7 +43,7 @@ public class CallReceiver extends BroadcastReceiver {
 			return;
 		} else {
 			if (DEBUG) {
-				Log.d(TAG, "CallReceiver pinged");
+				Log.d(TAG, "CallReceiver called");
 				Log.d(TAG,
 						""
 								+ intent.getStringExtra(TelephonyManager.EXTRA_STATE));
@@ -66,42 +66,30 @@ public class CallReceiver extends BroadcastReceiver {
 				boolean isBlocked = isOnBlockList(intent
 						.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER));
 				if (isBlocked) {
-					if (DEBUG) {
+					if (DEBUG)
 						Log.d(TAG, "Phone number is on block list!");
-					}
+
 					updateItemTime(intent
 							.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER));
 					if (method
 							.equalsIgnoreCase(Constants.CALL_BLOCK_METHOD_ONE)) {
+
 						incomingCallActionMethodOne(intent, context, version);
 					} else if (method
 							.equalsIgnoreCase(Constants.CALL_BLOCK_METHOD_TWO)) {
-						// Ignore call method
+
 						incomingCallActionMethodTwo(context);
-						new Thread(new Runnable() {
-							@Override
-							public void run() {
-								prefs.edit().putBoolean("blocked", true)
-										.commit();
-							}
-						}).start();
 
 					} else if (method
 							.equalsIgnoreCase(Constants.CALL_BLOCK_METHOD_THREE)) {
+
 						incomingCallActionMethodThree(context);
-						new Thread(new Runnable() {
-							@Override
-							public void run() {
-								prefs.edit().putBoolean("blocked", true)
-										.commit();
-							}
-						}).start();
 
 					}
+					setBlocked(true);
 				} else {
 					if (DEBUG)
-						Log.d(TAG,
-								"Phone number was not detected on block list");
+						Log.d(TAG, "Phone number not detected on block list");
 					return;
 				}
 			}
@@ -109,64 +97,70 @@ public class CallReceiver extends BroadcastReceiver {
 					TelephonyManager.EXTRA_STATE_OFFHOOK)) {
 				if (DEBUG)
 					Log.d(TAG, "WE in offhook state now.");
-				if (method.equalsIgnoreCase(Constants.CALL_BLOCK_METHOD_ONE)) {
-					try {
-						synchronized (this) {
-							Log.d(TAG, "Waiting for 1 sec ");
-							this.wait(1000);
-						}
-					} catch (Exception e) {
-						Log.d(TAG, "Exception while waiting !!");
-						e.printStackTrace();
-					}
-					offHookCallActionMethodOne(context, version);
 
+				if (prefs.getBoolean("blocked", false)) {
+
+					if (DEBUG)
+						Log.d(TAG, "hurray! it was blocked!");
+
+					setBlocked(false);
+
+					if (method
+							.equalsIgnoreCase(Constants.CALL_BLOCK_METHOD_ONE)) {
+						try {
+							synchronized (this) {
+								if (DEBUG)
+									Log.d(TAG, "Waiting for 1 sec ");
+
+								this.wait(1000);
+							}
+						} catch (Exception e) {
+							if (DEBUG) {
+								Log.d(TAG, "Exception while waiting !!");
+								e.printStackTrace();
+							}
+						}
+						offHookCallActionMethodOne(context, version);
+
+					}
 				}
 			}
 			if (intent.getStringExtra(TelephonyManager.EXTRA_STATE).equals(
 					TelephonyManager.EXTRA_STATE_IDLE)) {
+
 				if (DEBUG)
 					Log.d(TAG, "idle state");
-				if (method.equalsIgnoreCase(Constants.CALL_BLOCK_METHOD_TWO)) {
-					if (prefs.getBoolean("blocked", false)) {
-						if (DEBUG)
-							Log.d(TAG, "hurray! it was blocked!");
-						new Thread(new Runnable() {
-							@Override
-							public void run() {
-								prefs.edit().putBoolean("blocked", false);
-								prefs.edit().commit();
-							}
-						}).start();
-						idleCallActionMethodThree(context);
-					}
 
-				} else if (method
-						.equalsIgnoreCase(Constants.CALL_BLOCK_METHOD_THREE)) {
-					if (prefs.getBoolean("blocked", false)) {
-						if (DEBUG)
-							Log.d(TAG, "hurray! it was blocked!");
-						try {
-							synchronized (this) {
-								Log.d(TAG, "Waiting for 1 sec ");
-								this.wait(1000);
-							}
-						} catch (Exception e) {
-							Log.d(TAG, "Exception while waiting!");
-							e.printStackTrace();
-						}
-						if (DEBUG)
-							Log.d(TAG, "is blocked!");
-						new Thread(new Runnable() {
-							@Override
-							public void run() {
-								prefs.edit().putBoolean("blocked", false);
-								prefs.edit().commit();
-							}
-						}).start();
+				if (prefs.getBoolean("blocked", false)) {
+
+					if (DEBUG)
+						Log.d(TAG, "Number was blocked!");
+
+					setBlocked(false);
+					if (method
+							.equalsIgnoreCase(Constants.CALL_BLOCK_METHOD_TWO)) {
+
 						idleCallActionMethodThree(context);
+					} else if (method
+							.equalsIgnoreCase(Constants.CALL_BLOCK_METHOD_THREE)) {
+
+						synchronized (this) {
+							if (DEBUG)
+								Log.d(TAG, "Waiting for 1 sec ");
+							try {
+								this.wait(1000);
+							} catch (InterruptedException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+						}
+
+						idleCallActionMethodThree(context);
+					} else {
+						// Do nothing
 					}
 				}
+
 			}
 		}
 
@@ -197,8 +191,10 @@ public class CallReceiver extends BroadcastReceiver {
 
 	private void updateItemTime(String number) {
 
-		Log.d(TAG, "Number: " + number);
-		// Counter to tell if a number is on the blocklist.
+		if (DEBUG)
+			Log.d(TAG, "Number: " + number);
+
+		// Integer to store row ID
 		int ID = 0;
 		Cursor c = db.rawQuery("SELECT * FROM "
 				+ BlockItemTable.CALLBLOCK_TABLE_NAME, null);
@@ -211,17 +207,20 @@ public class CallReceiver extends BroadcastReceiver {
 		while (!c.isAfterLast()) {
 			if (number.contains(c.getString(c
 					.getColumnIndex(BlockItemTable.COLUMN_NUMBER)))) {
-				Log.d(TAG, "Found one in here!");
+
+				if (DEBUG)
+					Log.d(TAG, "Found one in here!");
+
 				ID = c.getInt(c.getColumnIndex(BlockItemTable.COLUMN_ID));
 			}
 			c.moveToNext();
 		}
 
-		Log.d(TAG, "ROW ID: " + ID);
+		if (DEBUG)
+			Log.d(TAG, "ROW ID: " + ID);
 
 		ContentValues cv = new ContentValues();
-		cv.put(BlockItemTable.COLUMN_LAST_CONTACT,
-				(int) System.currentTimeMillis());
+		cv.put(BlockItemTable.COLUMN_LAST_CONTACT, System.currentTimeMillis());
 		CallBlockFragment.loader.update(BlockItemTable.CALLBLOCK_TABLE_NAME,
 				cv, BlockItemTable.COLUMN_ID + "='" + ID + "'", null);
 	}
@@ -232,13 +231,13 @@ public class CallReceiver extends BroadcastReceiver {
 	private void incomingCallActionMethodOne(Intent intent, Context context,
 			int version) {
 
-		if (DEBUG) {
+		if (DEBUG)
 			Log.d(TAG, "Inside of incomingCallActionMethodOne");
-		}
+
 		if (version == 7) {
-			if (DEBUG) {
+			if (DEBUG)
 				Log.d(TAG, "Answering call using API 7 method");
-			}
+
 			// Simulate a press of the headset button to pick up the call
 			Intent buttonDown = new Intent(Intent.ACTION_MEDIA_BUTTON);
 			buttonDown.putExtra(Intent.EXTRA_KEY_EVENT, new KeyEvent(
@@ -247,9 +246,9 @@ public class CallReceiver extends BroadcastReceiver {
 					"android.permission.CALL_PRIVILEGED");
 			return;
 		} else if (version > 7) {
-			if (DEBUG) {
+			if (DEBUG)
 				Log.d(TAG, "Answering call using API 8 and above methods");
-			}
+
 			Intent buttonUp = new Intent(Intent.ACTION_MEDIA_BUTTON);
 			buttonUp.putExtra(Intent.EXTRA_KEY_EVENT, new KeyEvent(
 					KeyEvent.ACTION_UP, KeyEvent.KEYCODE_HEADSETHOOK));
@@ -325,14 +324,16 @@ public class CallReceiver extends BroadcastReceiver {
 		am.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
 	}
 
+	// Method used to gain access to the internal ITelephony service using the
+	// magic of reflection
 	private void getTeleService(Context context) {
 		TelephonyManager tm = (TelephonyManager) context
 				.getSystemService(Context.TELEPHONY_SERVICE);
 
 		try {
-			// Java reflection to gain access to TelephonyManager's
-			// ITelephony getter
-			Log.v(TAG, "Get getTeleService...");
+			if (DEBUG)
+				Log.d(TAG, "Get getTeleService...");
+
 			Class<?> c = Class.forName(tm.getClass().getName());
 			Method m = c.getDeclaredMethod("getITelephony");
 			m.setAccessible(true);
@@ -344,6 +345,20 @@ public class CallReceiver extends BroadcastReceiver {
 		}
 	}
 
+	// Method to set the block state variable to handle all the different phone
+	// states and block methods
+	private void setBlocked(final boolean blocked) {
+
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				prefs.edit().putBoolean("blocked", blocked).commit();
+			}
+		}).start();
+
+	}
+
+	// Method to get the version of Android that the phone is running
 	public int getVersion() {
 		try {
 			int n = Build.VERSION.class.getField("SDK_INT").getInt(null);
