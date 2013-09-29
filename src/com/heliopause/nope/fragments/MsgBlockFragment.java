@@ -120,7 +120,7 @@ public class MsgBlockFragment extends SherlockListFragment implements
 				+ BlockItemTable.COLUMN_NUMBER + ", "
 				+ BlockItemTable.COLUMN_LAST_CONTACT + " FROM "
 				+ BlockItemTable.MSGBLOCK_TABLE_NAME + " ORDER BY "
-				+ BlockItemTable.COLUMN_LAST_CONTACT, null);
+				+ BlockItemTable.COLUMN_LAST_CONTACT + " DESC", null);
 		return loader;
 	}
 

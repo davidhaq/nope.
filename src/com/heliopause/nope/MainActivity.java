@@ -231,7 +231,6 @@ public class MainActivity extends SherlockFragmentActivity {
 				mMenuPosition = 0;
 				((HomeMenuAdapter) mDrawerList.getAdapter())
 						.onItemSelected(mMenuPosition);
-				System.err.println("Call Block");
 				break;
 			case 1:
 				fragment = new MsgBlockFragment();
@@ -239,7 +238,6 @@ public class MainActivity extends SherlockFragmentActivity {
 				mMenuPosition = 1;
 				((HomeMenuAdapter) mDrawerList.getAdapter())
 						.onItemSelected(mMenuPosition);
-				System.err.println("SMS Blocklist");
 				break;
 			case 2:
 				fragment = new SpamBlockFragment();
@@ -247,7 +245,6 @@ public class MainActivity extends SherlockFragmentActivity {
 				mMenuPosition = 2;
 				((HomeMenuAdapter) mDrawerList.getAdapter())
 						.onItemSelected(mMenuPosition);
-				System.err.println("Anti Text Spam");
 				break;
 			case 3:
 				fragment = new SettingsFragment();
@@ -255,7 +252,6 @@ public class MainActivity extends SherlockFragmentActivity {
 				mMenuPosition = 3;
 				((HomeMenuAdapter) mDrawerList.getAdapter())
 						.onItemSelected(mMenuPosition);
-				System.err.println("Settings");
 				break;
 			case 4:
 				fragment = new AboutFragment();
@@ -263,7 +259,6 @@ public class MainActivity extends SherlockFragmentActivity {
 				mMenuPosition = 4;
 				((HomeMenuAdapter) mDrawerList.getAdapter())
 						.onItemSelected(mMenuPosition);
-				System.err.println("About");
 				break;
 			}
 
@@ -296,7 +291,6 @@ public class MainActivity extends SherlockFragmentActivity {
 					mMenuPosition = 0;
 					((HomeMenuAdapter) mDrawerList.getAdapter())
 							.onItemSelected(mMenuPosition);
-					System.err.println("Call Block");
 					break;
 				case 1:
 					fragment = (CallBlockFragment) getSupportFragmentManager()
@@ -304,7 +298,6 @@ public class MainActivity extends SherlockFragmentActivity {
 					mMenuPosition = 1;
 					((HomeMenuAdapter) mDrawerList.getAdapter())
 							.onItemSelected(mMenuPosition);
-					System.err.println("SMS Blocklist");
 					break;
 				case 2:
 					fragment = (CallBlockFragment) getSupportFragmentManager()
@@ -312,7 +305,6 @@ public class MainActivity extends SherlockFragmentActivity {
 					mMenuPosition = 2;
 					((HomeMenuAdapter) mDrawerList.getAdapter())
 							.onItemSelected(mMenuPosition);
-					System.err.println("Anti Text Spam");
 					break;
 				case 3:
 					fragment = (CallBlockFragment) getSupportFragmentManager()
@@ -320,7 +312,6 @@ public class MainActivity extends SherlockFragmentActivity {
 					mMenuPosition = 3;
 					((HomeMenuAdapter) mDrawerList.getAdapter())
 							.onItemSelected(mMenuPosition);
-					System.err.println("Settings");
 					break;
 				case 4:
 					fragment = (CallBlockFragment) getSupportFragmentManager()
@@ -328,7 +319,6 @@ public class MainActivity extends SherlockFragmentActivity {
 					mMenuPosition = 4;
 					((HomeMenuAdapter) mDrawerList.getAdapter())
 							.onItemSelected(mMenuPosition);
-					System.err.println("About");
 					break;
 				}
 
@@ -373,7 +363,6 @@ public class MainActivity extends SherlockFragmentActivity {
 		Display display = getWindowManager().getDefaultDisplay();
 
 		int i = display.getWidth();
-		System.err.println("width:" + i);
 		int j = localResources
 				.getDimensionPixelSize(R.dimen.side_panel_max_width);
 		int k = localResources.getConfiguration().orientation;
