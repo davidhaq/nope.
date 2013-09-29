@@ -43,7 +43,8 @@ public class MsgReceiver extends BroadcastReceiver {
 
 			String address = "";
 			String body = "";
-			Configuration localConfiguration;
+			Configuration localConfiguration = Configuration
+					.getInstance(context);
 
 			if (!intent.getExtras().isEmpty()) {
 				// ---retrieve the sender of the sms received.---
@@ -54,7 +55,6 @@ public class MsgReceiver extends BroadcastReceiver {
 
 					address = msgs[i].getOriginatingAddress();
 					body = msgs[i].getMessageBody();
-					localConfiguration = Configuration.getInstance(context);
 
 					if (DEBUG) {
 						Log.d(TAG, "Sender: " + address);
@@ -67,14 +67,26 @@ public class MsgReceiver extends BroadcastReceiver {
 						updateItemTime(PhoneNumberUtils
 								.stripSeparators(address));
 						abortBroadcast();
-					} else if (localConfiguration.mEnabled) {
-
-						if (localConfiguration.checkAndUpdateSMS(context,
-								address, body)) {
-							abortBroadcast();
-						}
 					} else {
-						i++;
+
+						if (DEBUG)
+							Log.d(TAG, "Phone number not on block list!");
+						if (localConfiguration.mEnabled) {
+							if (DEBUG)
+								Log.d(TAG, "Configuration enabled");
+							if (localConfiguration.checkAndUpdateSMS(context,
+									address, body)) {
+								if (DEBUG)
+									Log.d(TAG, "aborting broadcast");
+								abortBroadcast();
+							}
+						} else {
+							if (DEBUG)
+								Log.d(TAG, "Configuration disabled");
+							i++;
+							if (DEBUG)
+								Log.d(TAG, "i: " + i);
+						}
 					}
 
 				}
