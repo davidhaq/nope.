@@ -1,11 +1,5 @@
 package com.heliopause.nope.fragments;
 
-import com.heliopause.nope.Constants;
-import com.heliopause.nope.R;
-import com.heliopause.nope.services.callblock.CallBlockService;
-import com.heliopause.nope.services.msgblock.MsgBlockService;
-import com.heliopause.nope.services.spamblock.SpamBlockService;
-
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
@@ -13,6 +7,11 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.preference.PreferenceFragment;
 import android.util.Log;
+
+import com.heliopause.nope.Constants;
+import com.heliopause.nope.R;
+import com.heliopause.nope.services.CallBlockService;
+import com.heliopause.nope.services.MsgBlockService;
 
 public class SettingsFragment extends PreferenceFragment implements
 		OnSharedPreferenceChangeListener {
@@ -68,16 +67,6 @@ public class SettingsFragment extends PreferenceFragment implements
 			} else {
 				getActivity().stopService(
 						new Intent(getActivity(), MsgBlockService.class));
-			}
-		}
-		if (key.equals(Constants.SPAM_BLOCK_SERVICE_STATUS)) {
-			if (sharedPreferences.getBoolean(
-					Constants.SPAM_BLOCK_SERVICE_STATUS, false)) {
-				getActivity().startService(
-						new Intent(getActivity(), SpamBlockService.class));
-			} else {
-				getActivity().stopService(
-						new Intent(getActivity(), SpamBlockService.class));
 			}
 		}
 

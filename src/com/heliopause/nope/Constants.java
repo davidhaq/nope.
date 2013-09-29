@@ -6,6 +6,7 @@ public class Constants {
 	public static final String MSG_BLOCK_SERVICE_STATUS = "pref_key_text_block_service_state";
 	public static final String CALL_BLOCK_SERVICE_STATUS = "pref_key_call_block_service_state";
 	public static final String SPAM_BLOCK_SERVICE_STATUS = "pref_key_spam_block_service_state";
+	public static final String SPAM_BLOCK_THRESHOLD = "pref_key_spam_block_consecutive";
 
 	// Constants for call blocking method
 	public static final String CALL_BLOCK_METHOD_ONE = "callBlockMethodOne";

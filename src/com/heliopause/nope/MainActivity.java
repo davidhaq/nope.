@@ -33,9 +33,8 @@ import com.heliopause.nope.fragments.CallBlockFragment;
 import com.heliopause.nope.fragments.MsgBlockFragment;
 import com.heliopause.nope.fragments.SettingsFragment;
 import com.heliopause.nope.fragments.SpamBlockFragment;
-import com.heliopause.nope.services.callblock.CallBlockService;
-import com.heliopause.nope.services.msgblock.MsgBlockService;
-import com.heliopause.nope.services.spamblock.SpamBlockService;
+import com.heliopause.nope.services.CallBlockService;
+import com.heliopause.nope.services.MsgBlockService;
 
 public class MainActivity extends SherlockFragmentActivity {
 
@@ -152,7 +151,6 @@ public class MainActivity extends SherlockFragmentActivity {
 	private void startServicesOnFirstOpen() {
 		Intent callBlock = new Intent(this, CallBlockService.class);
 		Intent textBlock = new Intent(this, MsgBlockService.class);
-		Intent spamBlock = new Intent(this, SpamBlockService.class);
 
 		if (settings.getBoolean(Constants.MSG_BLOCK_SERVICE_STATUS, true)) {
 			startService(textBlock);
@@ -160,10 +158,6 @@ public class MainActivity extends SherlockFragmentActivity {
 		if (settings.getBoolean(Constants.CALL_BLOCK_SERVICE_STATUS, true)) {
 
 			startService(callBlock);
-		}
-		if (settings.getBoolean(Constants.SPAM_BLOCK_SERVICE_STATUS, true)) {
-
-			startService(spamBlock);
 		}
 	}
 

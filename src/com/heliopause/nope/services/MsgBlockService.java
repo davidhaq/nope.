@@ -1,4 +1,4 @@
-package com.heliopause.nope.services.callblock;
+package com.heliopause.nope.services;
 
 import android.app.Notification;
 import android.app.Service;
@@ -6,16 +6,15 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.IBinder;
-import android.telephony.TelephonyManager;
 import android.util.Log;
 
-public class CallBlockService extends Service {
+public class MsgBlockService extends Service {
 
 	// Debugging constants
 	private static final boolean DEBUG = false;
-	private static final String TAG = CallBlockService.class.getSimpleName();
+	private static final String TAG = MsgBlockService.class.getSimpleName();
 
-	public static CallReceiver receiver = new CallReceiver();
+	public static MsgReceiver receiver = new MsgReceiver();
 	SharedPreferences prefs;
 
 	@Override
@@ -27,9 +26,10 @@ public class CallBlockService extends Service {
 	public void onCreate() {
 		super.onCreate();
 		if (DEBUG)
-			Log.d(TAG, "onCreate called.");
+			Log.d(TAG, "service onCreate; registering receiver");
+
 		IntentFilter filter = new IntentFilter();
-		filter.addAction(TelephonyManager.ACTION_PHONE_STATE_CHANGED);
+		filter.addAction("android.provider.Telephony.SMS_RECEIVED");
 		filter.setPriority(999);
 		registerReceiver(receiver, filter);
 
@@ -39,14 +39,17 @@ public class CallBlockService extends Service {
 	public void onDestroy() {
 		super.onDestroy();
 		if (DEBUG)
-			Log.d(TAG, "onDestroy called.");
+			Log.d(TAG, "service onDestroy; unregistering receiver");
+
 		unregisterReceiver(receiver);
+
 	}
 
 	@Override
 	public void onStart(Intent intent, int startid) {
 		if (DEBUG)
-			Log.d(TAG, "onStart called.");
+			Log.d(TAG, "service onStart; starting forground notification");
+
 		startForeground(startid, new Notification());
 	}
 }

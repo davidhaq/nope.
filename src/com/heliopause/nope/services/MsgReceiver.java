@@ -1,4 +1,4 @@
-package com.heliopause.nope.services.msgblock;
+package com.heliopause.nope.services;
 
 import android.content.BroadcastReceiver;
 import android.content.ContentValues;
@@ -18,7 +18,7 @@ import com.heliopause.nope.fragments.MsgBlockFragment;
 public class MsgReceiver extends BroadcastReceiver {
 
 	// Debug constants
-	private static final boolean DEBUG = false;
+	private static final boolean DEBUG = true;
 	private static final String TAG = MsgReceiver.class.getSimpleName();
 
 	// Database checking objects
@@ -40,27 +40,43 @@ public class MsgReceiver extends BroadcastReceiver {
 			// Grab the bundle from the incoming message
 			Bundle bundle = intent.getExtras();
 			SmsMessage[] msgs = null;
+
 			String address = "";
-			if (bundle != null) {
+			String body = "";
+			Configuration localConfiguration;
+
+			if (!intent.getExtras().isEmpty()) {
 				// ---retrieve the sender of the sms received.---
 				Object[] pdus = (Object[]) bundle.get("pdus");
 				msgs = new SmsMessage[pdus.length];
-				for (int i = 0; i < msgs.length; i++) {
+				for (int i = 0; i < pdus.length; i++) {
 					msgs[i] = SmsMessage.createFromPdu((byte[]) pdus[i]);
-					address += msgs[i].getOriginatingAddress();
+
+					address = msgs[i].getOriginatingAddress();
+					body = msgs[i].getMessageBody();
+					localConfiguration = Configuration.getInstance(context);
+
 					if (DEBUG) {
 						Log.d(TAG, "Sender: " + address);
 					}
-				}
-				if (isOnBlockList(address)) {
-					if (DEBUG)
-						Log.d(TAG, "Phone number is on block list!");
 
-					updateItemTime(PhoneNumberUtils.stripSeparators(address));
-					abortBroadcast();
-				} else {
-					if (DEBUG)
-						Log.d(TAG, "Phone number not detected on block list");
+					if (isOnBlockList(address)) {
+						if (DEBUG)
+							Log.d(TAG, "Phone number is on block list!");
+
+						updateItemTime(PhoneNumberUtils
+								.stripSeparators(address));
+						abortBroadcast();
+					} else if (localConfiguration.mEnabled) {
+
+						if (localConfiguration.checkAndUpdateSMS(context,
+								address, body)) {
+							abortBroadcast();
+						}
+					} else {
+						i++;
+					}
+
 				}
 
 			}
