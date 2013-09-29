@@ -1,4 +1,4 @@
-package com.heliopause.nope.services;
+package com.heliopause.nope.services.msgblock;
 
 import android.content.BroadcastReceiver;
 import android.content.ContentValues;

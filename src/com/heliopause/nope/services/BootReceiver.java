@@ -7,6 +7,9 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
 import com.heliopause.nope.Constants;
+import com.heliopause.nope.services.callblock.CallBlockService;
+import com.heliopause.nope.services.msgblock.MsgBlockService;
+import com.heliopause.nope.services.spamblock.SpamBlockService;
 
 public class BootReceiver extends BroadcastReceiver {
 

@@ -1,4 +1,4 @@
-package com.heliopause.nope.services;
+package com.heliopause.nope.services.msgblock;
 
 import android.app.Notification;
 import android.app.Service;
@@ -8,13 +8,13 @@ import android.content.SharedPreferences;
 import android.os.IBinder;
 import android.util.Log;
 
-public class SpamBlockService extends Service {
+public class MsgBlockService extends Service {
 
 	// Debugging constants
 	private static final boolean DEBUG = false;
-	private static final String TAG = SpamBlockService.class.getSimpleName();
+	private static final String TAG = MsgBlockService.class.getSimpleName();
 
-	public static SpamReceiver receiver = new SpamReceiver();
+	public static MsgReceiver receiver = new MsgReceiver();
 	SharedPreferences prefs;
 
 	@Override
@@ -30,7 +30,7 @@ public class SpamBlockService extends Service {
 
 		IntentFilter filter = new IntentFilter();
 		filter.addAction("android.provider.Telephony.SMS_RECEIVED");
-		filter.setPriority(998);
+		filter.setPriority(999);
 		registerReceiver(receiver, filter);
 
 	}

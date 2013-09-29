@@ -1,4 +1,4 @@
-package com.heliopause.nope.services;
+package com.heliopause.nope.services.spamblock;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;

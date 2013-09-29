@@ -48,11 +48,11 @@
             </intent-filter>
         </receiver>
 
-        <service android:name="com.heliopause.nope.services.SpamBlockService" >
+        <service android:name="com.heliopause.nope.services.spamblock.SpamBlockService" >
         </service>
-        <service android:name="com.heliopause.nope.services.MsgBlockService" >
+        <service android:name="com.heliopause.nope.services.msgblock.MsgBlockService" >
         </service>
-        <service android:name="com.heliopause.nope.services.CallBlockService" >
+        <service android:name="com.heliopause.nope.services.callblock.CallBlockService" >
         </service>
     </application>
 

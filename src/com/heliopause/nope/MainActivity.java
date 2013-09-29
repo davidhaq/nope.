@@ -33,9 +33,9 @@ import com.heliopause.nope.fragments.CallBlockFragment;
 import com.heliopause.nope.fragments.MsgBlockFragment;
 import com.heliopause.nope.fragments.SettingsFragment;
 import com.heliopause.nope.fragments.SpamBlockFragment;
-import com.heliopause.nope.services.CallBlockService;
-import com.heliopause.nope.services.MsgBlockService;
-import com.heliopause.nope.services.SpamBlockService;
+import com.heliopause.nope.services.callblock.CallBlockService;
+import com.heliopause.nope.services.msgblock.MsgBlockService;
+import com.heliopause.nope.services.spamblock.SpamBlockService;
 
 public class MainActivity extends SherlockFragmentActivity {
 

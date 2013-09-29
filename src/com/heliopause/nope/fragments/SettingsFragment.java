@@ -2,9 +2,9 @@ package com.heliopause.nope.fragments;
 
 import com.heliopause.nope.Constants;
 import com.heliopause.nope.R;
-import com.heliopause.nope.services.CallBlockService;
-import com.heliopause.nope.services.MsgBlockService;
-import com.heliopause.nope.services.SpamBlockService;
+import com.heliopause.nope.services.callblock.CallBlockService;
+import com.heliopause.nope.services.msgblock.MsgBlockService;
+import com.heliopause.nope.services.spamblock.SpamBlockService;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
