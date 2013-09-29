@@ -29,8 +29,8 @@ import com.heliopause.nope.database.BlockItemTable;
 public class BlocklistAdapter extends CursorAdapter {
 
 	// Debugging
+	private static final boolean DEBUG = true;
 	private static final String TAG = BlocklistAdapter.class.getSimpleName();
-	private static final boolean DEBUG = false;
 
 	private LayoutInflater inflator;
 	private Context context;
@@ -55,7 +55,7 @@ public class BlocklistAdapter extends CursorAdapter {
 			Log.d(TAG, "number value: " + cursor.getString(1));
 		}
 		String name;
-		int lastContacted;
+		long lastContacted;
 		String lastContactedString = null;
 		String contactId;
 		Uri contactUri;
@@ -78,8 +78,12 @@ public class BlocklistAdapter extends CursorAdapter {
 
 		// Set the last contacted string based on whether or not we've ever been
 		// contacted
-		lastContacted = cursor.getInt(cursor
+		lastContacted = cursor.getLong(cursor
 				.getColumnIndex(BlockItemTable.COLUMN_LAST_CONTACT));
+
+		if (DEBUG)
+			Log.d(TAG, "Stored time value: " + lastContacted);
+
 		boolean contactedBefore = (lastContacted == -1337) ? false : true;
 		if (contactedBefore) {
 			lastContactedString = formatTimeStampString(context, lastContacted);
@@ -184,6 +188,10 @@ public class BlocklistAdapter extends CursorAdapter {
 			boolean fullFormat) {
 		Time then = new Time();
 		then.set(when);
+
+		if (DEBUG)
+			Log.d(TAG, "Contacted: " + then.toString());
+
 		Time now = new Time();
 		now.setToNow();
 
@@ -213,5 +221,4 @@ public class BlocklistAdapter extends CursorAdapter {
 
 		return DateUtils.formatDateTime(context, when, format_flags);
 	}
-
 }
