@@ -1,99 +1,124 @@
 package com.heliopause.nope.services;
 
 import android.content.BroadcastReceiver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.telephony.PhoneNumberUtils;
 import android.telephony.SmsMessage;
 import android.util.Log;
 
-import com.heliopause.nope.Constants;
 import com.heliopause.nope.database.BlockItemTable;
 import com.heliopause.nope.database.DatabaseHelper;
+import com.heliopause.nope.fragments.MsgBlockFragment;
 
 public class MsgReceiver extends BroadcastReceiver {
 
 	// Debug constants
-	private static final boolean DEBUG = true;
+	private static final boolean DEBUG = false;
 	private static final String TAG = MsgReceiver.class.getSimpleName();
 
 	// Database checking objects
 	private SQLiteDatabase db;
 	private DatabaseHelper helper;
-	private Context context;
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
 
-		// Set the context
-		this.context = context;
-
-		// Check is the listener is disabled
-		SharedPreferences prefs = context.getSharedPreferences(
-				Constants.SETTINGS_PREFS, Context.MODE_PRIVATE);
-		boolean turnedOn = prefs.getBoolean(Constants.MSG_BLOCK_SERVICE_STATUS, true);
-		if (!turnedOn) {
+		if (!intent.getAction().equals(
+				"android.provider.Telephony.SMS_RECEIVED")) {
 			return;
-		}
-
-		getHelper();
-		db = helper.getReadableDatabase();
-
-		Bundle bundle = intent.getExtras();
-		SmsMessage[] msgs = null;
-		String str = "";
-		if (bundle != null) {
-			// ---retrieve the sender of the sms received.---
-			Object[] pdus = (Object[]) bundle.get("pdus");
-			msgs = new SmsMessage[pdus.length];
-			for (int i = 0; i < msgs.length; i++) {
-				msgs[i] = SmsMessage.createFromPdu((byte[]) pdus[i]);
-				str += msgs[i].getOriginatingAddress();
-				if (DEBUG) {
-					Log.d(TAG, "Sender: " + str);
-				}
-			}
-			if (isOnBlockList(str)) {
-				if (DEBUG)
-					Log.d(TAG, "Phone number is on block list!");
-			} else {
-				if (DEBUG)
-					Log.d(TAG, "Phone number was not detected on block list");
-			}
-
-		}
-
-	}
-
-	private void getHelper() {
-		if (helper == null) {
-			helper = new DatabaseHelper(context);
-			if (DEBUG) {
-				Log.d(TAG,
-						"Creating a new instance of the database helper object");
-			}
 		} else {
-			if (DEBUG) {
-				Log.d(TAG, "Using existing database helper");
+
+			// Grab the database
+			helper = new DatabaseHelper(context);
+			db = helper.getReadableDatabase();
+
+			// Grab the bundle from the incoming message
+			Bundle bundle = intent.getExtras();
+			SmsMessage[] msgs = null;
+			String address = "";
+			if (bundle != null) {
+				// ---retrieve the sender of the sms received.---
+				Object[] pdus = (Object[]) bundle.get("pdus");
+				msgs = new SmsMessage[pdus.length];
+				for (int i = 0; i < msgs.length; i++) {
+					msgs[i] = SmsMessage.createFromPdu((byte[]) pdus[i]);
+					address += msgs[i].getOriginatingAddress();
+					if (DEBUG) {
+						Log.d(TAG, "Sender: " + address);
+					}
+				}
+				if (isOnBlockList(address)) {
+					if (DEBUG)
+						Log.d(TAG, "Phone number is on block list!");
+
+					updateItemTime(PhoneNumberUtils.stripSeparators(address));
+					abortBroadcast();
+				} else {
+					if (DEBUG)
+						Log.d(TAG, "Phone number not detected on block list");
+				}
+
 			}
 		}
+
 	}
 
 	private boolean isOnBlockList(String incomingNum) {
-
+		// Counter to tell if a number is on the blocklist.
+		int count = 0;
 		Cursor c = db.rawQuery("SELECT " + BlockItemTable.COLUMN_NUMBER
-				+ " FROM " + BlockItemTable.MSGBLOCK_TABLE_NAME + " WHERE "
-				+ BlockItemTable.COLUMN_NUMBER + "=?;",
-				new String[] { incomingNum });
-		if (c != null) {
-			return true;
-		} else {
-			return false;
+				+ " FROM " + BlockItemTable.MSGBLOCK_TABLE_NAME, null);
+
+		// Move to the first row, just in case.
+		c.moveToFirst();
+
+		// Scan through all the numbers in the column. If any match, count is
+		// incremented signifying that the number was found in the list
+		while (!c.isAfterLast()) {
+			if (incomingNum.contains(c.getString(c
+					.getColumnIndex(BlockItemTable.COLUMN_NUMBER)))) {
+
+				count++;
+			}
+			c.moveToNext();
+		}
+		return count > 0;
+
+	}
+
+	private void updateItemTime(String number) {
+
+		// Integer to store row ID
+		int ID = 0;
+		Cursor c = db.rawQuery("SELECT * FROM "
+				+ BlockItemTable.MSGBLOCK_TABLE_NAME, null);
+
+		// Move to the first row, just in case.
+		c.moveToFirst();
+
+		// Scan through all the numbers in the column. If any match, count is
+		// incremented signifying that the number was found in the list
+		while (!c.isAfterLast()) {
+			if (number.contains(c.getString(c
+					.getColumnIndex(BlockItemTable.COLUMN_NUMBER)))) {
+
+				ID = c.getInt(c.getColumnIndex(BlockItemTable.COLUMN_ID));
+			}
+			c.moveToNext();
 		}
 
+		if (DEBUG)
+			Log.d(TAG, "ROW ID: " + ID);
+
+		ContentValues cv = new ContentValues();
+		cv.put(BlockItemTable.COLUMN_LAST_CONTACT, System.currentTimeMillis());
+		MsgBlockFragment.loader.update(BlockItemTable.MSGBLOCK_TABLE_NAME, cv,
+				BlockItemTable.COLUMN_ID + "='" + ID + "'", null);
 	}
 
 }

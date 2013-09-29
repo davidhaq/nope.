@@ -41,7 +41,7 @@ public class MsgBlockFragment extends SherlockListFragment implements
 	// A few locally used objects
 	private DatabaseHelper db = null;
 	private BlocklistAdapter adapter = null;
-	private SQLiteCursorLoader loader;
+	public static SQLiteCursorLoader loader;
 	private Cursor mCursor;
 	private static final int LOADER_ID = 2;
 
@@ -99,23 +99,21 @@ public class MsgBlockFragment extends SherlockListFragment implements
 	private void getHelper() {
 		if (db == null) {
 			db = new DatabaseHelper(getSherlockActivity());
-			if (DEBUG) {
-				Log.d(TAG,
-						"Creating a new instance of the database helper object");
-			}
+			if (DEBUG)
+				Log.d(TAG, "Creating new instance of database helper object");
+
 		} else {
-			if (DEBUG) {
+			if (DEBUG)
 				Log.d(TAG, "Using existing database helper");
-			}
+
 		}
 	}
 
 	@Override
 	public Loader<Cursor> onCreateLoader(int loaderId, Bundle args) {
 
-		if (DEBUG) {
+		if (DEBUG)
 			Log.d(TAG, "++++ onCreateLoader ++++");
-		}
 
 		loader = new SQLiteCursorLoader(getSherlockActivity(), db, "SELECT "
 				+ BlockItemTable.COLUMN_ID + ", "
@@ -128,19 +126,19 @@ public class MsgBlockFragment extends SherlockListFragment implements
 
 	@Override
 	public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-		if (DEBUG) {
+		if (DEBUG)
 			Log.d(TAG, "++++ onLoadFinished ++++");
-		}
-		this.loader = (SQLiteCursorLoader) loader;
+
+		MsgBlockFragment.loader = (SQLiteCursorLoader) loader;
 		mCursor = cursor;
 		adapter.changeCursor(cursor);
 	}
 
 	@Override
 	public void onLoaderReset(Loader<Cursor> loader) {
-		if (DEBUG) {
+		if (DEBUG)
 			Log.d(TAG, "++++ onLoaderReset ++++");
-		}
+
 		adapter.changeCursor(null);
 	}
 
@@ -175,9 +173,8 @@ public class MsgBlockFragment extends SherlockListFragment implements
 
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
-						if (DEBUG) {
+						if (DEBUG)
 							Log.d(TAG, "Canceling add item dialog");
-						}
 
 					}
 
@@ -193,7 +190,6 @@ public class MsgBlockFragment extends SherlockListFragment implements
 
 			@Override
 			public void onDismiss(DialogInterface dialog) {
-				System.err.println("Dismissing add numberdialog");
 				adapter.notifyDataSetChanged();
 
 			}
