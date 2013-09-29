@@ -123,7 +123,7 @@ public class CallBlockFragment extends SherlockListFragment implements
 				+ BlockItemTable.COLUMN_NUMBER + ", "
 				+ BlockItemTable.COLUMN_LAST_CONTACT + " FROM "
 				+ BlockItemTable.CALLBLOCK_TABLE_NAME + " ORDER BY "
-				+ BlockItemTable.COLUMN_LAST_CONTACT, null);
+				+ BlockItemTable.COLUMN_LAST_CONTACT + " DESC", null);
 		return loader;
 	}
 
@@ -132,7 +132,7 @@ public class CallBlockFragment extends SherlockListFragment implements
 		if (DEBUG) {
 			Log.d(TAG, "++++ onLoadFinished ++++");
 		}
-		this.loader = (SQLiteCursorLoader) loader;
+		CallBlockFragment.loader = (SQLiteCursorLoader) loader;
 		mCursor = cursor;
 		adapter.changeCursor(cursor);
 	}
