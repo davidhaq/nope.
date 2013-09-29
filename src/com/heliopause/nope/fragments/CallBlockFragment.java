@@ -100,23 +100,21 @@ public class CallBlockFragment extends SherlockListFragment implements
 	private void getHelper() {
 		if (db == null) {
 			db = new DatabaseHelper(getSherlockActivity());
-			if (DEBUG) {
-				Log.d(TAG,
-						"Creating a new instance of the database helper object");
-			}
+			if (DEBUG)
+				Log.d(TAG, "Creating new instance of database helper object");
+
 		} else {
-			if (DEBUG) {
+			if (DEBUG)
 				Log.d(TAG, "Using existing database helper");
-			}
+
 		}
 	}
 
 	@Override
 	public Loader<Cursor> onCreateLoader(int loaderId, Bundle args) {
 
-		if (DEBUG) {
+		if (DEBUG)
 			Log.d(TAG, "++++ onCreateLoader ++++");
-		}
 
 		loader = new SQLiteCursorLoader(getSherlockActivity(), db, "SELECT "
 				+ BlockItemTable.COLUMN_ID + ", "
@@ -129,9 +127,8 @@ public class CallBlockFragment extends SherlockListFragment implements
 
 	@Override
 	public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-		if (DEBUG) {
+		if (DEBUG)
 			Log.d(TAG, "++++ onLoadFinished ++++");
-		}
 		CallBlockFragment.loader = (SQLiteCursorLoader) loader;
 		mCursor = cursor;
 		adapter.changeCursor(cursor);
@@ -139,9 +136,8 @@ public class CallBlockFragment extends SherlockListFragment implements
 
 	@Override
 	public void onLoaderReset(Loader<Cursor> loader) {
-		if (DEBUG) {
+		if (DEBUG)
 			Log.d(TAG, "++++ onLoaderReset ++++");
-		}
 		adapter.changeCursor(null);
 	}
 
@@ -176,9 +172,8 @@ public class CallBlockFragment extends SherlockListFragment implements
 
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
-						if (DEBUG) {
+						if (DEBUG)
 							Log.d(TAG, "Canceling add item dialog");
-						}
 
 					}
 
@@ -194,7 +189,7 @@ public class CallBlockFragment extends SherlockListFragment implements
 
 			@Override
 			public void onDismiss(DialogInterface dialog) {
-				System.err.println("Dismissing add numberdialog");
+
 				adapter.notifyDataSetChanged();
 
 			}
@@ -244,9 +239,8 @@ public class CallBlockFragment extends SherlockListFragment implements
 
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
-						if (DEBUG) {
+						if (DEBUG)
 							Log.d(TAG, "Canceling delete dialog");
-						}
 
 					}
 
@@ -262,7 +256,6 @@ public class CallBlockFragment extends SherlockListFragment implements
 
 			@Override
 			public void onDismiss(DialogInterface dialog) {
-				System.err.println("Dismissing delete dialog");
 				adapter.notifyDataSetChanged();
 
 			}
