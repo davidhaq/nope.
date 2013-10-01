@@ -26,7 +26,7 @@ import com.heliopause.nope.fragments.CallBlockFragment;
 public class CallReceiver extends BroadcastReceiver {
 
 	// Debug constants
-	private static final boolean DEBUG = false;
+	private static final boolean DEBUG = true;
 	private static final String TAG = CallReceiver.class.getSimpleName();
 
 	private SQLiteDatabase db;
@@ -264,6 +264,9 @@ public class CallReceiver extends BroadcastReceiver {
 	}
 
 	private void offHookCallActionMethodOne(Context context, int version) {
+		
+		if (DEBUG)
+			Log.d(TAG, "Inside of offHookCallActionMethodOne");
 
 		if (version == 7) {
 			getTeleService(context);
@@ -274,13 +277,16 @@ public class CallReceiver extends BroadcastReceiver {
 				e.printStackTrace();
 			}
 		} else if ((version > 7) && (version < 16)) {
-			Intent headSetUnPluggedintent = new Intent(
-					Intent.ACTION_HEADSET_PLUG);
-			headSetUnPluggedintent
-					.addFlags(Intent.FLAG_RECEIVER_REGISTERED_ONLY);
-			headSetUnPluggedintent.putExtra("state", 0);
-			headSetUnPluggedintent.putExtra("name", "Headset");
-			context.sendOrderedBroadcast(headSetUnPluggedintent, null);
+			Intent headSetUnPluggedintent = new Intent(Intent.ACTION_HEADSET_PLUG);
+		    headSetUnPluggedintent.addFlags(Intent.FLAG_RECEIVER_REGISTERED_ONLY);
+		    headSetUnPluggedintent.putExtra("state", 0);
+		    headSetUnPluggedintent.putExtra("name", "Headset");
+		    try {
+		        context.sendOrderedBroadcast(headSetUnPluggedintent, null);
+		    } catch (Exception e) {
+		        // TODO Auto-generated catch block
+		        e.printStackTrace();
+		    }
 
 		} else if (version > 16) {
 			getTeleService(context);
