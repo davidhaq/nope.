@@ -268,7 +268,7 @@ public class CallReceiver extends BroadcastReceiver {
 		if (DEBUG)
 			Log.d(TAG, "Inside of offHookCallActionMethodOne");
 
-		if (version == 7) {
+		if (version != 0) {
 			getTeleService(context);
 			try {
 				telephonyService.endCall();
