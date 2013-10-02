@@ -120,7 +120,7 @@ public class CallReceiver extends BroadcastReceiver {
 								e.printStackTrace();
 							}
 						}
-						offHookCallActionMethodOne(context, version);
+						offHookCallActionMethodOne(context);
 
 					}
 				}
@@ -162,6 +162,7 @@ public class CallReceiver extends BroadcastReceiver {
 				}
 
 			}
+			db.close();
 		}
 
 	}
@@ -185,6 +186,8 @@ public class CallReceiver extends BroadcastReceiver {
 			}
 			c.moveToNext();
 		}
+
+		c.close();
 		return count > 0;
 
 	}
@@ -218,6 +221,9 @@ public class CallReceiver extends BroadcastReceiver {
 
 		if (DEBUG)
 			Log.d(TAG, "ROW ID: " + ID);
+
+		// Closing the cursor because we're done with it.
+		c.close();
 
 		ContentValues cv = new ContentValues();
 		cv.put(BlockItemTable.COLUMN_LAST_CONTACT, System.currentTimeMillis());
@@ -263,41 +269,19 @@ public class CallReceiver extends BroadcastReceiver {
 		}
 	}
 
-	private void offHookCallActionMethodOne(Context context, int version) {
-		
+	// Once in the offhook state, end the call.
+	private void offHookCallActionMethodOne(Context context) {
+
 		if (DEBUG)
 			Log.d(TAG, "Inside of offHookCallActionMethodOne");
 
-		if (version != 0) {
-			getTeleService(context);
-			try {
-				telephonyService.endCall();
-			} catch (RemoteException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		} else if ((version > 7) && (version < 16)) {
-			Intent headSetUnPluggedintent = new Intent(Intent.ACTION_HEADSET_PLUG);
-		    headSetUnPluggedintent.addFlags(Intent.FLAG_RECEIVER_REGISTERED_ONLY);
-		    headSetUnPluggedintent.putExtra("state", 0);
-		    headSetUnPluggedintent.putExtra("name", "Headset");
-		    try {
-		        context.sendOrderedBroadcast(headSetUnPluggedintent, null);
-		    } catch (Exception e) {
-		        // TODO Auto-generated catch block
-		        e.printStackTrace();
-		    }
-
-		} else if (version > 16) {
-			getTeleService(context);
-			try {
-				telephonyService.endCall();
-			} catch (RemoteException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+		getTeleService(context);
+		try {
+			telephonyService.endCall();
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-
 	}
 
 	// Method 2 (Send to voicemail)
@@ -324,6 +308,7 @@ public class CallReceiver extends BroadcastReceiver {
 		return;
 	}
 
+	// Method to turn the sound back on when the state goes back into idle
 	private void idleCallActionMethodThree(Context context) {
 		AudioManager am;
 		am = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);

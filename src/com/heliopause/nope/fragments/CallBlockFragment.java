@@ -9,14 +9,15 @@ import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.telephony.PhoneNumberUtils;
+import android.text.Editable;
 import android.text.InputType;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.Button;
-import android.widget.EditText;
+import android.widget.AutoCompleteTextView;
 import android.widget.ListView;
 
 import com.actionbarsherlock.app.ActionBar;
@@ -161,8 +162,10 @@ public class CallBlockFragment extends SherlockListFragment implements
 
 	private void add() {
 
-		final EditText input = new EditText(getActivity());
-		input.setInputType(InputType.TYPE_CLASS_PHONE);
+		final AutoCompleteTextView input = new AutoCompleteTextView(
+				getSherlockActivity());
+		input.setInputType(InputType.TYPE_CLASS_TEXT);
+
 
 		final AlertDialog alert = new AlertDialog.Builder(getSherlockActivity())
 				.setTitle("Add Call Block")
@@ -181,6 +184,18 @@ public class CallBlockFragment extends SherlockListFragment implements
 
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
+						String temp = input.getText().toString();
+						String phoneNum = PhoneNumberUtils.formatNumber(temp);
+
+						// Create a block item in the database
+						ContentValues values = new ContentValues(2);
+						values.put(BlockItemTable.COLUMN_NUMBER,
+								PhoneNumberUtils.stripSeparators(phoneNum));
+						values.put(BlockItemTable.COLUMN_LAST_CONTACT, -1337);
+						loader.insert(BlockItemTable.CALLBLOCK_TABLE_NAME,
+								null, values);
+
+						dialog.dismiss();
 					}
 
 				}).create();
@@ -195,37 +210,33 @@ public class CallBlockFragment extends SherlockListFragment implements
 			}
 		});
 
-		alert.setOnShowListener(new DialogInterface.OnShowListener() {
+		input.addTextChangedListener(new TextWatcher() {
 
 			@Override
-			public void onShow(DialogInterface dialog) {
+			public void onTextChanged(CharSequence s, int start, int before,
+					int count) {
 
-				Button b = alert.getButton(DialogInterface.BUTTON_POSITIVE);
-				b.setOnClickListener(new View.OnClickListener() {
+			}
 
-					// Overriding the positive button on click to prevent the
-					// dialog from dismissing with an incorrectly formatted
-					// number.
-					@Override
-					public void onClick(View view) {
-						String temp = input.getText().toString();
-						String phoneNum = PhoneNumberUtils.formatNumber(temp);
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count,
+					int after) {
+			}
 
-						// Create a block item in the database
-						ContentValues values = new ContentValues(2);
-						values.put(BlockItemTable.COLUMN_NUMBER,
-								PhoneNumberUtils.stripSeparators(phoneNum));
-						values.put(BlockItemTable.COLUMN_LAST_CONTACT, -1337);
-						loader.insert(BlockItemTable.CALLBLOCK_TABLE_NAME,
-								null, values);
+			@Override
+			public void afterTextChanged(Editable editable) {
+				if (editable.toString().length() == 0) {
+					alert.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(
+							false);
+				} else {
+					alert.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(
+							true);
+				}
 
-						alert.dismiss();
-
-					}
-				});
 			}
 		});
 		alert.show();
+		alert.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
 
 	}
 

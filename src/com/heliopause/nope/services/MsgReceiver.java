@@ -121,6 +121,7 @@ public class MsgReceiver extends BroadcastReceiver {
 			}
 			c.moveToNext();
 		}
+		c.close();
 		return count > 0;
 
 	}
@@ -149,6 +150,9 @@ public class MsgReceiver extends BroadcastReceiver {
 		if (DEBUG)
 			Log.d(TAG, "ROW ID: " + ID);
 
+		//Closing the cursor because we're done with it.
+		c.close();
+		
 		ContentValues cv = new ContentValues();
 		cv.put(BlockItemTable.COLUMN_LAST_CONTACT, System.currentTimeMillis());
 		MsgBlockFragment.loader.update(BlockItemTable.MSGBLOCK_TABLE_NAME, cv,
