@@ -18,7 +18,7 @@ import com.heliopause.nope.fragments.MsgBlockFragment;
 public class MsgReceiver extends BroadcastReceiver {
 
 	// Debug constants
-	private static final boolean DEBUG = true;
+	private static final boolean DEBUG = false;
 	private static final String TAG = MsgReceiver.class.getSimpleName();
 
 	// Database checking objects

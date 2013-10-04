@@ -26,7 +26,7 @@ import com.heliopause.nope.fragments.CallBlockFragment;
 public class CallReceiver extends BroadcastReceiver {
 
 	// Debug constants
-	private static final boolean DEBUG = true;
+	private static final boolean DEBUG = false;
 	private static final String TAG = CallReceiver.class.getSimpleName();
 
 	private SQLiteDatabase db;
