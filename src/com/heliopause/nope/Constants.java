@@ -14,4 +14,7 @@ public class Constants {
 	public static final String CALL_BLOCK_METHOD_THREE = "callBlockMethodThree";
 	public static final String CALL_BLOCK_METHOD_FOUR = "callBlockMethodFour";
 
+	// Constants for about fragment
+	public static final String OPEN_SOURCE_LICENSE_KEY = "licenses";
+
 }
