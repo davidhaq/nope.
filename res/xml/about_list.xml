@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:key="main_pref" >
+
+    <com.heliopause.nope.fragments.PreferenceHeader android:layout="@layout/fragment_about" />
+
+    <Preference
+        android:key="@string/license_key"
+        android:title="@string/license_title" >
+        <intent android:action="com.heliopause.nope.LICENSES" />
+    </Preference>
+    <Preference
+        android:defaultValue="Unknown version"
+        android:enabled="true"
+        android:key="nope_version_key"
+        android:summary="@string/nope_version_summary"
+        android:title="@string/nope_version_title" />
+
+</PreferenceScreen>

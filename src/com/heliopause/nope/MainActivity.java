@@ -4,8 +4,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -75,6 +77,7 @@ public class MainActivity extends SherlockFragmentActivity {
 		mDrawerList = (ListView) findViewById(R.id.menu_frame);
 		mDrawerList.setAdapter(new HomeMenuAdapter(this,
 				R.layout.side_menu_list_item, menuListArray));
+
 		mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
 
 		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -149,6 +152,17 @@ public class MainActivity extends SherlockFragmentActivity {
 	}
 
 	private void startServicesOnFirstOpen() {
+
+		try {
+			settings.edit()
+					.putString(
+							"nope_version_key",
+							getPackageManager().getPackageInfo(
+									getPackageName(), 0).versionName).commit();
+		} catch (NameNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		Intent callBlock = new Intent(this, CallBlockService.class);
 		Intent textBlock = new Intent(this, MsgBlockService.class);
 
@@ -395,6 +409,10 @@ public class MainActivity extends SherlockFragmentActivity {
 				ViewGroup paramViewGroup) {
 			TextView localTextView = (TextView) super.getView(paramInt,
 					paramView, paramViewGroup);
+
+			Typeface tf = Typeface.createFromAsset(getAssets(),
+					"fonts/robotoLight.ttf");
+			localTextView.setTypeface(tf);
 			this.mSelectedIndex = mMenuPosition;
 			if (paramInt == this.mSelectedIndex) {
 				localTextView.setBackgroundColor(this.mSelectedColor);

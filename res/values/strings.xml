@@ -28,7 +28,6 @@
     <string name="pref_blocking_method_two">callBlockMethodTwo</string>
     <string name="pref_blocking_method_three">callBlockMethodThree</string>
     <string name="pref_blocking_method_four">callBlockMethodFour</string>
-    
     <string name="pref_text_block_title">Text Block</string>
     <string name="pref_title_text_blocking_service">Text Blocking</string>
     <string name="pref_summary_text_blocking_service">Text blocking toggle switch. Turn on if you want to block texts from your list.</string>
@@ -37,5 +36,14 @@
     <string name="pref_title_spam_blocking_service">Spam Blocking</string>
     <string name="pref_summary_spam_blocking_service">Spam blocking toggle switch. Turn on if you want to block text message spam.</string>
     <string name="pref_summary_spam_block_consecutive">The number of consecutive texts from the same number you can receive before the blocker considers it spam, and starts blocking that number.</string>
+    
+    <!-- Strings for the about fragment -->    
+    <string name="about_title">nope.</string>
+    <string name="about_text">The goal of nope. was to create an application that is simple and easy to use, and above all &#8212; it works. When we set out to create nope., we wanted to encompass all of those aspects, while maintain a high level of design. We hope you like it.</string>
+    <string name="catergory_developer">DEVELOPER</string>
+    <string name="license_key">licenses</string>
+    <string name="license_title">Open source licenses</string>
+    <string name="nope_version_title">nope. version</string>
+    <string name="nope_version_summary">Unknown version</string>
 
 </resources>

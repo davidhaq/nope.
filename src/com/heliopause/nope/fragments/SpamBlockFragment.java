@@ -1,6 +1,7 @@
 package com.heliopause.nope.fragments;
 
 import android.content.SharedPreferences;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
@@ -43,6 +44,9 @@ public class SpamBlockFragment extends SherlockFragment {
 		View view = inflater.inflate(R.layout.fragment_spamblock, container,
 				false);
 		message = (TextView) view.findViewById(R.id.spamblock_text);
+		Typeface tf = Typeface.createFromAsset(getActivity().getAssets(),
+				"fonts/robotoLight.ttf");
+		message.setTypeface(tf);
 		return view;
 	}
 

@@ -9,6 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#ffffff"
+        android:padding="20dip"
         android:gravity="center"
         android:textColor="#767676"
         android:textSize="30sp" />

@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.database.Cursor;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
@@ -19,6 +20,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockListFragment;
@@ -95,6 +97,10 @@ public class CallBlockFragment extends SherlockListFragment implements
 			Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.fragment_call_blocklist,
 				container, false);
+		TextView emptyText = (TextView) view.findViewById(android.R.id.empty);
+		Typeface tf = Typeface.createFromAsset(getActivity().getAssets(),
+				"fonts/robotoLight.ttf");
+		emptyText.setTypeface(tf);
 		return view;
 	}
 
@@ -165,7 +171,6 @@ public class CallBlockFragment extends SherlockListFragment implements
 		final AutoCompleteTextView input = new AutoCompleteTextView(
 				getSherlockActivity());
 		input.setInputType(InputType.TYPE_CLASS_TEXT);
-
 
 		final AlertDialog alert = new AlertDialog.Builder(getSherlockActivity())
 				.setTitle("Add Call Block")
