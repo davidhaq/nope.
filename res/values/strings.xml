@@ -39,7 +39,7 @@
 
     <!-- Strings for the about fragment -->
     <string name="about_title">nope.</string>
-    <string name="about_text">The goal of nope. was to create an application that is simple and easy to use, and above all &#8212; it works. When we set out to create nope., we wanted to encompass all of those aspects, while maintain a high level of design. We hope you like it.</string>
+    <string name="about_text">The goal of nope. was to create a comprehensive blocking application that was well designed, simple, easy to use &#8212; with features that work. We hope you like it.</string>
     <string name="catergory_developer">DEVELOPER</string>
     <string name="rate_app_key">rateApp</string>
     <string name="rate_app_title">Rate app</string>

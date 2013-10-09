@@ -11,7 +11,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.media.AudioManager;
 import android.os.Build;
-import android.os.RemoteException;
 import android.preference.PreferenceManager;
 import android.telephony.TelephonyManager;
 import android.util.Log;
@@ -276,12 +275,7 @@ public class CallReceiver extends BroadcastReceiver {
 			Log.d(TAG, "Inside of offHookCallActionMethodOne");
 
 		getTeleService(context);
-		try {
-			telephonyService.endCall();
-		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		telephonyService.endCall();
 	}
 
 	// Method 2 (Send to voicemail)
@@ -291,12 +285,7 @@ public class CallReceiver extends BroadcastReceiver {
 		am.setRingerMode(AudioManager.RINGER_MODE_SILENT);
 		getTeleService(context);
 
-		try {
-			telephonyService.endCall();
-		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		telephonyService.endCall();
 
 	}
 
