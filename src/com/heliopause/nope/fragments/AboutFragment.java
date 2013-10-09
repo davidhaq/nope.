@@ -3,8 +3,10 @@ package com.heliopause.nope.fragments;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnDismissListener;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceClickListener;
@@ -17,8 +19,11 @@ import com.heliopause.nope.R;
 public class AboutFragment extends PreferenceFragment implements
 		OnSharedPreferenceChangeListener, OnPreferenceClickListener {
 
-	private Preference mVersionPref;
+	private Preference mRateAppPref;
+	private Preference mContactDevPref;
+	private Preference mReportBugPref;
 	private Preference mOpenSourcePref;
+	private Preference mVersionPref;
 
 	private AlertDialog mTextDlg;
 	private WebView mWebView;
@@ -42,10 +47,61 @@ public class AboutFragment extends PreferenceFragment implements
 			}
 		});
 
-		mVersionPref = (Preference) getPreferenceScreen().findPreference(
-				"nope_version_key");
+		// Setup pref items
+		mRateAppPref = (Preference) getPreferenceScreen().findPreference(
+				Constants.ABOUT_KEY_RATE_APP);
+		mRateAppPref
+				.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+
+					@Override
+					public boolean onPreferenceClick(Preference preference) {
+						final String appName = "com.heliopause.nope";
+						try {
+							startActivity(new Intent(Intent.ACTION_VIEW, Uri
+									.parse("market://details?id=" + appName)));
+						} catch (android.content.ActivityNotFoundException anfe) {
+							startActivity(new Intent(
+									Intent.ACTION_VIEW,
+									Uri.parse("http://play.google.com/store/apps/details?id="
+											+ appName)));
+						}
+						return true;
+					}
+
+				});
+		mContactDevPref = (Preference) getPreferenceScreen().findPreference(
+				Constants.ABOUT_KEY_CONTACT_DEV);
+		mContactDevPref
+				.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+
+					@Override
+					public boolean onPreferenceClick(Preference preference) {
+						Intent intent = new Intent(Intent.ACTION_VIEW);
+						Uri data = Uri.parse("mailto:"
+								+ getActivity().getString(
+										R.string.developer_email));
+						intent.setData(data);
+						startActivity(intent);
+						return true;
+					}
+				});
+		mReportBugPref = (Preference) getPreferenceScreen().findPreference(
+				Constants.ABOUT_KEY_REPORT_BUG);
+		mReportBugPref
+				.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+
+					@Override
+					public boolean onPreferenceClick(Preference preference) {
+
+						Intent intent = new Intent(Intent.ACTION_VIEW);
+						intent.setData(Uri.parse(getActivity().getString(
+								R.string.report_bug_url)));
+						startActivity(intent);
+						return true;
+					}
+				});
 		mOpenSourcePref = (Preference) getPreferenceScreen().findPreference(
-				Constants.OPEN_SOURCE_LICENSE_KEY);
+				Constants.ABOUT_KEY_OPEN_SOURCE);
 		mOpenSourcePref
 				.setOnPreferenceClickListener(new OnPreferenceClickListener() {
 
@@ -55,6 +111,8 @@ public class AboutFragment extends PreferenceFragment implements
 						return true;
 					}
 				});
+		mVersionPref = (Preference) getPreferenceScreen().findPreference(
+				Constants.ABOUT_KEY_VERSION);
 
 	}
 
