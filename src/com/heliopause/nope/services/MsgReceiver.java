@@ -43,63 +43,40 @@ public class MsgReceiver extends BroadcastReceiver {
 			// Grab the bundle from the incoming message
 			Bundle bundle = intent.getExtras();
 			SmsMessage[] msgs = null;
-
 			String address = "";
-			String body = "";
-			Configuration localConfiguration;
 
 			if (!intent.getExtras().isEmpty()) {
 				// ---retrieve the sender of the sms received.---
 				Object[] pdus = (Object[]) bundle.get("pdus");
 				msgs = new SmsMessage[pdus.length];
-				for (int i = 0; i < pdus.length; i++) {
+
+				for (int i = 0; i < msgs.length; i++) {
 					msgs[i] = SmsMessage.createFromPdu((byte[]) pdus[i]);
-
 					address = msgs[i].getOriginatingAddress();
-					body = msgs[i].getMessageBody();
-					localConfiguration = Configuration.getInstance(context);
+				}
 
-					if (DEBUG) {
-						Log.d(TAG, "Sender: " + address);
-					}
+				if (DEBUG) {
+					Log.d(TAG, "Sender: " + address);
+				}
 
-					if (isOnBlockList(address)) {
-						if (DEBUG)
-							Log.d(TAG, "Phone number is on block list!");
+				if (isOnBlockList(address)) {
+					if (DEBUG)
+						Log.d(TAG, "Phone number is on block list!");
 
-						updateItemTime(PhoneNumberUtils
-								.stripSeparators(address));
-						abortBroadcast();
-						return;
-					} else {
+					updateItemTime(PhoneNumberUtils.stripSeparators(address));
+					abortBroadcast();
+					return;
+				} else {
 
-						if (DEBUG)
-							Log.d(TAG, "Phone number not on block list!");
-						if (localConfiguration.mEnabled) {
-							if (DEBUG)
-								Log.d(TAG, "Configuration enabled");
-							if (localConfiguration.checkAndUpdateSMS(context,
-									address, body)) {
-								if (DEBUG)
-									Log.d(TAG, "aborting broadcast");
-								abortBroadcast();
-								return;
-							}
-						} else {
-							if (DEBUG)
-								Log.d(TAG, "Configuration disabled");
-							i++;
-							if (DEBUG)
-								Log.d(TAG, "i: " + i);
-							return;
-						}
-					}
+					if (DEBUG)
+						Log.d(TAG, "Phone number not on block list!");
 
+					return;
 				}
 
 			}
-		}
 
+		}
 	}
 
 	private boolean isOnBlockList(String incomingNum) {
@@ -150,9 +127,9 @@ public class MsgReceiver extends BroadcastReceiver {
 		if (DEBUG)
 			Log.d(TAG, "ROW ID: " + ID);
 
-		//Closing the cursor because we're done with it.
+		// Closing the cursor because we're done with it.
 		c.close();
-		
+
 		ContentValues cv = new ContentValues();
 		cv.put(BlockItemTable.COLUMN_LAST_CONTACT, System.currentTimeMillis());
 		MsgBlockFragment.loader.update(BlockItemTable.MSGBLOCK_TABLE_NAME, cv,

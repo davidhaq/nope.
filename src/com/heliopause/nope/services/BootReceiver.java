@@ -20,6 +20,7 @@ public class BootReceiver extends BroadcastReceiver {
 
 		Intent callBlock = new Intent(context, CallBlockService.class);
 		Intent textBlock = new Intent(context, MsgBlockService.class);
+		Intent spamBlock = new Intent(context, SpamBlockService.class);
 
 		// Check if Services are set to be enabled. If they are, start
 		// them. If they aren't, don't do anything.
@@ -35,6 +36,14 @@ public class BootReceiver extends BroadcastReceiver {
 
 			// start service
 			context.startService(callBlock);
+		} else {
+			// do nothing
+			return;
+		}
+		if (settings.getBoolean(Constants.SPAM_BLOCK_SERVICE_STATUS, true)) {
+
+			// start service
+			context.startService(spamBlock);
 		} else {
 			// do nothing
 			return;
