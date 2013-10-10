@@ -15,3 +15,9 @@ Features
 - Personal text blocklist
 - Smart text spam blocker automatically filters text spam
 - 100% Ad Free!
+
+Info
+------
+
+heliopausedev.com
+https://play.google.com/store/apps/details?id=com.heliopause.nope
