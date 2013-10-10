@@ -19,5 +19,5 @@ Features
 Info
 ------
 
-heliopausedev.com
+http://heliopausedev.com<br>
 https://play.google.com/store/apps/details?id=com.heliopause.nope
