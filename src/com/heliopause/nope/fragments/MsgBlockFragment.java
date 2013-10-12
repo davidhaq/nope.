@@ -28,6 +28,9 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.commonsware.cwac.loaderex.acl.SQLiteCursorLoader;
+import com.google.i18n.phonenumbers.NumberParseException;
+import com.google.i18n.phonenumbers.PhoneNumberUtil;
+import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
 import com.heliopause.nope.R;
 import com.heliopause.nope.database.BlockItem;
 import com.heliopause.nope.database.BlockItemTable;
@@ -173,9 +176,13 @@ public class MsgBlockFragment extends SherlockListFragment implements
 		input.setInputType(InputType.TYPE_CLASS_PHONE);
 
 		final AlertDialog alert = new AlertDialog.Builder(getSherlockActivity())
-				.setTitle("Add Text Block")
-				.setMessage("Please enter a phone number below").setView(input)
-				.setCancelable(true)
+				.setTitle(
+						getSherlockActivity().getResources().getString(
+								R.string.dialog_add_text_block_title))
+				.setMessage(
+						getSherlockActivity().getResources().getString(
+								R.string.dialog_add_block_message))
+				.setView(input).setCancelable(true)
 				.setNegativeButton("Cancel", new Dialog.OnClickListener() {
 
 					@Override
@@ -215,27 +222,42 @@ public class MsgBlockFragment extends SherlockListFragment implements
 		});
 		input.addTextChangedListener(new TextWatcher() {
 
+			private PhoneNumber number = null;
+			private String locale = getSherlockActivity().getResources()
+					.getConfiguration().locale.getCountry();
+			PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
+
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before,
 					int count) {
 
+				try {
+					number = phoneUtil.parse(s.toString(), locale);
+				} catch (NumberParseException e) {
+					// do nothing
+				}
 			}
 
 			@Override
 			public void beforeTextChanged(CharSequence s, int start, int count,
 					int after) {
+
 			}
 
 			@Override
 			public void afterTextChanged(Editable editable) {
-				if (editable.toString().length() == 0) {
-					alert.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(
-							false);
-				} else {
-					alert.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(
-							true);
-				}
 
+				if (number != null) {
+					if (!phoneUtil.isValidNumber(number)) {
+						alert.getButton(AlertDialog.BUTTON_POSITIVE)
+								.setEnabled(false);
+					} else {
+						if (DEBUG)
+							Log.d(TAG, "Valid number: " + number.toString());
+						alert.getButton(AlertDialog.BUTTON_POSITIVE)
+								.setEnabled(true);
+					}
+				}
 			}
 		});
 		alert.show();
@@ -246,8 +268,12 @@ public class MsgBlockFragment extends SherlockListFragment implements
 	protected void deleteItem(final int position) {
 
 		final AlertDialog alert = new AlertDialog.Builder(getSherlockActivity())
-				.setTitle("Delete?")
-				.setMessage("This block item will be deleted.")
+				.setTitle(
+						getSherlockActivity().getResources().getString(
+								R.string.dialog_delete_text_block_title))
+				.setMessage(
+						getSherlockActivity().getResources().getString(
+								R.string.dialog_delete_block_message))
 				.setCancelable(true)
 				.setNegativeButton("Cancel", new Dialog.OnClickListener() {
 
