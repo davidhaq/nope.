@@ -39,7 +39,7 @@ import com.heliopause.nope.services.CallBlockService;
 import com.heliopause.nope.services.MsgBlockService;
 import com.heliopause.nope.services.SpamBlockService;
 
-public class MainActivity extends SherlockFragmentActivity {
+public class ContainerActivity extends SherlockFragmentActivity {
 
 	private DrawerLayout mDrawerLayout;
 	private ListView mDrawerList;

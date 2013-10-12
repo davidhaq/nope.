@@ -55,15 +55,16 @@ public class AboutFragment extends PreferenceFragment implements
 
 					@Override
 					public boolean onPreferenceClick(Preference preference) {
-						final String appName = "com.heliopause.nope";
+
 						try {
 							startActivity(new Intent(Intent.ACTION_VIEW, Uri
-									.parse("market://details?id=" + appName)));
+									.parse("market://details?id="
+											+ getActivity().getPackageName())));
 						} catch (android.content.ActivityNotFoundException anfe) {
 							startActivity(new Intent(
 									Intent.ACTION_VIEW,
 									Uri.parse("http://play.google.com/store/apps/details?id="
-											+ appName)));
+											+ getActivity().getPackageName())));
 						}
 						return true;
 					}
