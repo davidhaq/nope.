@@ -17,6 +17,11 @@
     <string name="drawer_close">This button will closed the navigation drawer.</string>
     <string name="spam_block_on">You are currently being protected from text spam. To configure this feature, visit the Settings menu.</string>
     <string name="spam_block_off">Text spam blocking is currently turned off.</string>
+    
+    <!-- Strings for block fragments -->
+    <string name="dialog_add_call_block_title">Add Call Block</string>
+    <string name="dialog_add_text_block_title">Add Text Block</string>
+    <string name="dialog_add_block_message">Please enter a valid phone number below. This includes area codes.</string>
 
     <!-- Strings for the preferences fragment -->
     <string name="pref_call_block_title">Call Block</string>
