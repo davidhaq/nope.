@@ -45,7 +45,7 @@
     <string name="rate_app_title">Rate app</string>
     <string name="contact_dev_key">contactDev</string>
     <string name="contact_dev_title">Contact developer</string>
-    <string name="developer_email">nope@heliopausedev.com</string>
+    <string name="developer_email">justin@heliopausedev.com</string>
     <string name="report_bug_key">reportBug</string>
     <string name="report_bug_title">Report bug</string>
     <string name="report_bug_url">https://github.com/justinharrison/Nope/issues</string>
