@@ -170,7 +170,7 @@ public class CallBlockFragment extends SherlockListFragment implements
 
 		final AutoCompleteTextView input = new AutoCompleteTextView(
 				getSherlockActivity());
-		input.setInputType(InputType.TYPE_CLASS_TEXT);
+		input.setInputType(InputType.TYPE_CLASS_PHONE);
 
 		final AlertDialog alert = new AlertDialog.Builder(getSherlockActivity())
 				.setTitle("Add Call Block")
