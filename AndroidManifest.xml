@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.heliopause.nope"
-    android:versionCode="4"
-    android:versionName="v1.01.34" >
+    android:versionCode="5"
+    android:versionName="v1.01.44" >
 
     <uses-sdk
         android:minSdkVersion="7"
@@ -28,7 +28,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="com.heliopause.nope.CheckerActivity"
+            android:name="com.heliopause.nope.ContainerActivity"
             android:configChanges="orientation" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -36,7 +36,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.heliopause.nope.ContainerActivity" />
+        <activity android:name="com.heliopause.nope.CheckerActivity" />
 
         <receiver android:name="com.heliopause.nope.services.BootReceiver" >
             <intent-filter>
