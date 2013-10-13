@@ -37,10 +37,10 @@ public class BlockItemTable {
 
 	public static void onUpgrade(SQLiteDatabase db, int oldVersion,
 			int newVersion) {
-		Log.d(TAG, "Upgrading database from version " + oldVersion
-				+ " to version " + newVersion + ". All data will be deleted ");
-		db.execSQL("DROP TABLE IF EXISTS " + CALLBLOCK_TABLE_NAME);
-		db.execSQL("DROP TABLE IF EXISTS " + MSGBLOCK_TABLE_NAME);
+
+		// Where we will change the databases on upgrading to future versions if
+		// the databases change to preserve block data
+		
 		onCreate(db);
 	}
 
