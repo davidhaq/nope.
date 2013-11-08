@@ -1,12 +1,11 @@
-package com.android.internal.telephony; 
+package com.android.internal.telephony;
 
-public abstract interface ITelephony
-{
-  public abstract void answerRingingCall();
+public abstract interface ITelephony {
+    public abstract void answerRingingCall();
 
-  public abstract void cancelMissedCallsNotification();
+    public abstract void cancelMissedCallsNotification();
 
-  public abstract boolean endCall();
+    public abstract boolean endCall();
 
-  public abstract void silenceRinger();
+    public abstract void silenceRinger();
 }

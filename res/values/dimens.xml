@@ -8,7 +8,7 @@
     <dimen name="shadow_width">15dip</dimen>
     <dimen name="actionbar_home_width">120dip</dimen>
     <dimen name="side_panel_max_width">320.0dip</dimen>
-    
+
     <!-- Block Log -->
     <dimen name="block_log_call_action_size">32dip</dimen>
     <dimen name="block_log_call_action_width">48dip</dimen>
@@ -20,7 +20,7 @@
     <dimen name="block_log_list_contact_photo_size">64dip</dimen>
     <dimen name="block_detail_contact_name_margin">24dip</dimen>
     <dimen name="block_detail_button_spacing">2dip</dimen>
-    
+
     <!-- side menu dimensions -->
     <dimen name="side_panel_menu_item_min_height">64.0dip</dimen>
 

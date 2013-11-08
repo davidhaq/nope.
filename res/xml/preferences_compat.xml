@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <PreferenceCategory
         android:key="pref_key_call_block_settings"
-        android:title="@string/pref_call_block_title" >
+        android:title="@string/pref_call_block_title">
         <CheckBoxPreference
             android:defaultValue="true"
             android:key="pref_key_call_block_service_state"
@@ -21,7 +21,7 @@
     </PreferenceCategory>
     <PreferenceCategory
         android:key="pref_key_text_block_settings"
-        android:title="@string/pref_text_block_title" >
+        android:title="@string/pref_text_block_title">
         <CheckBoxPreference
             android:defaultValue="true"
             android:key="pref_key_text_block_service_state"
@@ -30,7 +30,7 @@
     </PreferenceCategory>
     <PreferenceCategory
         android:key="pref_key_spam_block_settings"
-        android:title="@string/pref_spam_block_title" >
+        android:title="@string/pref_spam_block_title">
         <CheckBoxPreference
             android:defaultValue="true"
             android:key="pref_key_spam_block_service_state"

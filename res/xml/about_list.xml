@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-    android:key="main_pref" >
+    android:key="main_pref">
 
     <com.heliopause.nope.fragments.PreferenceHeader
         android:layout="@layout/fragment_about"
@@ -8,20 +8,16 @@
 
     <Preference
         android:key="@string/rate_app_key"
-        android:title="@string/rate_app_title" >
-    </Preference>
+        android:title="@string/rate_app_title" />
     <Preference
         android:key="@string/contact_dev_key"
-        android:title="@string/contact_dev_title" >
-    </Preference>
+        android:title="@string/contact_dev_title" />
     <Preference
         android:key="@string/report_bug_key"
-        android:title="@string/report_bug_title" >
-    </Preference>
+        android:title="@string/report_bug_title" />
     <Preference
         android:key="@string/license_key"
-        android:title="@string/license_title" >
-    </Preference>
+        android:title="@string/license_title" />
     <Preference
         android:key="@string/version_key"
         android:title="@string/version_title" />

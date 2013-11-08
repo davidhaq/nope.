@@ -17,7 +17,7 @@
     <string name="drawer_close">This button will closed the navigation drawer.</string>
     <string name="spam_block_on">You are currently being protected from text spam. To configure this feature, visit the Settings menu.</string>
     <string name="spam_block_off">Text spam blocking is currently turned off.</string>
-    
+
     <!-- Strings for block fragments -->
     <string name="dialog_add_call_block_title">Add Call Block</string>
     <string name="dialog_add_text_block_title">Add Text Block</string>
@@ -61,7 +61,7 @@
     <string name="license_title">Open source licenses</string>
     <string name="version_key">version</string>
     <string name="version_title">nope. version</string>
-    
+
     <!-- Licensing strings -->
     <string name="license_dialog_message_not_licensed">This application is not licensed. Please purchase it from Google Play</string>
     <string name="license_dialog_title_not_licensed">Application Not Licensed</string>

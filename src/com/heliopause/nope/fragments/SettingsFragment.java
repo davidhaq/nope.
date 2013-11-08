@@ -14,69 +14,69 @@ import com.heliopause.nope.services.Configuration;
 import com.heliopause.nope.services.MsgBlockService;
 
 public class SettingsFragment extends PreferenceFragment implements
-		OnSharedPreferenceChangeListener {
+        OnSharedPreferenceChangeListener {
 
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
-		// Load the preferences from an XML resource
-		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
-			addPreferencesFromResource(R.xml.preferences_compat);
-		} else {
-			addPreferencesFromResource(R.xml.preferences);
-		}
+        // Load the preferences from an XML resource
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
+            addPreferencesFromResource(R.xml.preferences_compat);
+        } else {
+            addPreferencesFromResource(R.xml.preferences);
+        }
 
-	}
+    }
 
-	@Override
-	public void onResume() {
-		super.onResume();
-		getPreferenceManager().getSharedPreferences()
-				.registerOnSharedPreferenceChangeListener(this);
+    @Override
+    public void onResume() {
+        super.onResume();
+        getPreferenceManager().getSharedPreferences()
+                .registerOnSharedPreferenceChangeListener(this);
 
-	}
+    }
 
-	@Override
-	public void onPause() {
-		getPreferenceManager().getSharedPreferences()
-				.unregisterOnSharedPreferenceChangeListener(this);
-		super.onPause();
-	}
+    @Override
+    public void onPause() {
+        getPreferenceManager().getSharedPreferences()
+                .unregisterOnSharedPreferenceChangeListener(this);
+        super.onPause();
+    }
 
-	@Override
-	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
-			String key) {
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
+                                          String key) {
 
-		if (key.equals(Constants.CALL_BLOCK_SERVICE_STATUS)) {
-			if (sharedPreferences.getBoolean(
-					Constants.CALL_BLOCK_SERVICE_STATUS, false)) {
-				getActivity().startService(
-						new Intent(getActivity(), CallBlockService.class));
-			} else {
-				getActivity().stopService(
-						new Intent(getActivity(), CallBlockService.class));
-			}
-		}
-		if (key.equals(Constants.MSG_BLOCK_SERVICE_STATUS)) {
-			if (sharedPreferences.getBoolean(
-					Constants.MSG_BLOCK_SERVICE_STATUS, false)) {
-				getActivity().startService(
-						new Intent(getActivity(), MsgBlockService.class));
-			} else {
-				getActivity().stopService(
-						new Intent(getActivity(), MsgBlockService.class));
-			}
-		}
-		if (key.equals(Constants.SPAM_BLOCK_SERVICE_STATUS)) {
-			if (sharedPreferences.getBoolean(
-					Constants.SPAM_BLOCK_SERVICE_STATUS, false)) {
-				Configuration.instance = null;
-			} else {
-				Configuration.instance = null;
-			}
-		}
+        if (key.equals(Constants.CALL_BLOCK_SERVICE_STATUS)) {
+            if (sharedPreferences.getBoolean(
+                    Constants.CALL_BLOCK_SERVICE_STATUS, false)) {
+                getActivity().startService(
+                        new Intent(getActivity(), CallBlockService.class));
+            } else {
+                getActivity().stopService(
+                        new Intent(getActivity(), CallBlockService.class));
+            }
+        }
+        if (key.equals(Constants.MSG_BLOCK_SERVICE_STATUS)) {
+            if (sharedPreferences.getBoolean(
+                    Constants.MSG_BLOCK_SERVICE_STATUS, false)) {
+                getActivity().startService(
+                        new Intent(getActivity(), MsgBlockService.class));
+            } else {
+                getActivity().stopService(
+                        new Intent(getActivity(), MsgBlockService.class));
+            }
+        }
+        if (key.equals(Constants.SPAM_BLOCK_SERVICE_STATUS)) {
+            if (sharedPreferences.getBoolean(
+                    Constants.SPAM_BLOCK_SERVICE_STATUS, false)) {
+                Configuration.instance = null;
+            } else {
+                Configuration.instance = null;
+            }
+        }
 
-	}
+    }
 
 }

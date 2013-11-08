@@ -17,144 +17,139 @@ import com.heliopause.nope.Constants;
 import com.heliopause.nope.R;
 
 public class AboutFragment extends PreferenceFragment implements
-		OnSharedPreferenceChangeListener, OnPreferenceClickListener {
+        OnSharedPreferenceChangeListener, OnPreferenceClickListener {
 
-	private Preference mRateAppPref;
-	private Preference mContactDevPref;
-	private Preference mReportBugPref;
-	private Preference mOpenSourcePref;
-	private Preference mVersionPref;
+    private Preference mVersionPref;
 
-	private AlertDialog mTextDlg;
-	private WebView mWebView;
+    private AlertDialog mTextDlg;
 
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		addPreferencesFromResource(R.xml.about_list);
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        addPreferencesFromResource(R.xml.about_list);
 
-		mWebView = new WebView(getPreferenceScreen().getContext());
-		mWebView.loadUrl("file:///android_asset/licenses/licenses_html");
+        WebView mWebView = new WebView(getPreferenceScreen().getContext());
+        mWebView.loadUrl("file:///android_asset/licenses/licenses_html");
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-		builder.setCancelable(true).setView(mWebView)
-				.setTitle(R.string.license_title);
-		mTextDlg = builder.create();
-		mTextDlg.setOnDismissListener(new OnDismissListener() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setCancelable(true).setView(mWebView)
+                .setTitle(R.string.license_title);
+        mTextDlg = builder.create();
+        mTextDlg.setOnDismissListener(new OnDismissListener() {
 
-			public void onDismiss(DialogInterface dialog) {
-				dialog.dismiss();
-			}
-		});
+            public void onDismiss(DialogInterface dialog) {
+                dialog.dismiss();
+            }
+        });
 
-		// Setup pref items
-		mRateAppPref = (Preference) getPreferenceScreen().findPreference(
-				Constants.ABOUT_KEY_RATE_APP);
-		mRateAppPref
-				.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+        // Setup pref items
+        Preference mRateAppPref = getPreferenceScreen().findPreference(
+                Constants.ABOUT_KEY_RATE_APP);
+        mRateAppPref
+                .setOnPreferenceClickListener(new OnPreferenceClickListener() {
 
-					@Override
-					public boolean onPreferenceClick(Preference preference) {
+                    @Override
+                    public boolean onPreferenceClick(Preference preference) {
 
-						try {
-							startActivity(new Intent(Intent.ACTION_VIEW, Uri
-									.parse("market://details?id="
-											+ getActivity().getPackageName())));
-						} catch (android.content.ActivityNotFoundException anfe) {
-							startActivity(new Intent(
-									Intent.ACTION_VIEW,
-									Uri.parse("http://play.google.com/store/apps/details?id="
-											+ getActivity().getPackageName())));
-						}
-						return true;
-					}
+                        try {
+                            startActivity(new Intent(Intent.ACTION_VIEW, Uri
+                                    .parse("market://details?id="
+                                            + getActivity().getPackageName())));
+                        } catch (android.content.ActivityNotFoundException anfe) {
+                            startActivity(new Intent(
+                                    Intent.ACTION_VIEW,
+                                    Uri.parse("http://play.google.com/store/apps/details?id="
+                                            + getActivity().getPackageName())));
+                        }
+                        return true;
+                    }
 
-				});
-		mContactDevPref = (Preference) getPreferenceScreen().findPreference(
-				Constants.ABOUT_KEY_CONTACT_DEV);
-		mContactDevPref
-				.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+                });
+        Preference mContactDevPref = (Preference) getPreferenceScreen().findPreference(
+                Constants.ABOUT_KEY_CONTACT_DEV);
+        mContactDevPref
+                .setOnPreferenceClickListener(new OnPreferenceClickListener() {
 
-					@Override
-					public boolean onPreferenceClick(Preference preference) {
-						Intent intent = new Intent(Intent.ACTION_VIEW);
-						Uri data = Uri.parse("mailto:"
-								+ getActivity().getString(
-										R.string.developer_email));
-						intent.setData(data);
-						startActivity(intent);
-						return true;
-					}
-				});
-		mReportBugPref = (Preference) getPreferenceScreen().findPreference(
-				Constants.ABOUT_KEY_REPORT_BUG);
-		mReportBugPref
-				.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+                    @Override
+                    public boolean onPreferenceClick(Preference preference) {
+                        Intent intent = new Intent(Intent.ACTION_VIEW);
+                        Uri data = Uri.parse("mailto:"
+                                + getActivity().getString(
+                                R.string.developer_email));
+                        intent.setData(data);
+                        startActivity(intent);
+                        return true;
+                    }
+                });
+        Preference mReportBugPref = (Preference) getPreferenceScreen().findPreference(
+                Constants.ABOUT_KEY_REPORT_BUG);
+        mReportBugPref
+                .setOnPreferenceClickListener(new OnPreferenceClickListener() {
 
-					@Override
-					public boolean onPreferenceClick(Preference preference) {
+                    @Override
+                    public boolean onPreferenceClick(Preference preference) {
 
-						Intent intent = new Intent(Intent.ACTION_VIEW);
-						intent.setData(Uri.parse(getActivity().getString(
-								R.string.report_bug_url)));
-						startActivity(intent);
-						return true;
-					}
-				});
-		mOpenSourcePref = (Preference) getPreferenceScreen().findPreference(
-				Constants.ABOUT_KEY_OPEN_SOURCE);
-		mOpenSourcePref
-				.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+                        Intent intent = new Intent(Intent.ACTION_VIEW);
+                        intent.setData(Uri.parse(getActivity().getString(
+                                R.string.report_bug_url)));
+                        startActivity(intent);
+                        return true;
+                    }
+                });
+        Preference mOpenSourcePref = (Preference) getPreferenceScreen().findPreference(
+                Constants.ABOUT_KEY_OPEN_SOURCE);
+        mOpenSourcePref
+                .setOnPreferenceClickListener(new OnPreferenceClickListener() {
 
-					@Override
-					public boolean onPreferenceClick(Preference preference) {
-						mTextDlg.show();
-						return true;
-					}
-				});
-		mVersionPref = (Preference) getPreferenceScreen().findPreference(
-				Constants.ABOUT_KEY_VERSION);
+                    @Override
+                    public boolean onPreferenceClick(Preference preference) {
+                        mTextDlg.show();
+                        return true;
+                    }
+                });
+        mVersionPref = (Preference) getPreferenceScreen().findPreference(
+                Constants.ABOUT_KEY_VERSION);
 
-	}
+    }
 
-	@Override
-	public void onResume() {
-		super.onResume();
-		mVersionPref.setSummary(getPreferenceScreen().getSharedPreferences()
-				.getString("nope_version_key", "Unknown version"));
-		getPreferenceManager().getSharedPreferences()
-				.registerOnSharedPreferenceChangeListener(this);
+    @Override
+    public void onResume() {
+        super.onResume();
+        mVersionPref.setSummary(getPreferenceScreen().getSharedPreferences()
+                .getString("nope_version_key", "Unknown version"));
+        getPreferenceManager().getSharedPreferences()
+                .registerOnSharedPreferenceChangeListener(this);
 
-	}
+    }
 
-	@Override
-	public void onPause() {
-		getPreferenceManager().getSharedPreferences()
-				.unregisterOnSharedPreferenceChangeListener(this);
-		super.onPause();
-	}
+    @Override
+    public void onPause() {
+        getPreferenceManager().getSharedPreferences()
+                .unregisterOnSharedPreferenceChangeListener(this);
+        super.onPause();
+    }
 
-	@Override
-	public void onDestroy() {
-		if (mTextDlg != null && mTextDlg.isShowing()) {
-			mTextDlg.dismiss();
-		}
-		super.onDestroy();
-	}
+    @Override
+    public void onDestroy() {
+        if (mTextDlg != null && mTextDlg.isShowing()) {
+            mTextDlg.dismiss();
+        }
+        super.onDestroy();
+    }
 
-	@Override
-	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
-			String key) {
-		if (key.equals("nope_version_key")) {
-			mVersionPref.setSummary(sharedPreferences.getString(
-					"nope_version_key", "Unknown version"));
-		}
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
+                                          String key) {
+        if (key.equals("nope_version_key")) {
+            mVersionPref.setSummary(sharedPreferences.getString(
+                    "nope_version_key", "Unknown version"));
+        }
 
-	}
+    }
 
-	@Override
-	public boolean onPreferenceClick(Preference preference) {
-		// TODO Auto-generated method stub
-		return false;
-	}
+    @Override
+    public boolean onPreferenceClick(Preference preference) {
+        // TODO Auto-generated method stub
+        return false;
+    }
 }

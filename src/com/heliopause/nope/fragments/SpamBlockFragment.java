@@ -18,59 +18,50 @@ import com.heliopause.nope.R;
 
 public class SpamBlockFragment extends SherlockFragment {
 
-	private SharedPreferences prefs;
-	private TextView message;
+    private TextView message;
 
-	private Boolean toggleState = null;
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
 
-	@Override
-	public void onActivityCreated(Bundle savedInstanceState) {
-		super.onActivityCreated(savedInstanceState);
+        String[] menuListArray = getResources().getStringArray(
+                R.array.menu_list);
+        ActionBar actionBar = getSherlockActivity().getSupportActionBar();
+        actionBar.setTitle(menuListArray[0]);
+        actionBar.setDisplayShowCustomEnabled(true);
+        actionBar.show();
 
-		String[] menuListArray = getResources().getStringArray(
-				R.array.menu_list);
-		ActionBar actionBar = getSherlockActivity().getSupportActionBar();
-		actionBar.setTitle(menuListArray[0]);
-		actionBar.setDisplayShowCustomEnabled(true);
-		actionBar.show();
+        setHasOptionsMenu(true);
 
-		setHasOptionsMenu(true);
+    }
 
-	}
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_spamblock, container,
+                false);
+        message = (TextView) view.findViewById(R.id.spamblock_text);
+        Typeface tf = Typeface.createFromAsset(getActivity().getAssets(),
+                "fonts/robotoLight.ttf");
+        message.setTypeface(tf);
+        return view;
+    }
 
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {
-		View view = inflater.inflate(R.layout.fragment_spamblock, container,
-				false);
-		message = (TextView) view.findViewById(R.id.spamblock_text);
-		Typeface tf = Typeface.createFromAsset(getActivity().getAssets(),
-				"fonts/robotoLight.ttf");
-		message.setTypeface(tf);
-		return view;
-	}
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 
-	@Override
-	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        SharedPreferences prefs = PreferenceManager
+                .getDefaultSharedPreferences(getSherlockActivity());
+        Boolean toggleState = prefs.getBoolean(Constants.SPAM_BLOCK_SERVICE_STATUS,
+                false);
+        if (toggleState) {
+            message.setText(getSherlockActivity().getResources().getString(
+                    R.string.spam_block_on));
+        } else {
+            message.setText(getSherlockActivity().getResources().getString(
+                    R.string.spam_block_off));
+        }
 
-		prefs = PreferenceManager
-				.getDefaultSharedPreferences(getSherlockActivity());
-		toggleState = prefs.getBoolean(Constants.SPAM_BLOCK_SERVICE_STATUS,
-				false);
-		if (toggleState) {
-			message.setText(getSherlockActivity().getResources().getString(
-					R.string.spam_block_on));
-		} else {
-			message.setText(getSherlockActivity().getResources().getString(
-					R.string.spam_block_off));
-		}
-
-	}
-
-	@Override
-	public void onSaveInstanceState(Bundle outState) {
-		super.onSaveInstanceState(outState);
-
-	}
+    }
 
 }
