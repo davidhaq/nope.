@@ -1,26 +1,36 @@
-bin/
-gen/
-/proguard-project.txt
-/assets
-/.classpath
-/.settings
-/project.properties
-/.project
+# Eclipse
+.project
+.classpath
+.settings
+.checkstyle
+
+# IntelliJ IDEA
+.idea
+*.iml
+*.ipr
+*.iws
+classes
+
+# Gradle
+.gradle
+build
+gradlew
+gradlew.bat
+
+# Ant
+bin
+gen
+build.xml
+ant.properties
+local.properties
+proguard.cfg
+proguard-project.txt
+
+# Other
+.DS_Store
+tmp
 *.apk
 *.ap_
 *.dex
 *.class
-
-.idea/
-.gradle
-/*/local.properties
-/*/out
-/*/*/build
-/*/*/production
-*.iml
-*.iws
-*.ipr
-*~
 *.swp
-
-build/
