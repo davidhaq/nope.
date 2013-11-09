@@ -1,1 +1,1 @@
-include ":nope.", "libs:android-support-v4-preferencefragment", "libs:lvl"
+include ":nope.", "libs:android-support-v4-preferencefragment"

@@ -15,7 +15,6 @@
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
     <uses-permission android:name="android.permission.RECEIVE_SMS" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <uses-permission android:name="com.android.vending.CHECK_LICENSE" />
 
     <uses-feature
         android:name="android.hardware.telephony"
@@ -28,18 +27,17 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
         <activity
-            android:name="com.heliopause.nope.CheckerActivity"
+            android:name="com.heliopause.nope.ContainerActivity"
             android:configChanges="orientation">
-        <intent-filter>
+            <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.heliopause.nope.ContainerActivity" />
 
         <receiver android:name="com.heliopause.nope.services.BootReceiver">
-        <intent-filter>
+            <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>

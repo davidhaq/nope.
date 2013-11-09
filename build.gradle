@@ -18,7 +18,6 @@ dependencies {
     compile files('libs/libphonenumber-5.8.jar')
     compile files('libs/CWAC-LoaderEx.jar')
     compile project(":libs:android-support-v4-preferencefragment")
-    compile project(":libs:lvl")
 }
 
 android {

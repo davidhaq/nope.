@@ -41,18 +41,16 @@ import com.heliopause.nope.services.SpamBlockService;
 
 public class ContainerActivity extends SherlockFragmentActivity {
 
+    private static final String OPENED_KEY = "OPENED_KEY";
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
     private ActionBarDrawerToggle mDrawerToggle;
     private String[] menuListArray;
     private CharSequence mTitle;
     private Integer mMenuPosition;
-
-    private static final String OPENED_KEY = "OPENED_KEY";
     private SharedPreferences prefs = null;
     private SharedPreferences settings = null;
     private Boolean opened = null;
-
     private Fragment fragment;
 
     @Override
@@ -224,16 +222,6 @@ public class ContainerActivity extends SherlockFragmentActivity {
         return super.onPrepareOptionsMenu(menu);
     }
 
-    private class DrawerItemClickListener implements
-            ListView.OnItemClickListener {
-        @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position,
-                                long id) {
-            view.setSelected(true);
-            selectItem(position);
-        }
-    }
-
     // Swaps fragments that are shown in the main view
     private void selectItem(int position) {
 
@@ -395,6 +383,16 @@ public class ContainerActivity extends SherlockFragmentActivity {
         }
         return m;
 
+    }
+
+    private class DrawerItemClickListener implements
+            ListView.OnItemClickListener {
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position,
+                                long id) {
+            view.setSelected(true);
+            selectItem(position);
+        }
     }
 
     @SuppressWarnings("SameReturnValue")
