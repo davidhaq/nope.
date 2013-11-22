@@ -7,6 +7,7 @@ import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.graphics.Point;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
@@ -30,6 +31,8 @@ import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
+import com.espian.showcaseview.ShowcaseView;
+import com.espian.showcaseview.targets.ViewTarget;
 import com.heliopause.nope.fragments.AboutFragment;
 import com.heliopause.nope.fragments.CallBlockFragment;
 import com.heliopause.nope.fragments.MsgBlockFragment;
@@ -48,7 +51,6 @@ public class ContainerActivity extends SherlockFragmentActivity {
     private String[] menuListArray;
     private CharSequence mTitle;
     private Integer mMenuPosition;
-    private SharedPreferences prefs = null;
     private SharedPreferences settings = null;
     private Boolean opened = null;
     private Fragment fragment;
@@ -67,6 +69,9 @@ public class ContainerActivity extends SherlockFragmentActivity {
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         setSupportProgressBarIndeterminateVisibility(false);
+
+        // get Shared Prefs
+        settings = PreferenceManager.getDefaultSharedPreferences(this);
 
         // Make sure we get the array of menu item strings.
         menuListArray = getResources().getStringArray(R.array.menu_list);
@@ -91,8 +96,8 @@ public class ContainerActivity extends SherlockFragmentActivity {
                 supportInvalidateOptionsMenu();
                 if (opened != null && opened != null && !opened) {
                     opened = true;
-                    if (prefs != null) {
-                        Editor editor = prefs.edit();
+                    if (settings != null) {
+                        Editor editor = settings.edit();
                         editor.putBoolean(Constants.SPAM_BLOCK_SERVICE_STATUS,
                                 true);
                         editor.putBoolean(OPENED_KEY, true);
@@ -104,16 +109,13 @@ public class ContainerActivity extends SherlockFragmentActivity {
             public void onDrawerOpened(View drawerView) {
                 mTitle = "nope.";
                 getSupportActionBar().setTitle(mTitle);
-                supportInvalidateOptionsMenu(); // creates call to
-                // onPrepareOptionsMenu()
+                supportInvalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
             }
 
             @Override
             public void onDrawerSlide(View drawerView, float offset) {
                 super.onDrawerSlide(drawerView, offset);
-                // getActionBar().setTitle(mTitle);
-                supportInvalidateOptionsMenu(); // creates call to
-                // onPrepareOptionsMenu()
+                supportInvalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
             }
         };
 
@@ -127,16 +129,15 @@ public class ContainerActivity extends SherlockFragmentActivity {
             selectItem(0);
         }
 
-        settings = PreferenceManager.getDefaultSharedPreferences(this);
         new Thread(new Runnable() {
             @Override
             public void run() {
 
-                prefs = getPreferences(MODE_PRIVATE);
-                opened = prefs.getBoolean(OPENED_KEY, false);
+                settings = getPreferences(MODE_PRIVATE);
+                opened = settings.getBoolean(OPENED_KEY, false);
                 if (opened != null && !opened) {
-
                     mDrawerLayout.openDrawer(mDrawerList);
+                    showTutorial();
                 }
             }
         }).start();
@@ -149,6 +150,29 @@ public class ContainerActivity extends SherlockFragmentActivity {
         startServicesOnFirstOpen();
     }
 
+    private void showTutorial() {
+        ShowcaseView.ConfigOptions config = new ShowcaseView.ConfigOptions();
+        config.block = false;
+        config.shotType = ShowcaseView.TYPE_ONE_SHOT;
+        config.hideOnClickOutside = false;
+        config.fadeInDuration = 700;
+        config.fadeOutDuration = 700;
+
+        final ShowcaseView showcaseView = ShowcaseView.insertShowcaseView(new ViewTarget(findViewById(android.R.id.home)), this, R.string.welcome_title, R.string.welcome_text, config);
+        showcaseView.setText(R.string.welcome_title, R.string.welcome_text);
+        showcaseView.show();
+
+        showcaseView.animateGesture(50, 300, 400, 300);
+
+        showcaseView.overrideButtonClick(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mDrawerLayout.closeDrawer(mDrawerList);
+                showcaseView.hide();
+            }
+        });
+    }
+
     private void startServicesOnFirstOpen() {
 
         try {
@@ -158,7 +182,6 @@ public class ContainerActivity extends SherlockFragmentActivity {
                             getPackageManager().getPackageInfo(
                                     getPackageName(), 0).versionName).commit();
         } catch (NameNotFoundException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         Intent callBlock = new Intent(this, CallBlockService.class);
@@ -227,121 +250,58 @@ public class ContainerActivity extends SherlockFragmentActivity {
 
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction ft = fragmentManager.beginTransaction();
-        String tag = null;
-        boolean firstload;
-        if (firstload = true) {
-            // Create a new fragment and specify
+
+        if (mMenuPosition == position) {
+
+            // update the title, and close the drawer
+            mDrawerList.setItemChecked(position, true);
+            setTitle(menuListArray[position]);
+            mDrawerLayout.closeDrawer(mDrawerList);
+
+        } else {
+            // Set the fragment by ID and specify
             // the fragment to show based on position
             switch (position) {
                 case 0:
                     fragment = new CallBlockFragment();
-                    tag = "cbFrag";
                     mMenuPosition = 0;
                     ((HomeMenuAdapter) mDrawerList.getAdapter())
                             .onItemSelected(mMenuPosition);
                     break;
                 case 1:
                     fragment = new MsgBlockFragment();
-                    tag = "mbFrag";
                     mMenuPosition = 1;
                     ((HomeMenuAdapter) mDrawerList.getAdapter())
                             .onItemSelected(mMenuPosition);
                     break;
                 case 2:
                     fragment = new SpamBlockFragment();
-                    tag = "sbFrag";
                     mMenuPosition = 2;
                     ((HomeMenuAdapter) mDrawerList.getAdapter())
                             .onItemSelected(mMenuPosition);
                     break;
                 case 3:
                     fragment = new SettingsFragment();
-                    tag = "stFrag";
                     mMenuPosition = 3;
                     ((HomeMenuAdapter) mDrawerList.getAdapter())
                             .onItemSelected(mMenuPosition);
                     break;
                 case 4:
                     fragment = new AboutFragment();
-                    tag = "abFrag";
                     mMenuPosition = 4;
                     ((HomeMenuAdapter) mDrawerList.getAdapter())
                             .onItemSelected(mMenuPosition);
                     break;
             }
 
-            // Highlight the selected item, update the title, and close the
-            // drawer
-            // mDrawerList.setItemChecked(position, true);
+            // update the title, and close the drawer
             setTitle(menuListArray[position]);
             mDrawerLayout.closeDrawer(mDrawerList);
 
-            // Insert the fragment by replacing any existing fragment
-            ft.replace(R.id.content_frame, fragment, tag);
+            // attach to the fragment and commit
+            ft.replace(R.id.content_frame, fragment);
             ft.commit();
-        } else {
-
-            if (mMenuPosition == position) {
-
-                // Highlight the selected item, update the title, and close the
-                // drawer
-                mDrawerList.setItemChecked(position, true);
-                setTitle(menuListArray[position]);
-                mDrawerLayout.closeDrawer(mDrawerList);
-
-            } else {
-                // Set the fragment by ID and specify
-                // the fragment to show based on position
-                switch (position) {
-                    case 0:
-                        fragment = getSupportFragmentManager()
-                                .findFragmentByTag("cbFrag");
-                        mMenuPosition = 0;
-                        ((HomeMenuAdapter) mDrawerList.getAdapter())
-                                .onItemSelected(mMenuPosition);
-                        break;
-                    case 1:
-                        fragment = getSupportFragmentManager()
-                                .findFragmentByTag("mbFrag");
-                        mMenuPosition = 1;
-                        ((HomeMenuAdapter) mDrawerList.getAdapter())
-                                .onItemSelected(mMenuPosition);
-                        break;
-                    case 2:
-                        fragment = getSupportFragmentManager()
-                                .findFragmentByTag("sbFrag");
-                        mMenuPosition = 2;
-                        ((HomeMenuAdapter) mDrawerList.getAdapter())
-                                .onItemSelected(mMenuPosition);
-                        break;
-                    case 3:
-                        fragment = getSupportFragmentManager()
-                                .findFragmentByTag("stFrag");
-                        mMenuPosition = 3;
-                        ((HomeMenuAdapter) mDrawerList.getAdapter())
-                                .onItemSelected(mMenuPosition);
-                        break;
-                    case 4:
-                        fragment = getSupportFragmentManager()
-                                .findFragmentByTag("abFrag");
-                        mMenuPosition = 4;
-                        ((HomeMenuAdapter) mDrawerList.getAdapter())
-                                .onItemSelected(mMenuPosition);
-                        break;
-                }
-
-                // Highlight the selected item, update the title, and close the
-                // drawer
-                // mDrawerList.setItemChecked(position, true);
-                setTitle(menuListArray[position]);
-                mDrawerLayout.closeDrawer(mDrawerList);
-
-                // attach to the fragment and commit
-                ft.replace(R.id.content_frame, fragment);
-                ft.commit();
-            }
         }
-
     }
 
     @Override
@@ -364,13 +324,21 @@ public class ContainerActivity extends SherlockFragmentActivity {
         mDrawerToggle.onConfigurationChanged(newConfig);
     }
 
-    @SuppressWarnings("deprecation")
     protected int calculateSideDrawerWidth() {
 
         Resources localResources = getResources();
         Display display = getWindowManager().getDefaultDisplay();
 
-        int i = display.getWidth();
+        int i;
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
+            //noinspection deprecation
+            i = display.getWidth();
+        } else {
+            Point size = new Point();
+            display.getSize(size);
+            i = size.x;
+        }
+
         int j = localResources
                 .getDimensionPixelSize(R.dimen.side_panel_max_width);
         int k = localResources.getConfiguration().orientation;
