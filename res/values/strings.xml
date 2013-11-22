@@ -62,8 +62,9 @@
     <string name="version_key">version</string>
     <string name="version_title">nope. version</string>
 
-    <!-- Licensing strings -->
-    <string name="license_dialog_message_not_licensed">This application is not licensed. Please purchase it from Google Play</string>
-    <string name="license_dialog_title_not_licensed">Application Not Licensed</string>
+    <!-- showcase strings -->
+    <string name="welcome_title">start here.</string>
+    <string name="welcome_text">Use your finger to swipe from the left edge of your phone, or press the icon in your action bar to access the navigation menu.</string>
+
 
 </resources>

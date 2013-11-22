@@ -1,14 +1,12 @@
 <resources>
 
-    <!--
-        Base application theme for API 14+. This theme completely replaces
-        AppBaseTheme from BOTH res/values/styles.xml and
-        res/values-v11/styles.xml on API 14+ devices.
-    -->
     <style name="AppBaseTheme" parent="android:Theme.Holo.Light.DarkActionBar">
+        <item name="showcaseViewStyle">@style/CustomShowcaseTheme</item>
+    </style>
 
-        <!-- API 14 theme customizations can go here. -->
-
+    <style name="CustomShowcaseTheme" parent="ShowcaseView">
+        <item name="sv_backgroundColor">#d9333434</item>
+        <item name="sv_buttonText">Close</item>
     </style>
 
 </resources>

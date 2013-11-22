@@ -44,7 +44,6 @@ import com.heliopause.nope.services.SpamBlockService;
 
 public class ContainerActivity extends SherlockFragmentActivity {
 
-    private static final String OPENED_KEY = "OPENED_KEY";
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
     private ActionBarDrawerToggle mDrawerToggle;
@@ -100,7 +99,7 @@ public class ContainerActivity extends SherlockFragmentActivity {
                         Editor editor = settings.edit();
                         editor.putBoolean(Constants.SPAM_BLOCK_SERVICE_STATUS,
                                 true);
-                        editor.putBoolean(OPENED_KEY, true);
+                        editor.putBoolean("opened", true);
                         editor.commit();
                     }
                 }
@@ -125,19 +124,20 @@ public class ContainerActivity extends SherlockFragmentActivity {
             mMenuPosition = savedInstanceState.getInt("position");
 
         } else {
-            mMenuPosition = 0;
+            mMenuPosition = -1;
             selectItem(0);
+        }
+
+        if (!settings.getBoolean("opened", false)) {
+            showTutorial();
         }
 
         new Thread(new Runnable() {
             @Override
             public void run() {
-
-                settings = getPreferences(MODE_PRIVATE);
-                opened = settings.getBoolean(OPENED_KEY, false);
+                opened = settings.getBoolean("opened", false);
                 if (opened != null && !opened) {
                     mDrawerLayout.openDrawer(mDrawerList);
-                    showTutorial();
                 }
             }
         }).start();
